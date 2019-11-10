@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="cache-control" content="no-cache">
+<meta name="description" content="Backgammon Board App">
+<meta name="author" content="(C)hinacoppy 2019">
+<!-- link rel="stylesheet" href="css/bgboardapp.css" -->
+<link rel="stylesheet" href="css/font-awesome-animation.min.css">
+<title>bgboard</title>
+<style>
+/* document outline ----------------------------------------- */
+*{
+  user-select:none;
+}
+html{
+  height: 100%;
+}
+body{
+  margin:0;
+  padding:0;
+  min-height:100%;
+  height:100%;
+  font-family:'Arial', 'Meiryo UI';
+}
+/* Grid Layout settings ------------------------------------- */
+/* 以下すべて相対サイズにし、レスポンシブ対応可能にしておく */
+
+.container{
+/*  margin: 2vw 2vh;*/
+/*  background-image: url("board.png");  /* 画像ファイルの指定 */
+/*  background-position: center center;  /* 画像を常に天地左右の中央に配置 */
+  background-repeat: no-repeat;  /* 画像をタイル状に繰り返し表示しない */
+/*  background-attachment: fixed;  /* コンテンツの高さが画像の高さより大きい時、動かないように固定 */
+  background-size: 100vw 100vh;  /* 表示するコンテナの大きさに基づいて、背景画像を調整 */
+  background-color: #cfc;  /* 背景画像が読み込まれる前に表示される背景のカラー */
+
+
+  display: grid; /* Grid Layout でコンテンツを配置 */
+  grid-template-columns: 40vw 40vw 5vw 15vw;
+  grid-template-rows: 30vh 39vh 30vh;
+  grid-template-areas:
+     'area1 area2 boff1 player2'
+     'centr_l centr_r none nav'
+     'area4 area3 boff2 player1';
+  justify-items: center; /* 横方向は中央に */
+  align-items: center;
+}
+#board{
+  position: absolute;
+  width: 90vw;
+  height: 100vh;
+  grid-row: 1 / 4;
+  grid-column: 1 / 4;
+}
+#center_left{
+  position:relative;
+  grid-area: centr_l;
+/*  text-align: center;*/
+  background-color: #efe;
+  opacity: 0.55;
+  width: 100%;
+  height: 100%;
+}
+#center_right{
+  position:relative;
+  grid-area: centr_r;
+/*  text-align: center;*/
+  background-color: #ccf;
+  opacity: 0.55;
+  width: 100%;
+  height: 100%;
+}
+#player1{
+  grid-area: player1;
+  justify-self: start;
+}
+#player2{
+  grid-area: player2;
+  justify-self: center;
+  align-self: center;
+  background-color: #ccf;
+  opacity: 0.55;
+}
+#nav{
+  grid-area: nav;
+  justify-self: start;
+}
+.playerinfo{
+  transform: rotateZ(-90deg);
+  text-align: center;
+/*    display: flex;
+/*    justify-content: center;*/
+/*    align-items: center;*/
+}
+.nav{
+  transform: rotateZ(-90deg);
+  text-align: center;
+/*    display: flex;
+/*    justify-content: center;*/
+    align-items: center;
+  background-color: #fcc;
+  opacity: 0.55;
+
+}
+#settingbtn{
+/*  grid-area: settingbtn;
+/*  background-color: pink;*/
+/*  color: black;*/
+/*  width: 4vh;*/
+/*  height: 4vw;*/
+/*  line-height: 4vw;*/
+/*  text-align: center;*/
+/*  font-size:2vw;*/
+}
+.score{
+  display: inline-block;
+  background-color: gray;
+  color: white;
+  width: 20vh;
+  height: 5vw;
+  line-height: 5vw;
+  text-align: center;
+  font-size:5vw;
+}
+.pip{
+  display: inline-block;
+  background-color: #4aa;
+  color: white;
+  width: 10vh;
+  height: 3vw;
+  line-height: 3vw;
+  text-align: center;
+  font-size:1vw;
+}
+
+
+
+.cubeclass{
+  position:absolute;
+/*  width:10vw;
+  height: 10vw;*/
+/*  background-color:#ddf;*/
+  color: 30vw;#6fe;
+  font-size:5vw;
+}
+.dice{
+  position:absolute;
+/*  width:10vw;
+  height: 10vw;*/
+  font-size:5vw;
+}
+.cubecenter{
+  transform: rotateZ(-90deg);
+}
+.turn1{
+  transform: rotateZ(0deg);
+}
+.turn2{
+  transform: rotateZ(180deg);
+}
+.col_player1{
+  color: #9ce;
+}
+.col_player2{
+  color: #456;
+}
+.chequer{
+  position:absolute;
+/*  width:10vw;
+  height: 10vw;*/
+  font-size:5vw;
+}
+.oparationbtn{
+/*  display: inline-block;*/
+  background-color:#adf;
+  border:3px solid #29f;
+  color:#29f;
+  border-radius:20px;
+  padding:2vh 2vw;
+  font-size:2vw;
+}
+.area{
+  position:absolute;
+/*  display:none;*/
+}
+/* settingwindow decorations ------------------------------------- */
+.settings{
+  position: absolute;
+  display: none;
+  z-index: 5;
+  background-color: #dff;
+  border: 3px solid #00f;
+  padding: 2vh 4vw;
+  font-size: 1.8vw;
+}
+.popuptitle{
+  font-size: 2.2vw;
+  color: #fff;
+  background-color: #46f;
+  padding: 2vh 2vw;
+  margin-bottom: 2vh;
+}
+/* toggle switch ----------------------------------------- */
+input {
+/*  position: absolute;
+  left: -9999px;*/
+display: none;
+}
+
+.togglelabel {
+  display: block;
+width: 300px;
+  position: relative;
+/*  margin: 20px;*/
+  padding: 15px 30px 15px 62px;
+  border: 3px solid #fff;
+  border-radius: 100px;
+  color: #fff;
+  background-color: #999;  /*#6a8494;*/
+/*  box-shadow: 0 0 20px rgba(0, 0, 0, .2);*/
+  white-space: nowrap;
+/*  cursor: pointer;
+  user-select: none;*/
+  transition: background-color .2s, box-shadow .2s;
+}
+
+.togglelabel::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 10px;
+  width: 32px;
+  border: 3px solid #fff;
+  border-radius: 100px;
+  transition: background-color .2s;
+}
+
+.switch:checked + label {
+  background-color: #29f; /*#ab576c;*/
+}
+
+.switch:checked + label::before {
+  background-color: #fff;
+}
+</style>
+</head>
+<body class="container">
+<section id="board" class="boardarea">
+<!-- Items insert from showBoard() method in BgBoard_class -->
+</section>
+<div id="center_left">
+</div>
+<div id="center_right">
+</div>
+
+
+<div id="player1" class="playerinfo">
+<div id="score1" class="score">3</div>
+<div id="pip1" class="pip">150</div>
+<div id="clock1" class="clock">10:00</div>
+</div>
+<div id="player2" class="playerinfo">
+<div id="score2" class="score">0</div>
+<div id="pip2" class="pip">137</div>
+<div id="clock2" class="clock">10:00</div>
+</div>
+<nav id="nav" class="nav">
+<div id="matchinfo" class="matchinfo score">5</div>
+<button id="settingbtn" class="oparationbtn"><i class="fas fa-bars"></i> Settings</button>
+</nav>
+
+<section id="panelholder" style="display:none">
+<button id="rollbtn" class="oparationbtn area"><i class="fas fa-dice"></i> Roll</button>
+<span id="doubleresign" class="area">
+<button id="doublebtn" class="oparationbtn"><i class="fas fa-dice-d6"></i> Double</button> &emsp;
+<button id="resignbtn" class="oparationbtn"><i class="fas fa-flag" style="color:white"></i> Resign</button>
+</span>
+
+<button id="takebtn" class="oparationbtn area"><i class="fas fa-thumbs-up"></i> Take</button>
+<button id="dropbtn" class="oparationbtn area"><i class="fas fa-thumbs-down"></i> Pass</button>
+
+<div id="doneundo" class="area">
+<button id="donebtn" class="oparationbtn"><i class="fas fa-check-circle"></i> Done</button> &emsp;
+<button id="undobtn" class="oparationbtn"><i class="fas fa-undo"></i> Undo</button>
+</div>
+<button id="openingroll" class="oparationbtn area"><i class="fas fa-dice"></i> Opening Roll</button>
+
+<div id="gameend" class="area settings">
+<p class="mes1">You WIN and MATCH</p>
+<p class="mes2">Get <span>2</span>pt</p>
+<p class="mes3"><span>7</span> - <span>5</span> &emsp; (<span>9</span>pt)</p>
+<button id="gameendnextbtn" class="oparationbtn"><i class="fas fa-arrow-alt-circle-right"></i> Next</button>
+<button id="gameendokbtn" class="oparationbtn"><i class="fas fa-check-circle"></i> OK</button>
+</div>
+</section>
+
+<aside id="settings" class="settings" style="display:none">
+<h2>### Backgammon Score board App Settings ###</h2>
+<p>
+Match length:
+<select id="matchlen" name="matchlen">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="5" selected>5</option>
+<option value="7">7</option>
+<option value="9">9</option>
+<option value="11">11</option>
+<option value="13">13</option>
+<option value="15">15</option>
+<option value="17">17</option>
+<option value="19">19</option>
+<option value="21">21</option>
+<option value="23">23</option>
+<option value="25">25</option>
+</select>
+(0 = Unlimited)
+</p>
+<p>
+<input type="checkbox" id="showpip" name="showpip" class="switch" checked>
+<label for="showpip" class="togglelabel">Show pip</label>
+</p>
+<p>
+<input type="checkbox" id="useclock" name="useclock" class="switch">
+<label for="useclock" class="togglelabel">Use Clock</label>
+</p>
+
+<aside class="aside">
+<textarea id="kifusource" cols="70" rows="20"></textarea>
+</aside>
+
+<br><br>
+<button id="resetscorebtn" class="oparationbtn"><i class="fas fa-eraser"></i> Reset Score</button> &emsp;&emsp;&emsp;&emsp;
+<button id="newgamebtn" class="oparationbtn"><i class="fas fa-check"></i> New Game</button> &emsp;&emsp;&emsp;&emsp;
+<button id="cancelbtn" class="oparationbtn"><i class="fas fa-times"></i> Cancel</button>
+</aside>
+
+
+<script src="js/fontawesome-all.min.js" defer></script>
+<script src="js/jquery-3.4.1.min.js"></script>
+<script src="js/jquery-ui.min.js"></script>
+<script src="js/jquery.ui.touch-punch.min.js"></script>
+<script src="js/BgBoard_class3.js"></script>
+<script src="js/BgXgid_class.js"></script>
+<script src="js/BgUtil_class.js"></script>
+<script>
+class BgGame {
+  constructor() {
+    this.player = false; //true=player1, false=player2
+    this.matchLength = 9;
+    this.matchflg = true;
+    this.matchwinflg = false;
+    this.gamescore = 2;
+
+    this.score = [0,4,6];
+    this.cubeValue = 1; // =2^0
+    this.xgidstrbf = "";
+    this.crawford = false;
+    this.xgid = new Xgid();
+    this.board = new BgBoard();
+    this.setDomNames();
+    this.setEventHandler();
+    this.showpipflg = true;
+    this.useclockflg = false;
+    this.beginNewGame(true); //スコアをリセットして新規ゲームを始める
+  } //end of constructor()
+
+  setDomNames() {
+    //button
+    this.rollbtn     = $("#rollbtn");
+    this.doublebtn   = $("#doublebtn");
+    this.resignbtn   = $("#resignbtn");
+    this.takebtn     = $("#takebtn");
+    this.dropbtn     = $("#dropbtn");
+    this.donebtn     = $("#donebtn");
+    this.undobtn     = $("#undobtn");
+    this.newgamebtn  = $("#newgamebtn");
+    this.cancelbtn   = $("#cancelbtn");
+    this.settingbtn  = $("#settingbtn");
+    this.openrollbtn = $("#openingroll");
+    this.resetscorebtn = $("#resetscorebtn");
+    this.gameendnextbtn= $("#gameendnextbtn");
+    this.gameendokbtn  = $("#gameendokbtn");
+
+    //infos
+    this.playerinfo = [undefined, $("#playerinfo1"), $("#playerinfo2")];
+    this.scoreinfo  = [undefined, $("#score1"), $("#score2")];
+    this.pipinfo    = [undefined, $("#pip1"), $("#pip2")];
+    this.matchinfo  = $("#matchinfo");
+
+    //grid area
+    this.center_right = $("#center_right");
+    this.center_left  = $("#center_left");
+
+    //panel
+    this.panelholder  = $("#panelholder");
+    this.allpanel     = $(".area");
+    this.doubleresign = $("#doubleresign");
+    this.doneundo     = $("#doneundo");
+    this.gameend      = $("#gameend");
+    this.hideAllPanel(); //font awesome が描画するのを待つ必要がある
+    this.panelholder.show();
+
+    //settings and valiables
+    this.settings    = $("#settings");
+    this.showpipflg  = $("[name=showpip]").prop("checked");
+    this.useclockflg = $("[name=useclock]").prop("checked");
+    this.matchlen    = $("#matchlen");
+    this.kifusource  = $("#kifusource");
+  }
+
+  setEventHandler() {
+    //Button Click Event
+    this.rollbtn.    on('click', () => { this.rollAction(); });
+    this.doublebtn.  on('click', () => { this.doubleAction(); });
+    this.resignbtn.  on('click', () => { this.resignAction(); });
+    this.takebtn.    on('click', () => { this.takeAction(); });
+    this.dropbtn.    on('click', () => { this.dropAction(); });
+    this.donebtn.    on('click', () => { this.doneAction(); });
+    this.undobtn.    on('click', () => { this.undoAction(); });
+    this.openrollbtn.on('click', () => { this.openrollAction(); });
+    this.gameendnextbtn.on('click', () => { this.gameendnextAction(); });
+    this.gameendokbtn.on('click', () => { this.gameendokAction(); });
+
+    //設定画面
+    this.settingbtn.on('click', () => {
+      this.settings.alignCenter($('body')).slideToggle("normal"); //画面表示
+      this.settingbtn.prop("disabled", true);
+    });
+    this.resetscorebtn.on('click', () => {
+      this.score = [0,0,0];
+      this.scoreinfo[1].text(0);
+      this.scoreinfo[2].text(0);
+    });
+    this.newgamebtn.on('click', () => {
+      this.settings.slideToggle("normal"); //画面を消す
+      this.settingbtn.prop("disabled", false);
+      this.initGameOption();
+      this.beginNewGame(true);
+    });
+    this.cancelbtn.on('click', () => {
+      this.settings.slideToggle("normal"); //画面を消す
+      this.settingbtn.prop("disabled", false);
+    });
+
+  }
+
+  initGameOption() {
+    this.showpipflg  = $("[name=showpip]").prop("checked");
+    $(".pip").toggle(this.showpipflg);
+
+    this.useclockflg = $("[name=useclock]").prop("checked");
+    $(".clock").toggle(this.useclockflg);
+    $(".pip").toggle(!this.useclockflg); //クロックモードのときはピップ表示しない
+
+    this.matchLength = this.matchlen.val();
+    this.matchinfo.text(this.matchLength);
+//console.log("initGameOption", this.matchlen.val())
+  }
+
+  beginNewGame(newmatch = false) {
+console.log("beginNewGame");
+    const xgidstr = "XGID=-b----E-C---eE---c-e----B-:0:0:0:00:0:0:0:0:0"
+    this.xgid = new Xgid(xgidstr);
+    if (newmatch) {
+      this.xgid.matchsc = this.matchLength;
+    }
+    this.board.showBoard2(this.xgid);
+    this.hideAllPanel();
+    this.showOpenRollPanel();
+  }
+
+  showOpenRollPanel() {
+    this.showElement(this.openrollbtn, 'R', true);
+  }
+
+  openrollAction() {
+    this.hideAllPanel();
+    const dice = this.randomdice(true);
+    this.player = (dice[0] < dice[1]);
+    this.xgid.dice = dice[2];
+    this.xgidstrbf = this.xgid.xgidstr;
+console.log("openrollAction", this.player, this.xgidstrbf);
+    this.board.showBoard2(this.xgid);
+    this.addKifuXgid(this.xgid.xgidstr);
+    this.showDoneUndoPanel(this.player, true);
+  }
+
+  rollAction() {
+    this.hideAllPanel();
+    this.xgid.dice = this.randomdice()[2];
+    this.xgidstrbf = this.xgid.xgidstr;
+console.log("rollAction", this.player, this.xgid.dice, this.xgidstrbf);
+    this.board.showBoard2(this.xgid);
+    this.addKifuXgid(this.xgid.xgidstr);
+    this.showDoneUndoPanel(this.player);
+  }
+
+  undoAction() {
+    //ムーブ前のボードを再表示
+    this.xgid = new Xgid(this.xgidstrbf);
+console.log("undoAction", this.xgidstrbf);
+    this.board.showBoard2(this.xgid);
+  }
+
+  addKifuXgid(xgid) {
+    this.kifusource.append(xgid + "\n");
+  }
+
+  player2xgturn(player) {
+    return (player) ? 1 : -1;
+  }
+  player2idx(player) {
+    return (player) ? 1 : 2;
+  }
+  player2flipclass(player) {
+    return (player) ? 'turn2' : 'turn1';
+  }
+  swapTurn() {
+    this.player = !this.player;
+  }
+  swapXgTurn() {
+    this.xgid.turn = -1 * this.xgid.turn;
+  }
+
+  doneAction() {
+console.log("doneAction");
+    this.hideAllPanel();
+    this.swapTurn();
+    //★this.boardからXgidを取得
+    this.xgid.dice = "00";
+    this.xgid.turn = this.player2xgturn(this.player);
+//    this.swapXgTurn();
+    this.showPipInfo();
+    this.board.showBoard2(this.xgid);
+    this.addKifuXgid(this.xgid.xgidstr);
+    this.showRollDoubleResignPanel(this.player);
+  }
+
+  doubleAction() {
+console.log("doubleAction");
+    this.hideAllPanel();
+    this.swapTurn();
+    //★Xgidを編集
+    this.xgid.dbloffer = true;
+    this.swapXgTurn();
+    this.board.showBoard2(this.xgid); //double offer
+    this.addKifuXgid(this.xgid.xgidstr);
+    this.showTakeDropPanel(this.player);
+  }
+
+  resignAction() {
+console.log("resignAction");
+    this.hideAllPanel();
+    this.swapTurn();
+    //★得点計算
+    this.xgid.dice = "00";
+    this.calcScore(this.player);
+///    this.showScoreInfo();
+    this.addKifuXgid(this.xgid.xgidstr);
+    this.showGameEndPanel(this.player);
+  }
+
+  takeAction() {
+console.log("takeAction");
+    this.hideAllPanel();
+    this.swapTurn();
+    this.swapXgTurn();
+    //★Xgid編集
+//    const cube = this.xgid.cube;
+//    const cubepos = this.xgid.cubepos;
+//    const turn = this.xgid.turn;
+    this.xgid.cube += 1;
+    this.xgid.cubepos = BgUtil.getXgOppo(this.xgid.turn);
+    this.xgid.dice = "00";
+    this.board.showBoard2(this.xgid);
+    this.addKifuXgid(this.xgid.xgidstr);
+    this.showRollDoubleResignPanel(this.player, false); //dont show resign button
+  }
+
+  dropAction() {
+console.log("dropAction");
+    this.hideAllPanel();
+    this.swapTurn();
+    //★得点計算
+    this.calcScore(this.player);
+//    this.showScoreInfo();
+    this.addKifuXgid(this.xgid.xgidstr);
+    this.showGameEndPanel(this.player);
+  }
+
+  calcScore(player) {
+    this.gamescore = this.xgid.get_gamesc( this.player2xgturn(player) );
+    const w = this.player2idx( player);
+    const l = this.player2idx(!player);
+    this.score[w] += this.gamescore;
+    this.xgid.sc_me = this.score[1];
+    this.xgid.sc_yu = this.score[2];
+    this.xgid.crawford = this.xgid.checkCrawford(this.score[w], this.gamescore, this.score[l]);
+    this.matchwinflg = (this.score[w] >= this.matchLength);
+  }
+
+  gameendnextAction() {
+console.log("gameendnextAction");
+    this.hideAllPanel();
+    this.showScoreInfo();
+    this.beginNewGame(false);
+  }
+  gameendokAction() {
+console.log("gameendokAction");
+    this.hideAllPanel();
+    this.showScoreInfo();
+  }
+
+  bearoffAllAction() {
+console.log("bearoffAllAction");
+    //★得点計算
+    this.calcScore(this.player); // this.player is winner
+//    this.showScoreInfo();
+    this.addKifuXgid(this.xgid.xgidstr);
+    this.showGameEndPanel(this.player);
+  }
+
+  randomdice(opening = false) {
+    const d1 = Math.floor( Math.random() * 6 ) + 1;
+    let   d2 = Math.floor( Math.random() * 6 ) + 1;
+    if (opening) { //オープニングロールでは同じ目を出さない
+      while (d1 == d2) {
+        d2 = Math.floor( Math.random() * 6 ) + 1;
+      }
+    }
+    const dicestr = String(d1) + String(d2);
+console.log("randomdice", d1, d2, dicestr);
+    return [d1, d2, dicestr];
+  }
+
+  showPipInfo() {
+    this.pipinfo[1].text(this.xgid.get_pip(-1));
+    this.pipinfo[2].text(this.xgid.get_pip(+1));
+  }
+  showScoreInfo() {
+    this.scoreinfo[1].text(this.xgid.sc_me);
+    this.scoreinfo[2].text(this.xgid.sc_yu);
+  }
+
+  showTakeDropPanel(player) {
+console.log("showTakeDropPanel", player);
+    if (player) {
+      this.showElement(this.takebtn, 'R', player);
+      this.showElement(this.dropbtn, 'L', player);
+    } else {
+      this.showElement(this.takebtn, 'L', player);
+      this.showElement(this.dropbtn, 'R', player);
+    }
+  }
+
+  canDouble(player) {
+    const candbl = (this.xgid.cubepos == 0) || (this.xgid.cubepos == this.xgid.turn);
+console.log("canDouble", candbl, this.xgid.cubepos , this.xgid.turn, player);
+    return candbl;
+  }
+
+  showRollDoubleResignPanel(player, doubleresignpanel = true) {
+console.log("showRollDoubleResignPanel", player);
+    this.doublebtn.toggle( this.canDouble(player) );
+    if (player) {
+      this.showElement(this.rollbtn, 'R', player);
+      if (doubleresignpanel) { this.showElement(this.doubleresign, 'L', player); }
+    } else {
+      this.showElement(this.rollbtn, 'L', player);
+      if (doubleresignpanel) { this.showElement(this.doubleresign, 'R', player); }
+    }
+  }
+
+  showDoneUndoPanel(player, opening = false) {
+console.log("showDoneUndoPanel", player);
+    if (player) {
+      this.doneundo.css('margin-top', 0);
+      this.showElement(this.doneundo, 'L', player);
+    } else {
+      this.doneundo.css('margin-top', 0);
+      this.showElement(this.doneundo, 'R', player);
+    }
+    if (opening) { //オープニングロールのときは出目の大きい側に下にずらして表示
+      if (player) {
+        this.doneundo.css('margin-top', '24vh');
+        this.showElement(this.doneundo, 'R', player);
+      } else {
+        this.doneundo.css('margin-top', '-8vh');
+        this.showElement(this.doneundo, 'L', player);
+      }
+    }
+  }
+
+  showGameEndPanel(player) {
+console.log("showGameEndPanel", player);
+    const mes1 = "You WIN" + ((this.matchwinflg) ? " and MATCH" : "");
+    this.gameend.children('.mes1').text(mes1);
+
+    const mes2 = "Get " + this.gamescore + "pt";
+    this.gameend.children('.mes2').text(mes2);
+
+    const p1 = this.player2idx(player);
+    const p2 = this.player2idx(!player);
+    const mes3 = this.score[p1] + " - " + this.score[p2] + ((!this.matchflg) ? "" : "&emsp;(" +this.matchLength + "pt)");
+    this.gameend.children('.mes3').html(mes3);
+
+console.log("showGameEndPanel", mes1, mes2, mes3);
+    this.gameendnextbtn.toggle(!this.matchwinflg);
+    this.gameendokbtn.toggle(this.matchwinflg);
+
+    const tn1 = (player) ? 'turn2' : 'turn1';
+    const tn2 = (player) ? 'turn1' : 'turn2';
+    this.gameend.removeClass(tn1).addClass(tn2).alignCenter($('body')).show();
+  }
+
+  showElement(obj, which, turn) {
+    const disparea = (which == 'L') ? this.center_left : this.center_right;
+    const tn1 = (turn) ? 'turn2' : 'turn1';
+    const tn2 = (turn) ? 'turn1' : 'turn2';
+    obj.show().removeClass(tn1).addClass(tn2).alignCenter(disparea);
+  }
+
+  hideAllPanel() {
+    this.allpanel.hide();
+  }
+
+} //end of class BgGame
+
+//参考：https://qiita.com/ampersand/items/e8444779cd202d9cb084
+//親要素の中央に配置するためのjQuery拡張(追加関数)
+(function($){
+    $.fn.alignCenter = function(parent) {
+  //      this.each(function(){
+            const innerelem = $(this);
+            const wx = parent.offset().left + (parent.width() - innerelem.outerWidth(true)) / 2;
+            //if (wx < 0) { wx = 0; }
+            const wy = parent.offset().top + (parent.height() - innerelem.outerHeight(true)) / 2;
+            //if (wy < 0) { wy = 0; }
+//console.log("alignCenter", wx, wy, innerelem, parent);
+//console.log("alignCenter", parent.offset().left, parent.width(), innerelem.outerWidth(true));
+//console.log("alignCenter", parent.offset().top, parent.height(), innerelem.outerHeight(true));
+            innerelem.css({left:wx, top:wy});
+  //      });
+        return this;
+    };
+})(jQuery);
+
+</script>
+<script>
+var bgGame = new BgGame();
+</script>
+</body>
+</html>

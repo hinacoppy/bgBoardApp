@@ -1,0 +1,352 @@
+/**
+  KifuViewer.css
+  designed by hinacoppy 2018
+*/
+
+html{
+  height: 100%;
+}
+
+body{
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  height: 100%;
+}
+
+.container{
+  background: #efe;
+  display: grid; /* Grid Layout でコンテンツを配置 */
+  grid-template-columns: auto auto;
+  grid-template-rows: max-content auto auto 3em;
+  grid-template-areas:
+     'header nav'
+     'board  nav'
+     'aside  aside'
+     'footer footer';
+}
+
+.header{
+  grid-area: header;
+  text-align: center;
+}
+
+.footer{
+  grid-area: footer;
+  background: #eee;
+  background-image: linear-gradient(#fff 0%, #eee 50%, #ddd 51%, #fff 100%);
+  height: 3em;
+  text-align: right;
+}
+
+.mainarea{
+  grid-area: board;
+  margin: 1vh auto; /* 上寄せ、左右中央配置 */
+}
+
+.mainareaflex{
+  display: flex;
+  flex-direction: column; /* toggle column, column-reverse */
+}
+
+.nav{
+  grid-area: nav;
+  padding-left: 1vw;
+}
+
+.aside{
+  grid-area: aside;
+}
+
+.mainboard{
+  position: relative;
+}
+
+.cube{
+  position: absolute;
+  text-align: center;
+  line-height: 40px;
+  text-align: center;
+  color: black;
+  font-size: 16pt;
+  font-weight: bold;
+  color: white; /* normal cube */
+  background-color: olive;
+}
+
+.cubeoffer{
+  color: blue;
+  background-color: violet;
+}
+
+.dice{
+  position: absolute;
+  font-size: 35px;
+}
+
+.label{
+  position: absolute;
+  text-align: center;
+  color: white;
+  font-size: 8pt;
+  width: 30px;
+}
+
+.stack{
+  position: absolute;
+  text-align: center;
+  font-weight: bold;
+  font-size: 12pt;
+  padding-top: 2px;
+  line-height: 30px;
+  width: 30px;
+  z-index: 30;
+}
+
+.chequer{
+  position: absolute;
+  width: 30px;
+  font-size: 30px;
+  line-height: 30px;
+  z-index: 10;
+}
+
+.pagetitle{
+  font-weight: bold;
+  font-size: 120%;
+  padding-top: 0.5vh;
+  margin-bottom: 1vh;
+}
+
+.playername{
+  font-weight: bold;
+  text-align: left;
+  float: left; /* pipを右寄せ */
+}
+
+.pip{
+  text-align: right;
+}
+
+.infodisp{
+  font-weight: bold;
+  margin-bottom: 1vh;
+}
+
+.analysisresult{
+  font-weight: normal;
+}
+
+.navbutton{
+  width: 6vw;
+  height: 6vh;
+}
+
+.normalbutton{
+}
+
+.jumpselect{
+}
+
+.dropzone{
+  border: 2px dotted #18a;
+  width: 90%;
+  height: 50px;
+  line-height: 50px;
+  color: #9ab;
+  text-align: left;
+  padding-left: 20px;
+  margin-bottom: 10px;
+  /*font-size: 120%;*/
+}
+
+/* モーダルウィンドウCSS */
+/* 参考：https://myscreate.com/pure-modal/ */
+/* 参考：https://ameblo.jp/mikuxmiku/entry-10358513809.html */
+.modalArea{
+  display: none;
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(30,30,30,0.7);
+}
+.modalTitleContainer{
+  font-weight: bold;
+  background: #777;
+  color: white;
+  padding: 5px;
+  text-align: right;
+}
+.modalTitle{
+  float:left;
+}
+.modalContents{
+  position: absolute;
+  top: 50%; /* 画面の中央寄せ */
+  left: 50%;
+  transform:translate(-50%,-50%);
+  width: 70%;
+  max-width: 432px;
+  padding: 0px 30px 10px 30px;
+  background-color: #ffe;
+  border:solid #00f 2px;
+}
+.closeModal{
+  cursor: pointer;
+}
+/* bgscore.css ---------------------------------------------- */
+/* designed by (C)hinacoppy 2019                              */
+
+/* document outline ----------------------------------------- */
+*{
+  user-select:none;
+}
+html{
+  height:100%;
+}
+body{
+  margin:0;
+  padding:0;
+  min-height:100%;
+  height:100%;
+  background-color:#efe;
+  font-family:'Arial', 'Meiryo UI';
+}
+/* Grid Layout settings ------------------------------------- */
+/* 以下すべて相対サイズにし、レスポンシブ対応可能にしておく */
+#mainwindow{
+  display:grid; /* Grid Layout でコンテンツを配置 */
+  grid-template-columns:40% 20% 40%;
+  grid-template-areas:
+     'score1 matchinfo    score2'
+     'score1 crawfordinfo score2'
+     'score1 settingbtn   score2';
+  align-items:center; /* 子アイテムはデフォで上下左右に中央揃え */
+  justify-items:center;
+  padding:1vh 1vw;
+}
+#score1{
+  grid-area:score1;
+}
+#score2{
+  grid-area:score2;
+}
+#matchinfo{
+  grid-area:matchinfo;
+}
+#crawfordinfo{
+  grid-area:crawfordinfo;
+}
+#settingbtn{
+  grid-area:settingbtn;
+}
+/* Contents decorations ------------------------------------- */
+#matchinfo {
+  width:18vw;
+  height:30vh;
+  line-height:30vh;
+  text-align:center;
+  font-size:10vw;
+  border-radius:20px;
+  background-color:#dfa;
+}
+#crawfordinfo {
+  margin-top:5vh;
+  height:30vh;
+  font-size:3vw;
+  text-align:center;
+}
+.oparationbtn{
+  background-color:#adf;
+  border:3px solid #29f;
+  color:#29f;
+  border-radius:20px;
+  padding:2vh 2vw;
+  font-size:2vw;
+}
+/* Flip Card styles ------------------------------------- */
+.cardcontainer {
+  position:relative;
+  width:38vw;
+  height:90vh;
+  border-radius:20px;
+}
+.card {
+  position:absolute;
+  top:0;
+  left:0;
+  width:38vw;
+  height:90vh;
+  line-height:90vh;
+  border-radius:20px;
+  text-align:center;
+  font-size:25vw;
+  background-color:#ddf;
+  transform-style:preserve-3d;
+}
+.curr {
+  transform:perspective(1500px) rotateX(0deg);
+}
+.next {
+  transform:perspective(1500px) rotateX(90deg);
+  display:none;
+}
+.prev {
+  transform:perspective(1500px) rotateX(-90deg);
+}
+.flipup90 {
+  transform:perspective(1500px) rotateX(-90deg);
+  transition:ease-out 0.3s transform;
+}
+.flipdn90 {
+  transform:perspective(1500px) rotateX(90deg);
+  transition:ease-out 0.3s transform;
+}
+.flipdn0 {
+  transform:perspective(1500px) rotateX(0deg);
+  transition:ease-out 0.3s transform;
+}
+.flipup0 {
+  transform:perspective(1500px) rotateX(0deg);
+  transition:ease-out 0.3s transform;
+}
+/* settingwindow decorations ------------------------------------- */
+.mainwin{
+  transform-style:preserve-3d;
+  transform:perspective(1500px) rotateY(0deg);
+  transition:ease-out 0.3s transform;
+}
+.setting{
+  transform-style:preserve-3d;
+  transform:perspective(1500px) rotateY(90deg);
+  transition:ease-out 0.3s transform;
+  display:none;
+}
+.fliphoriz90 {
+  transform:perspective(1500px) rotateY(-90deg);
+  transition:ease-out 0.3s transform;
+}
+.fliphoriz0 {
+  transform:perspective(1500px) rotateY(0deg);
+  transition:ease-out 0.3s transform;
+}
+#settingwindow{
+  position:absolute;
+  top:0;
+  left:0;
+  width:96vw;
+  font-size:2vw;
+  background-color:#dff;
+  text-align:center;
+  margin:2vh 2vw;
+}
+#settingwindow select{
+  font-size:100%;
+  background-color:transparent;
+  padding:0;
+  margin:0;
+  appearance:none;
+}
