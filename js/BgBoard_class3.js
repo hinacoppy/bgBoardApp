@@ -3,6 +3,7 @@
 
 class BgBoard {
   constructor() {
+    this.gameObj = "";
     this.mainBoard = $('#board'); //need to define before prepareBoard()
     this.xgidstr = "XGID=--------------------------:0:0:0:00:0:0:0:0:0";
     this.bgBoardConfig();
@@ -16,7 +17,14 @@ class BgBoard {
     this.applyDomStyle();
 //    this.resetBoard();
     this.setChequerDraggable();
+    this.dragStartPos = null;
+    this.dragObject = null;
   } //end of constructor()
+
+  setGameObject(game) {
+    this.gameObj = game;
+console.log("setGameObject",this.gameObj)
+  }
 
   setDomNames() {
     this.cubeDisp = $('#cube');
@@ -104,7 +112,52 @@ class BgBoard {
   }
 
   setChequerDraggable() {
-    $(".chequer").draggable();
+    $(".chequer").draggable({
+      //event
+      start: ( event, ui ) => {
+        this.dragStartAction(event, ui);
+//        console.log("dragStart", this, this.dragStartPos, $(event.currentTarget));
+//        this.dragObject = $(event.currentTarget);
+//        let id = this.dragObject.attr("id");
+//        this.dragStartPos = ui.position;
+//        console.log("dragStart", id, ui.position, this.dragStartPos);
+//        console.log("dragStart this.gameObj", this.gameObj);
+//        this.gameObj.pushXgidPosition();
+      },
+      stop: ( event, ui ) => {
+        this.dragStopAction(event, ui);
+//        let id = this.dragObject.attr("id");
+//        console.log("dragStop", id, ui.position);
+////       $(event.currentTarget).draggable("option", "revert", true);
+//        this.dragObject.animate(this.dragStartPos, 500);
+      },
+      //options
+      containment: 'parent',
+      opacity: 0.6,
+      zIndex: 99,
+      revertDuration: 200
+    });
+  }
+
+  dragStartAction(event, ui) {
+        console.log("dragStart", this, this.dragStartPos, $(event.currentTarget));
+        this.dragObject = $(event.currentTarget);
+        let id = this.dragObject.attr("id");
+        this.dragStartPos = ui.position;
+        console.log("dragStart", id, ui.position, this.dragStartPos);
+        console.log("dragStart this.gameObj", this.gameObj);
+        this.gameObj.pushXgidPosition();
+  }
+  dragStopAction(event, ui) {
+        let id = this.dragObject.attr("id");
+//        console.log("dragStop e", event.currentTarget);
+        console.log("dragStop", id, ui.position);
+//       $(event.currentTarget).draggable("option", "revert", true);
+        let player = true;
+        //player = this.isChequerOwner(this.dragObject);
+        this.gameObj.moveChequer("24/23", player);
+//        this.gameObj.returnXgid(this.xgidstr);
+        this.dragObject.animate(this.dragStartPos, 300);
   }
 
   getPosObj(x, y) {
@@ -162,7 +215,7 @@ class BgBoard {
     this.cubeDisp.css(this.getPosObj(this.cubeX, this.cubeY[cubepos]));
     this.cubeDisp.removeClass("cubecenter turn1 turn2").addClass(this.cubePosClass[cubepos])
                  .toggleClass("cubeoffer", offer);
-console.log("showCube",cubepos, cubeval, this.getPosObj(this.cubeX, this.cubeY[cubepos]));
+console.log("showCube",cubepos, cubeval, offer, crawford, this.getPosObj(this.cubeX, this.cubeY[cubepos]));
   }
 
   showDiceAll(turn, d1, d2) {
@@ -401,4 +454,13 @@ console.log("bgBoardConfig", this.mainBoard.height(), this.mainBoard.width(), th
     this.barYpos = [null, this.bar1ypos, this.bar2ypos];
   }
 
+  setDraggableChequer(player, init = false) {
+    $(".chequer").draggable({disabled: true});
+    if (init) {
+      return;
+    }
+    for (let i = 0; i < 15; i++) {
+      (this.pieces[player][i]).draggable({disabled: false});
+    }
+  }
 } //class BgBoard

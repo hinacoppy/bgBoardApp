@@ -1,265 +1,180 @@
 /**
-  KifuViewer.css
-  designed by hinacoppy 2018
+  bgboardapp.css
+  designed by hinacoppy 2019
 */
-
-html{
-  height: 100%;
-}
-
-body{
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
-  height: 100%;
-}
-
-.container{
-  background: #efe;
-  display: grid; /* Grid Layout でコンテンツを配置 */
-  grid-template-columns: auto auto;
-  grid-template-rows: max-content auto auto 3em;
-  grid-template-areas:
-     'header nav'
-     'board  nav'
-     'aside  aside'
-     'footer footer';
-}
-
-.header{
-  grid-area: header;
-  text-align: center;
-}
-
-.footer{
-  grid-area: footer;
-  background: #eee;
-  background-image: linear-gradient(#fff 0%, #eee 50%, #ddd 51%, #fff 100%);
-  height: 3em;
-  text-align: right;
-}
-
-.mainarea{
-  grid-area: board;
-  margin: 1vh auto; /* 上寄せ、左右中央配置 */
-}
-
-.mainareaflex{
-  display: flex;
-  flex-direction: column; /* toggle column, column-reverse */
-}
-
-.nav{
-  grid-area: nav;
-  padding-left: 1vw;
-}
-
-.aside{
-  grid-area: aside;
-}
-
-.mainboard{
-  position: relative;
-}
-
-.cube{
-  position: absolute;
-  text-align: center;
-  line-height: 40px;
-  text-align: center;
-  color: black;
-  font-size: 16pt;
-  font-weight: bold;
-  color: white; /* normal cube */
-  background-color: olive;
-}
-
-.cubeoffer{
-  color: blue;
-  background-color: violet;
-}
-
-.dice{
-  position: absolute;
-  font-size: 35px;
-}
-
-.label{
-  position: absolute;
-  text-align: center;
-  color: white;
-  font-size: 8pt;
-  width: 30px;
-}
-
-.stack{
-  position: absolute;
-  text-align: center;
-  font-weight: bold;
-  font-size: 12pt;
-  padding-top: 2px;
-  line-height: 30px;
-  width: 30px;
-  z-index: 30;
-}
-
-.chequer{
-  position: absolute;
-  width: 30px;
-  font-size: 30px;
-  line-height: 30px;
-  z-index: 10;
-}
-
-.pagetitle{
-  font-weight: bold;
-  font-size: 120%;
-  padding-top: 0.5vh;
-  margin-bottom: 1vh;
-}
-
-.playername{
-  font-weight: bold;
-  text-align: left;
-  float: left; /* pipを右寄せ */
-}
-
-.pip{
-  text-align: right;
-}
-
-.infodisp{
-  font-weight: bold;
-  margin-bottom: 1vh;
-}
-
-.analysisresult{
-  font-weight: normal;
-}
-
-.navbutton{
-  width: 6vw;
-  height: 6vh;
-}
-
-.normalbutton{
-}
-
-.jumpselect{
-}
-
-.dropzone{
-  border: 2px dotted #18a;
-  width: 90%;
-  height: 50px;
-  line-height: 50px;
-  color: #9ab;
-  text-align: left;
-  padding-left: 20px;
-  margin-bottom: 10px;
-  /*font-size: 120%;*/
-}
-
-/* モーダルウィンドウCSS */
-/* 参考：https://myscreate.com/pure-modal/ */
-/* 参考：https://ameblo.jp/mikuxmiku/entry-10358513809.html */
-.modalArea{
-  display: none;
-  position: fixed;
-  z-index: 50;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(30,30,30,0.7);
-}
-.modalTitleContainer{
-  font-weight: bold;
-  background: #777;
-  color: white;
-  padding: 5px;
-  text-align: right;
-}
-.modalTitle{
-  float:left;
-}
-.modalContents{
-  position: absolute;
-  top: 50%; /* 画面の中央寄せ */
-  left: 50%;
-  transform:translate(-50%,-50%);
-  width: 70%;
-  max-width: 432px;
-  padding: 0px 30px 10px 30px;
-  background-color: #ffe;
-  border:solid #00f 2px;
-}
-.closeModal{
-  cursor: pointer;
-}
-/* bgscore.css ---------------------------------------------- */
-/* designed by (C)hinacoppy 2019                              */
 
 /* document outline ----------------------------------------- */
 *{
   user-select:none;
 }
 html{
-  height:100%;
+  height: 100%;
 }
 body{
-  margin:0;
-  padding:0;
-  min-height:100%;
-  height:100%;
-  background-color:#efe;
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  height: 100%;
   font-family:'Arial', 'Meiryo UI';
 }
+
 /* Grid Layout settings ------------------------------------- */
 /* 以下すべて相対サイズにし、レスポンシブ対応可能にしておく */
-#mainwindow{
-  display:grid; /* Grid Layout でコンテンツを配置 */
-  grid-template-columns:40% 20% 40%;
+
+.container{
+/*  margin: 2vw 2vh;*/
+/*  background-image: url("board.png");  /* 画像ファイルの指定 */
+/*  background-position: center center;  /* 画像を常に天地左右の中央に配置 */
+  background-repeat: no-repeat;  /* 画像をタイル状に繰り返し表示しない */
+/*  background-attachment: fixed;  /* コンテンツの高さが画像の高さより大きい時、動かないように固定 */
+  background-size: 100vw 100vh;  /* 表示するコンテナの大きさに基づいて、背景画像を調整 */
+  background-color: #cfc;  /* 背景画像が読み込まれる前に表示される背景のカラー */
+
+
+  display: grid; /* Grid Layout でコンテンツを配置 */
+  grid-template-columns: 40vw 40vw 5vw 15vw;
+  grid-template-rows: 30vh 39vh 30vh;
   grid-template-areas:
-     'score1 matchinfo    score2'
-     'score1 crawfordinfo score2'
-     'score1 settingbtn   score2';
-  align-items:center; /* 子アイテムはデフォで上下左右に中央揃え */
-  justify-items:center;
-  padding:1vh 1vw;
+     'area1 area2 boff1 player2'
+     'centr_l centr_r none nav'
+     'area4 area3 boff2 player1';
+  justify-items: center; /* 横方向は中央に */
+  align-items: center;
 }
-#score1{
-  grid-area:score1;
+#board{
+  position: absolute;
+  width: 90vw;
+  height: 100vh;
+  grid-row: 1 / 4;
+  grid-column: 1 / 4;
 }
-#score2{
-  grid-area:score2;
+#center_left{
+  position:relative;
+  grid-area: centr_l;
+/*  text-align: center;*/
+  background-color: #efe;
+  opacity: 0.55;
+  width: 100%;
+  height: 100%;
 }
-#matchinfo{
-  grid-area:matchinfo;
+#center_right{
+  position:relative;
+  grid-area: centr_r;
+/*  text-align: center;*/
+  background-color: #ccf;
+  opacity: 0.55;
+  width: 100%;
+  height: 100%;
 }
-#crawfordinfo{
-  grid-area:crawfordinfo;
+#player1{
+  grid-area: player1;
+  justify-self: start;
+}
+#player2{
+  grid-area: player2;
+  justify-self: center;
+  align-self: center;
+  background-color: #ccf;
+  opacity: 0.55;
+}
+#nav{
+  grid-area: nav;
+  justify-self: start;
+}
+.playerinfo{
+  transform: rotateZ(-90deg);
+  text-align: center;
+/*    display: flex;
+/*    justify-content: center;*/
+/*    align-items: center;*/
+}
+.nav{
+  transform: rotateZ(-90deg);
+  text-align: center;
+/*    display: flex;
+/*    justify-content: center;*/
+    align-items: center;
+  background-color: #fcc;
+  opacity: 0.55;
+
 }
 #settingbtn{
-  grid-area:settingbtn;
+/*  grid-area: settingbtn;
+/*  background-color: pink;*/
+/*  color: black;*/
+/*  width: 4vh;*/
+/*  height: 4vw;*/
+/*  line-height: 4vw;*/
+/*  text-align: center;*/
+/*  font-size:2vw;*/
 }
-/* Contents decorations ------------------------------------- */
-#matchinfo {
-  width:18vw;
-  height:30vh;
-  line-height:30vh;
-  text-align:center;
-  font-size:10vw;
-  border-radius:20px;
-  background-color:#dfa;
+.score{
+  display: inline-block;
+  background-color: gray;
+  color: white;
+  width: 20vh;
+  height: 5vw;
+  line-height: 5vw;
+  text-align: center;
+  font-size:5vw;
 }
-#crawfordinfo {
-  margin-top:5vh;
-  height:30vh;
-  font-size:3vw;
-  text-align:center;
+.pip{
+  display: inline-block;
+  background-color: #4aa;
+  color: white;
+  width: 10vh;
+  height: 3vw;
+  line-height: 3vw;
+  text-align: center;
+  font-size:1vw;
+}
+
+.clock{
+  display: none;
+}
+
+.cubeclass{
+  position:absolute;
+/*  width:10vw;
+  height: 10vw;*/
+/*  background-color:#ddf;*/
+  color: 30vw;#6fe;
+  font-size:5vw;
+}
+.cubeoffer{
+  color: blue;
+  background-color: violet;
+}
+
+.dice{
+  position:absolute;
+/*  width:10vw;
+  height: 10vw;*/
+  font-size:5vw;
+}
+.cubecenter{
+  transform: rotateZ(-90deg);
+}
+.turn1{
+  transform: rotateZ(0deg);
+}
+.turn2{
+  transform: rotateZ(180deg);
+}
+.col_player1{
+  color: #9ce;
+}
+.col_player2{
+  color: #456;
+}
+.chequer{
+  position:absolute;
+/*  width:10vw;
+  height: 10vw;*/
+  font-size:5vw;
 }
 .oparationbtn{
+/*  display: inline-block;*/
   background-color:#adf;
   border:3px solid #29f;
   color:#29f;
@@ -267,86 +182,69 @@ body{
   padding:2vh 2vw;
   font-size:2vw;
 }
-/* Flip Card styles ------------------------------------- */
-.cardcontainer {
-  position:relative;
-  width:38vw;
-  height:90vh;
-  border-radius:20px;
-}
-.card {
+.area{
   position:absolute;
-  top:0;
-  left:0;
-  width:38vw;
-  height:90vh;
-  line-height:90vh;
-  border-radius:20px;
-  text-align:center;
-  font-size:25vw;
-  background-color:#ddf;
-  transform-style:preserve-3d;
-}
-.curr {
-  transform:perspective(1500px) rotateX(0deg);
-}
-.next {
-  transform:perspective(1500px) rotateX(90deg);
-  display:none;
-}
-.prev {
-  transform:perspective(1500px) rotateX(-90deg);
-}
-.flipup90 {
-  transform:perspective(1500px) rotateX(-90deg);
-  transition:ease-out 0.3s transform;
-}
-.flipdn90 {
-  transform:perspective(1500px) rotateX(90deg);
-  transition:ease-out 0.3s transform;
-}
-.flipdn0 {
-  transform:perspective(1500px) rotateX(0deg);
-  transition:ease-out 0.3s transform;
-}
-.flipup0 {
-  transform:perspective(1500px) rotateX(0deg);
-  transition:ease-out 0.3s transform;
+/*  display:none;*/
 }
 /* settingwindow decorations ------------------------------------- */
-.mainwin{
-  transform-style:preserve-3d;
-  transform:perspective(1500px) rotateY(0deg);
-  transition:ease-out 0.3s transform;
+.settings{
+  position: absolute;
+  display: none;
+  z-index: 5;
+  background-color: #dff;
+  border: 3px solid #00f;
+  padding: 2vh 4vw;
+  font-size: 1.8vw;
 }
-.setting{
-  transform-style:preserve-3d;
-  transform:perspective(1500px) rotateY(90deg);
-  transition:ease-out 0.3s transform;
-  display:none;
+.popuptitle{
+  font-size: 2.2vw;
+  color: #fff;
+  background-color: #46f;
+  padding: 2vh 2vw;
+  margin-bottom: 2vh;
 }
-.fliphoriz90 {
-  transform:perspective(1500px) rotateY(-90deg);
-  transition:ease-out 0.3s transform;
+/* toggle switch ----------------------------------------- */
+input {
+/*  position: absolute;
+  left: -9999px;*/
+display: none;
 }
-.fliphoriz0 {
-  transform:perspective(1500px) rotateY(0deg);
-  transition:ease-out 0.3s transform;
+
+.togglelabel {
+  display: block;
+width: 300px;
+  position: relative;
+/*  margin: 20px;*/
+  padding: 15px 30px 15px 62px;
+  border: 3px solid #fff;
+  border-radius: 100px;
+  color: #fff;
+  background-color: #999;  /*#6a8494;*/
+/*  box-shadow: 0 0 20px rgba(0, 0, 0, .2);*/
+  white-space: nowrap;
+/*  cursor: pointer;
+  user-select: none;*/
+  transition: background-color .2s, box-shadow .2s;
 }
-#settingwindow{
-  position:absolute;
-  top:0;
-  left:0;
-  width:96vw;
-  font-size:2vw;
-  background-color:#dff;
-  text-align:center;
-  margin:2vh 2vw;
+
+.togglelabel::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 10px;
+  width: 32px;
+  border: 3px solid #fff;
+  border-radius: 100px;
+  transition: background-color .2s;
 }
-#settingwindow select{
-  font-size:100%;
-  background-color:transparent;
-  padding:0;
-  margin:0;
-  appearance:none;
+
+.switch:checked + label {
+  background-color: #29f; /*#ab576c;*/
 }
+
+.switch:checked + label::before {
+  background-color: #fff;
+}
+
