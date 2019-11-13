@@ -231,4 +231,55 @@ class Xgid {
     return (this._ptno[pt] >= 2 && this._ptcol[pt] != this._turn);
   }
 
+  isMovable(fr, to, strict=false) {
+    const movable = this.movablePoint(fr, strict);
+    return movable.includes(to);
+  }
+
+  _topt(f, d) {
+    return (f - d < 0) ? 0 : (f - d);
+  }
+
+  _isMovableWithDice(fr, to) {
+    const d1 = this.get_dice(1);
+    const d2 = this.get_dice(2);
+    let blocked = false;
+    let movable = [];
+    let p;
+
+    p = this._topt(fr, d1);
+    if (!this.isBlocked(p)) { movable.push(p); }
+    p = this._topt(fr, d2);
+    if (!this.isBlocked(p)) { movable.push(p); }
+    if (movable.length == 0) { blocked = true; }
+
+    p = this._topt(fr, d1 + d2);
+    if (!this.isBlocked(p) && !blocked) { movable.push(p); }
+    else { blocked = true; }
+
+    if (d1 == d2) {
+      p = this._topt(fr, d1 + d1 + d1);
+      if (!this.isBlocked(p) && !blocked) { movable.push(p); }
+      else { blocked = true; }
+
+      p = this._topt(fr, d1 + d1 + d1 + d1);
+      if (!this.isBlocked(p) && !blocked) { movable.push(p); }
+    }
+
+    return movable.includes(to);
+  }
+
+  movablePoint(fr, strict=false) {
+    //frの駒が進めるポイントをリストで返す(前＆ブロックポイント以外)
+    //strict=trueのときは、ダイスの目に従って進めるポイントを計算する
+    let movable = [];
+    for (let p=0; p<fr; p++) {
+      if (!this.isBlocked(p)) {
+        if (strict && !this._isMovableWithDice(fr, p)) { continue; }
+        movable.push(p);
+      }
+    }
+    return movable;
+  }
+
 } //class Xgid

@@ -12,12 +12,13 @@ class BgGame {
     this.undoStack = [];
     this.crawford = false;
     this.xgid = new Xgid();
-    this.board = new BgBoard();
-    this.board.setGameObject(this);
+    this.board = new BgBoard(this);
+//    this.board.setGameObject(this);
 
     this.setDomNames();
     this.setEventHandler();
     this.showpipflg = true;
+    this.frashflg = true; //ドラッグ開始時に移動可能なポイントを光らせる
     this.useclockflg = false;
     this.beginNewGame(true); //スコアをリセットして新規ゲームを始める
   } //end of constructor()
@@ -117,7 +118,7 @@ class BgGame {
 
   beginNewGame(newmatch = false) {
 console.log("beginNewGame");
-    const xgidstr = "XGID=-b----E-C---eE---c-e----B-:0:0:0:00:0:0:0:0:0"
+    const xgidstr = "XGID=Eb----------gF----------Ad:0:0:0:00:0:0:0:0:0"
     this.xgid = new Xgid(xgidstr);
     if (newmatch) {
       this.xgid.matchsc = this.matchLength;
@@ -160,7 +161,7 @@ console.log("rollAction", this.player, this.xgid.dice, this.xgidstrbf);
   undoAction() {
     //ムーブ前のボードを再表示
     if (this.undoStack.length > 0) {
-      const xgidstr = this.undoStack.pop();
+      const xgidstr = this.popXgidPosition();
       this.xgid = new Xgid(xgidstr);
 console.log("undoAction", xgidstr);
       this.board.showBoard2(this.xgid);
@@ -168,8 +169,11 @@ console.log("undoAction", xgidstr);
   }
 
   pushXgidPosition() {
- console.log("pushXgidPosition", this.xgid.xgidstr);
+console.log("pushXgidPosition", this.xgid.xgidstr);
    this.undoStack.push(this.xgid.xgidstr);
+  }
+  popXgidPosition() {
+   return this.undoStack.pop();
   }
 
   addKifuXgid(xgid) {

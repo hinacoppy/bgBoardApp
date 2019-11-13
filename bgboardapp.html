@@ -12,16 +12,40 @@
   <link rel="icon" href="./favicon.ico">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <title>bgBoardApp</title>
-</head>
+<style>
+/*    this.pointcolfigclass = ["triange_dnev", "triange_dnod", "triange_upev", "triange_upod"];*/
+.point{
+  position: absolute;
+  width: 6vw;
+  height: 40vh;
+}
+.triange_dnev{
+  background:linear-gradient(to top    left,  #844 50%, transparent 50%) top left/  50.1% 100% no-repeat,
+             linear-gradient(to top    right, #844 50%, transparent 50%) top right/ 50.1% 100% no-repeat;
+}
+.triange_dnod{
+  background:linear-gradient(to top    left,  #448 50%, transparent 50%) top left/  50.1% 100% no-repeat,
+             linear-gradient(to top    right, #448 50%, transparent 50%) top right/ 50.1% 100% no-repeat;
+}
+.triange_upev{
+  background:linear-gradient(to bottom left,  #844 50%, transparent 50%) top left/  50.1% 100% no-repeat,
+             linear-gradient(to bottom right, #844 50%, transparent 50%) top right/ 50.1% 100% no-repeat;
+}
+.triange_upod{
+  background:linear-gradient(to bottom left,  #448 50%, transparent 50%) top left/  50.1% 100% no-repeat,
+             linear-gradient(to bottom right, #448 50%, transparent 50%) top right/ 50.1% 100% no-repeat;
+}
+</style>
 </head>
 <body class="container">
 <section id="board" class="boardarea">
 <!-- Items insert from showBoard() method in BgBoard_class -->
 </section>
-<div id="center_left">
-</div>
-<div id="center_right">
-</div>
+<div id="center_left"></div>
+<div id="center_right"></div>
+<div id="bar"> </div>
+<div id="offtray1"> </div>
+<div id="offtray2"> </div>
 
 
 <div id="player1" class="playerinfo">
@@ -92,6 +116,10 @@ Match length:
 <label for="showpip" class="togglelabel">Show pip</label>
 </p>
 <p>
+<input type="checkbox" id="frashdest" name="frashdest" class="switch">
+<label for="frashdest" class="togglelabel">Use Clock</label>
+</p>
+<p>
 <input type="checkbox" id="useclock" name="useclock" class="switch">
 <label for="useclock" class="togglelabel">Use Clock</label>
 </p>
@@ -113,6 +141,7 @@ Match length:
 <script src="js/jquery.ui.touch-punch.min.js"></script>
 <script src="js/BgGame_class3.js"></script>
 <script src="js/BgBoard_class3.js"></script>
+<script src="js/BgChequer_class.js"></script>
 <script src="js/BgXgid_class.js"></script>
 <script src="js/BgUtil_class.js"></script>
 <script>
