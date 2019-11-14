@@ -280,29 +280,14 @@ console.log("showDiceAll",turn, d1, d2);
           ex = this.pointx[pt];
           sf = (st > this.barstackthreshold);
           ty = sf ? this.barstackthreshold : ptStack[pt];
-//          ey = this.get_barYpos(player) + (ty * this.pieceHeight);
-/***********************************
-  get_barYpos(num, pt) {
-    const ty = (num > this.barstackthreshold) ? this.barstackthreshold : num;
-    const ey = (pt == 0) ? this.barYpos[1] + (ty * this.pieceHeight) : this.barYpos[2] - (ty * this.pieceHeight);
-    return ey;
-  }
-**********************************/
-          ey = (pt == 0) ? this.barYpos[1] + (ty * this.pieceHeight) : this.barYpos[2] - (ty * this.pieceHeight);
-          //ey = this.get_barYpos(ptStack[pt], pt);
+          //ey = (pt == 0) ? this.barYpos[1] + (ty * this.pieceHeight) : this.barYpos[2] - (ty * this.pieceHeight);
+          ey = this.get_barYpos(ptStack[pt], pt);
         } else { //in field
           ex = this.pointx[pt];
           sf = (st > this.pointstackthreshold);
           ty = sf ? this.pointstackthreshold : ptStack[pt];
-/***********************************
-  get_ptYpos(num, pt) {
-    const ty = (num > this.pointstackthreshold) ? this.pointstackthreshold : num;
-    const ey = (pt > 12) ? this.yupper + (ty * this.pieceHeight) : this.ylower - (ty * this.pieceHeight);
-    return ey;
-  }
-*********************************/
-          ey = (pt > 12) ? this.yupper + (ty * this.pieceHeight) : this.ylower - (ty * this.pieceHeight);
-          //ey = this.get_ptYpos(ptStack[pt], pt);
+          //ey = (pt > 12) ? this.yupper + (ty * this.pieceHeight) : this.ylower - (ty * this.pieceHeight);
+          ey = this.get_ptYpos(ptStack[pt], pt);
         }
         ptStack[pt] += 1;
         const position = this.getPosObj(ex, ey);
@@ -317,6 +302,21 @@ console.log("showPosition2", player, i, position, ptStack[pt]);
     }
 
   }
+
+/***********************************/
+  get_barYpos(num, pt) {
+    const ty = (num > this.barstackthreshold) ? this.barstackthreshold : num;
+    const ey = (pt == 0) ? this.barYpos[2] - (ty * this.pieceHeight) : this.barYpos[1] + (ty * this.pieceHeight);
+    return ey;
+  }
+/**********************************/
+/***********************************/
+  get_ptYpos(num, pt) {
+    const ty = (num > this.pointstackthreshold) ? this.pointstackthreshold : num;
+    const ey = (pt > 12) ? this.yupper + (ty * this.pieceHeight) : this.ylower - (ty * this.pieceHeight);
+    return ey;
+  }
+/*********************************/
 
   animateDice(msec) {
     const animationclass = "faa-shake animated"; //ダイスを揺らすアニメーション

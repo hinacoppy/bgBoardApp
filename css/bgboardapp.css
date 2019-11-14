@@ -78,6 +78,7 @@ body{
   height: 100vh;
   background-color: #670;
   z-index: -1;
+  opacity: 0.5;
 }
 #offtray1{
   grid-area: boff1;
@@ -88,6 +89,7 @@ body{
   border: 3px solid #330;
   background-color: #760;
   z-index: -1;
+  opacity: 0.5;
 }
 #offtray2{
   grid-area: boff2;
@@ -98,6 +100,7 @@ body{
   border: 3px solid #330;
   background-color: #760;
   z-index: -1;
+  opacity: 0.5;
 }
 #player1{
   grid-area: player1;
