@@ -9,6 +9,8 @@
 }
 html{
   height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 body{
   margin: 0;
@@ -22,31 +24,34 @@ body{
 /* 以下すべて相対サイズにし、レスポンシブ対応可能にしておく */
 
 .container{
+  position: relative;
 /*  margin: 2vw 2vh;*/
 /*  background-image: url("board.png");  /* 画像ファイルの指定 */
 /*  background-position: center center;  /* 画像を常に天地左右の中央に配置 */
-  background-repeat: no-repeat;  /* 画像をタイル状に繰り返し表示しない */
+/*  background-repeat: no-repeat;  /* 画像をタイル状に繰り返し表示しない */
 /*  background-attachment: fixed;  /* コンテンツの高さが画像の高さより大きい時、動かないように固定 */
-  background-size: 100vw 100vh;  /* 表示するコンテナの大きさに基づいて、背景画像を調整 */
-  background-color: #cfc;  /* 背景画像が読み込まれる前に表示される背景のカラー */
+/*  background-size: 100vw 100vh;  /* 表示するコンテナの大きさに基づいて、背景画像を調整 */
+/*  background-color: #cfc;  /* 背景画像が読み込まれる前に表示される背景のカラー */
 
 
   display: grid; /* Grid Layout でコンテンツを配置 */
   grid-template-columns: 36vw 6vw 36vw 6vw 16vw;
   grid-template-rows: 30vh 34vh 30vh;
   grid-template-areas:
-     'area1   bar area2   boff1 player2'
+     'area1   bar area2   boff2 player2'
      'centr_l bar centr_r none  nav'
-     'area4   bar area3   boff2 player1';
-  justify-items: center; /* 横方向は中央に */
-  align-items: center;
+     'area4   bar area3   boff1 player1';
+  justify-items: auto; /* 横方向は中央に */
+  align-items: auto;
 }
 #board{
   position: absolute;
-  width: 90vw;
+  width: 84vw;
   height: 100vh;
   grid-row: 1 / 5;
   grid-column: 1 / 4;
+  background-color: #ffc;
+  z-index: -2;
 }
 #center_left{
   position:relative;
@@ -67,25 +72,27 @@ body{
   height: 100%;
 }
 #bar{
-/*  grid-area: bar;*/
-  position: absolute;
+  grid-area: bar;
+/*  position: absolute;*/
   width: 6vw;
-  height: 100%;
+  height: 100vh;
   background-color: #670;
   z-index: -1;
 }
 #offtray1{
-/*  grid-area: boff1;*/
-  position: absolute;
+  grid-area: boff1;
+/*  position: absolute;*/
+  align-self: end;
   width: 6vw;
-  height: 40vh;
+  height: 100%;
   border: 3px solid #330;
   background-color: #760;
   z-index: -1;
 }
 #offtray2{
-/*  grid-area: boff2;*/
-  position: absolute;
+  grid-area: boff2;
+/*  position: absolute;*/
+  align-self: start;
   width: 6vw;
   height: 40vh;
   border: 3px solid #330;
@@ -94,18 +101,20 @@ body{
 }
 #player1{
   grid-area: player1;
-  justify-self: start;
+  justify-self: end;
+  align-self: end;
 }
 #player2{
   grid-area: player2;
-  justify-self: center;
-  align-self: center;
+  justify-self: end;
+  align-self: start;
   background-color: #ccf;
   opacity: 0.55;
 }
 #nav{
   grid-area: nav;
-  justify-self: start;
+  justify-self: end;
+  align-self: center;
 }
 .playerinfo{
   transform: rotateZ(-90deg);
@@ -135,7 +144,7 @@ body{
 /*  font-size:2vw;*/
 }
 .score{
-  display: inline-block;
+  display: block;
   background-color: gray;
   color: white;
   width: 20vh;
@@ -145,7 +154,7 @@ body{
   font-size:5vw;
 }
 .pip{
-  display: inline-block;
+  display: block;
   background-color: #4aa;
   color: white;
   width: 10vh;
@@ -164,12 +173,12 @@ body{
 /*  width:10vw;
   height: 10vw;*/
 /*  background-color:#ddf;*/
-  color: 30vw;#6fe;
+  color: #6fe;
   font-size:5vw;
 }
 .cubeoffer{
-  color: blue;
-  background-color: violet;
+  color: violet;
+/*  background-color: violet;*/
 }
 
 .dice{
@@ -180,6 +189,7 @@ body{
 }
 .stack{
   position: absolute;
+  display: inline-block;
   text-align: center;
   font-weight: bold;
   font-size: 2vw;
@@ -187,6 +197,7 @@ body{
   line-height: 6vw;
   width: 5vw;
   z-index: 30;
+  pointer-events: none;
 }
 
 .cubecenter{

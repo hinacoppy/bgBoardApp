@@ -274,19 +274,35 @@ console.log("showDiceAll",turn, d1, d2);
 
         if (pt == 26 || pt == 27) { //bear off
           ex = this.pointx[26];
-          ey = this.get_offYpos(player) + (ptStack[pt] * this.boffHeight);
+          ey = this.offYpos[player] + (ptStack[pt] * this.boffHeight);
           sf = false;
         } else if (pt == 0 || pt == 25) { //on the bar
           ex = this.pointx[pt];
           sf = (st > this.barstackthreshold);
           ty = sf ? this.barstackthreshold : ptStack[pt];
 //          ey = this.get_barYpos(player) + (ty * this.pieceHeight);
-          ey = this.get_barYpos(ptStack[pt], pt);
+/***********************************
+  get_barYpos(num, pt) {
+    const ty = (num > this.barstackthreshold) ? this.barstackthreshold : num;
+    const ey = (pt == 0) ? this.barYpos[1] + (ty * this.pieceHeight) : this.barYpos[2] - (ty * this.pieceHeight);
+    return ey;
+  }
+**********************************/
+          ey = (pt == 0) ? this.barYpos[1] + (ty * this.pieceHeight) : this.barYpos[2] - (ty * this.pieceHeight);
+          //ey = this.get_barYpos(ptStack[pt], pt);
         } else { //in field
           ex = this.pointx[pt];
           sf = (st > this.pointstackthreshold);
           ty = sf ? this.pointstackthreshold : ptStack[pt];
-          ey = this.get_ptYpos(ptStack[pt], pt);
+/***********************************
+  get_ptYpos(num, pt) {
+    const ty = (num > this.pointstackthreshold) ? this.pointstackthreshold : num;
+    const ey = (pt > 12) ? this.yupper + (ty * this.pieceHeight) : this.ylower - (ty * this.pieceHeight);
+    return ey;
+  }
+*********************************/
+          ey = (pt > 12) ? this.yupper + (ty * this.pieceHeight) : this.ylower - (ty * this.pieceHeight);
+          //ey = this.get_ptYpos(ptStack[pt], pt);
         }
         ptStack[pt] += 1;
         const position = this.getPosObj(ex, ey);
@@ -334,108 +350,61 @@ console.log("showPosition2", player, i, position, ptStack[pt]);
     return defer.promise();
   }
 
-  //sub routine for upsidedown
-  get_cubeYpos(turn) {
-    const which = (this.topbottomFlag) ? turn : BgUtil.getOppo(turn);
-    return this.cubeY[which];
-  }
-  get_offYpos(turn) {
-    const which = (this.topbottomFlag) ? turn : BgUtil.getOppo(turn);
-    return this.offYpos[which];
-  }
-  get_barYpos___(turn) {
-    const which = (this.topbottomFlag) ? turn : BgUtil.getOppo(turn);
-    return this.barYpos[which];
-  }
-  get_barYpos(num, pt) {
-//    const which = (pt == 0) ?  true : false;
-    const ty = (num > this.barstackthreshold) ? this.barstackthreshold : num;
-    const ey = (pt == 0) ? this.barYpos[1] + (ty * this.pieceHeight) : this.barYpos[2] - (ty * this.pieceHeight);
-//console.log("get_ptYpos", num, pt, which, ty, ey);
-    return ey;
-  }
-  get_ptYpos(num, pt) {
-//    const which = (pt > 12 && this.topbottomFlag == true) || (pt <= 12 && this.topbottomFlag == false);
-    const ty = (num > this.pointstackthreshold) ? this.pointstackthreshold : num;
-    const ey = (pt > 12) ? this.yupper + (ty * this.pieceHeight) : this.ylower - (ty * this.pieceHeight);
-//console.log("get_ptYpos", num, pt, which, ty, ey);
-    return ey;
-  }
   getPosObj(x, y) {
     return {left:x, top:y}
   }
 
 
   bgBoardConfig() {
-//console.log("bgBoardConfig", this.mainBoard.height(), this.mainBoard.width());
-    this.boardWidth = 540;
-    this.boardHeight = 410;
-
     this.mainBoardHeight = this.mainBoard.height()
     this.mainBoardWidth = this.mainBoard.width()
-    this.vw_ratio = this.mainBoardWidth / 100 * 100 / 84; // 84 is grid-area width
+    this.vw_ratio = this.mainBoardWidth / 84; // 84 is grid-area width
     this.vh_ratio = this.mainBoardHeight / 100;
 
-    this.xratio = this.mainBoard.width() / this.boardWidth;
-    this.yratio = this.mainBoard.height() / this.boardHeight;
-console.log("bgBoardConfig", this.mainBoard.width(), this.mainBoard.height(), this.xratio, this.yratio, this.vw_ratio, this.vh_ratio);
-    this.boardFrame = 0; //15;
     this.pieceWidth = 5 * this.vw_ratio; // equal to width in css
     this.pieceHeight = 8 * this.vh_ratio;
     this.boffHeight = this.pieceWidth / 3 ; // bear off chequer height
     this.pointWidth = 6 * this.vw_ratio;
 
-//    this.pointx = [255, 60, 90, 120, 150, 180, 210, 300, 330, 360, 390, 420, 450,
-//                   450, 420, 390, 360, 330, 300, 210, 180, 150, 120, 90, 60, 255, 13];
-//    this.pointx = [255, 450, 420, 390, 360, 330, 300, 210, 180, 150, 120, 90, 60,
-//                    60, 90, 120, 150, 180, 210, 300, 330, 360, 390, 420, 450, 255, 13];
-//    this.pointx = [180, 360, 330, 300, 270, 240, 210, 150, 120, 90, 60, 30, 0,
-//                    0, 30, 60, 90, 120, 150, 210, 240, 270, 300, 330, 360, 180, 78];
     this.pointx = [36, 72, 66, 60, 54, 48, 42, 30, 24, 18, 12, 6, 0,
                     0, 6, 12, 18, 24, 30, 42, 48, 54, 60, 66, 72, 36, 78];
     for (let i=0; i< this.pointx.length; i++) {
-      this.pointx[i] = this.pointx[i] * this.vw_ratio;
+      this.pointx[i] *= this.vw_ratio;
     }
-    this.leftSideOff = this.boardFrame; // Off tray x coord (left)
-    this.rightSideOff = this.mainBoardWidth - this.pieceWidth - this.boardFrame; // Off tray x coord (right)
 
-    this.yupper = this.boardFrame;
+    this.yupper = 0;
     this.ylower = this.mainBoardHeight - this.pieceHeight - this.vh_ratio; //はみだしを避けるため 1vh 上げる
 
-    this.uppertrayY = 10; //10; // Y coord of upper off side tray
-    this.lowertrayY = this.mainBoardHeight - $("#offtray1").height() -  this.uppertrayY;
-    this.offYpos = [null, this.uppertrayY, this.lowertrayY];
+    const tray2Y = 10;
+    const tray1Y = this.mainBoardHeight - $("#offtray1").height() -  tray2Y;
+    this.offYpos = [null, tray1Y, tray2Y];
 
     this.pointcolfigclass = ["triange_dnev", "triange_dnod", "triange_upev", "triange_upod"];
     this.stackinfocolor = ["gray", "black", "white"]; // color code name
-    this.dicepipcolor = ["", "black", "white"]; // color code name
-    this.turncolor = ["", "#9ce", "#456"]; // color code name
+    this.dicepipcolor = ["gray", "black", "white"]; // color code name
+    this.turncolor = ["gray", "#9ce", "#456"]; // color code name
 
     this.diceSize = 5 * this.vw_ratio ; // = 5vw equal to width in css
-    this.dicey = Math.round(this.mainBoardHeight / 2 - this.diceSize / 2); // dice y coord
-    this.dice10x = this.pointx[3]; //Math.round(this.pieceWidth * 3 - 1.3 * this.diceSize +  60);
-    this.dice11x = this.pointx[4];  //Math.round(this.dice10x + 1.6 * this.diceSize);
-    this.dice20x = this.pointx[9]; //Math.round(this.pieceWidth * 3 - 1.3 * this.diceSize + 300);
-    this.dice21x = this.pointx[10]; //Math.round(this.dice20x + 1.6 * this.diceSize);
-//    this.upperlabelY = 0;
-//    this.lowerlabelY = this.boardHeight - this.boardFrame;
+    this.dicey = this.mainBoardHeight / 2 - this.diceSize / 2;
+    this.dice10x = this.pointx[3];
+    this.dice11x = this.pointx[4];
+    this.dice20x = this.pointx[9];
+    this.dice21x = this.pointx[10];
 
-    this.pointstackthreshold = 5; // Max pieces per layer on a point (+1)
-    this.barstackthreshold = 3; // Max pieces per layer on the bar (+1)
+    this.pointstackthreshold = 5;
+    this.barstackthreshold = 3;
 
     this.cubeSize = 5 * this.vw_ratio ; // =5vw equal to width in css
-    this.cubeX = this.pointx[0]; //Math.round(this.boardWidth / 2 - this.cubeSize / 2);
-    this.cubeY = [,,];
-    this.cubeY[0] = Math.round(this.mainBoardHeight / 2 - this.cubeSize / 2);
-    this.cubeY[1] =                    0 + 5;
-    this.cubeY[2] = this.mainBoardHeight - 5;
+    this.cubeX = this.pointx[0];
+    const cubeY0 = Math.round(this.mainBoardHeight / 2 - this.cubeSize / 2);
+    const cubeY1 = 5;
+    const cubeY2 = this.mainBoardHeight - cubeY1 - this.cubeSize;
+    this.cubeY = [cubeY0, cubeY1, cubeY2];
     this.cubePosClass = ["cubecenter", "turn2", "turn1"];
 
-    this.bar1ypos = this.cubeSize + 5;
-//    this.bar2ypos = this.mainBoardHeight - this.cubeSize - this.pieceHeight * 4 - 10;
-    this.bar2ypos = this.mainBoardHeight - this.bar1ypos - this.pieceHeight;
-
-    this.barYpos = [null, this.bar1ypos, this.bar2ypos];
+    const bar1ypos = this.cubeSize + 5;
+    const bar2ypos = this.mainBoardHeight - bar1ypos - this.pieceHeight;
+    this.barYpos = [null, bar1ypos, bar2ypos];
   }
 
   setDraggableChequer(player, init = false) {

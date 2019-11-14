@@ -119,6 +119,7 @@ class BgGame {
   beginNewGame(newmatch = false) {
 console.log("beginNewGame");
     const xgidstr = "XGID=Eb----------gF----------Ad:0:0:0:00:0:0:0:0:0"
+//    const xgidstr = "XGID=-b----E-C---eE---c-e----B-:0:0:1:00:0:0:0:0:10"
     this.xgid = new Xgid(xgidstr);
     if (newmatch) {
       this.xgid.matchsc = this.matchLength;
