@@ -12,13 +12,15 @@ class Chequer {
     this._domhtml = this._makeDomHtml();
     this._dom = null;
     this._position = {left:0, top:0};
+    this._width = 0;
+    this._height = 0;
     this._point = 0;
     this._stack = 0;
   }
 
   _makeDomHtml() {
     let xh;
-    xh = '<span id="' + this._domid + '" class="chequer fa-layers fa-fw">';
+    xh  = '<span id="' + this._domid + '" class="chequer fa-layers fa-fw">';
     xh += '<i class="fas fa-circle" style="color:gray"></i>';
     xh += '<i class="fas fa-circle" style="color:'+ this._color +'" data-fa-transform="shrink-1"></i>';
     xh += '</span>';
@@ -26,7 +28,11 @@ class Chequer {
   }
 
   //global function
-  set_jQueryDom()    { this._dom = $("#" + this._domid); }
+  set_jQueryDom() {
+    this._dom = $("#" + this._domid);
+    this._width = this._dom.outerWidth(true);
+    this._height = this._dom.outerHeight(true);
+  }
 
   //setter method
   set position(x) { this._position = x;     }
@@ -39,6 +45,8 @@ class Chequer {
   get domhtml()  { return this._domhtml; }
   get color()    { return this._color; }
   get position() { return this._position; }
+  get width()    { return this._width; }
+  get height()   { return this._height; }
   get point()    { return this._point; }
   get stack()    { return this._stack; }
 

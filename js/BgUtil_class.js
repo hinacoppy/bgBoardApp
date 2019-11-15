@@ -24,12 +24,12 @@ class BgUtil {
   }
 
   static cvtTurnXg2kv(t) { //cvt XGID's turn to ThisApp's turn
-    const hash = { "0":0, "1":2, "-1":1 };
+    const hash = { "0":0, "1":1, "-1":2 };
     return hash[t];
   }
 
   static cvtTurnKv2xg(t) { //cvt ThisApp's turn to XGID's turn
-    const hash = { "0":0, "1":-1, "2":1 };
+    const hash = { "0":0, "1":1, "2":-1 };
     return hash[t];
   }
 

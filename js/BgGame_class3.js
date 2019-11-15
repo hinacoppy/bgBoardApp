@@ -77,12 +77,13 @@ class BgGame {
     this.donebtn.    on('click', () => { this.doneAction(); });
     this.undobtn.    on('click', () => { this.undoAction(); });
     this.openrollbtn.on('click', () => { this.openrollAction(); });
-    this.gameendnextbtn.on('click', () => { this.gameendnextAction(); });
-    this.gameendokbtn.on('click', () => { this.gameendokAction(); });
+    this.gameendnextbtn.on('click', () => { this.gameendNextAction(); });
+    this.gameendokbtn.on('click', () => { this.gameendOkAction(); });
 
     //設定画面
     this.settingbtn.on('click', () => {
-      this.settings.alignCenter($('body')).slideToggle("normal"); //画面表示
+//      this.settings.alignCenter($('body')).slideToggle("normal"); //画面表示
+      this.settings.css(this.calcCenterPosition("S", this.settings)).slideToggle("normal"); //画面表示
       this.settingbtn.prop("disabled", true);
     });
     this.resetscorebtn.on('click', () => {
@@ -137,7 +138,7 @@ console.log("beginNewGame");
   openrollAction() {
     this.hideAllPanel();
     const dice = this.randomdice(true);
-    this.player = (dice[0] < dice[1]);
+    this.player = (dice[0] > dice[1]);
     this.xgid.dice = dice[2];
     this.xgidstrbf = this.xgid.xgidstr;
 console.log("openrollAction", this.player, this.xgidstrbf);
@@ -281,14 +282,14 @@ console.log("dropAction");
     this.matchwinflg = (this.score[w] >= this.matchLength);
   }
 
-  gameendnextAction() {
-console.log("gameendnextAction");
+  gameendNextAction() {
+console.log("gameendNextAction");
     this.hideAllPanel();
     this.showScoreInfo();
     this.beginNewGame(false);
   }
-  gameendokAction() {
-console.log("gameendokAction");
+  gameendOkAction() {
+console.log("gameendOkAction");
     this.hideAllPanel();
     this.showScoreInfo();
   }
@@ -356,23 +357,23 @@ console.log("showRollDoubleResignPanel", player);
   showDoneUndoPanel(player, opening = false) {
 console.log("showDoneUndoPanel", player);
     if (player) {
-      this.doneundo.css('margin-top', 0);
+//      this.doneundo.css('margin-top', 0);
 //      this.doneundo.css('transform', 'translateY(0px)');
       this.showElement(this.doneundo, 'L', player);
     } else {
-      this.doneundo.css('margin-top', 0);
+//      this.doneundo.css('margin-top', 0);
 //      this.doneundo.css('transform', 'translateY(0px)');
       this.showElement(this.doneundo, 'R', player);
     }
     if (opening) { //オープニングロールのときは出目の大きい側に下にずらして表示
       if (player) {
-        this.doneundo.css('margin-top', '24vh');
+//        this.doneundo.css('margin-top', '24vh');
 //        this.doneundo.css('transform', 'translateY(100px)');
-        this.showElement(this.doneundo, 'R', player);
+        this.showElement(this.doneundo, 'R', player, 12);
       } else {
-        this.doneundo.css('margin-top', '-8vh');
+//        this.doneundo.css('margin-top', '-8vh');
 //        this.doneundo.css('transform', 'translateY(-100px)');
-        this.showElement(this.doneundo, 'L', player);
+        this.showElement(this.doneundo, 'L', player, -12);
       }
     }
   }
@@ -396,14 +397,16 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
 
     const tn1 = (player) ? 'turn2' : 'turn1';
     const tn2 = (player) ? 'turn1' : 'turn2';
-    this.gameend.removeClass(tn1).addClass(tn2).alignCenter($('body')).show();
+//    this.gameend.removeClass(tn1).addClass(tn2).alignCenter($('body')).show();
+    this.gameend.removeClass(tn1).addClass(tn2).css(this.calcCenterPosition("B", this.gameend)).show();
   }
 
-  showElement(obj, which, turn) {
-    const disparea = (which == 'L') ? this.center_left : this.center_right;
+  showElement(elem, pos, turn, yoffset=0) {
+    const disparea = (pos == 'L') ? this.center_left : this.center_right;
     const tn1 = (turn) ? 'turn2' : 'turn1';
     const tn2 = (turn) ? 'turn1' : 'turn2';
-    obj.show().removeClass(tn1).addClass(tn2).alignCenter(disparea);
+//    elem.show().removeClass(tn1).addClass(tn2).alignCenter(disparea);
+    elem.show().removeClass(tn1).addClass(tn2).css(this.calcCenterPosition(pos, elem, yoffset));
   }
 
   hideAllPanel() {
@@ -421,6 +424,41 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
     this.board.showBoard2(this.xgid);
   }
 
+  calcCenterPosition(pos, elem, yoffset=0) {
+    let p_top, p_left, p_width, p_height;
+    switch (pos) {
+    case 'L': //left area
+      p_top = 0;
+      p_left = 0;
+      p_width = 36 * this.board.getVw();
+      p_height = 100 * this.board.getVh();
+      break;
+    case 'R': //right area
+      p_top = 0;
+      p_left = 42 * this.board.getVw();
+      p_width = 36 * this.board.getVw();
+      p_height = 100 * this.board.getVh();
+      break;
+    case 'B': //board area
+      p_top = 0;
+      p_left = 0;
+      p_width = 78 * this.board.getVw();
+      p_height = 100 * this.board.getVh();
+      break;
+    case 'S': //screen (default)
+    default:
+      p_top = 0;
+      p_left = 0;
+      p_width = 100 * this.board.getVw();
+      p_height = 100 * this.board.getVh();
+      break;
+    }
+    const dy = yoffset * this.board.getVh();
+    const wx = p_left + (p_width - elem.outerWidth(true)) / 2;
+    const wy = p_top + (p_height - elem.outerHeight(true)) / 2 + dy;
+
+    return {left:wx, top:wy};
+  }
 } //end of class BgGame
 
 //参考：https://qiita.com/ampersand/items/e8444779cd202d9cb084
