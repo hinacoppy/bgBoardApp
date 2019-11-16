@@ -113,7 +113,8 @@ class BgGame {
     $(".pip").toggle(!this.useclockflg); //クロックモードのときはピップ表示しない
 
     this.matchLength = this.matchlen.val();
-    this.matchinfo.text(this.matchLength);
+    const matchinfotxt = (this.matchLength == 0) ? "$" : this.matchLength;
+    this.matchinfo.text(matchinfotxt);
 //console.log("initGameOption", this.matchlen.val())
   }
 
@@ -279,7 +280,7 @@ console.log("dropAction");
     this.xgid.sc_me = this.score[1];
     this.xgid.sc_yu = this.score[2];
     this.xgid.crawford = this.xgid.checkCrawford(this.score[w], this.gamescore, this.score[l]);
-    this.matchwinflg = (this.score[w] >= this.matchLength);
+    this.matchwinflg = (this.matchLength != 0) && (this.score[w] >= this.matchLength);
   }
 
   gameendNextAction() {
@@ -421,6 +422,7 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
     let pos = this.xgid.position;
     let posout = this.xgid.moveChequer(pos, move, turn);
     this.xgid.position = posout;
+console.log("moveChequer",move, player, turn, pos, posout);
     this.board.showBoard2(this.xgid);
   }
 

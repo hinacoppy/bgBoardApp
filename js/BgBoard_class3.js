@@ -28,6 +28,7 @@ class BgBoard {
     this.setChequerDraggable();
     this.dragStartPos = null;
     this.dragObject = null;
+    this.player = 0;
   } //end of constructor()
 
   setGameObject(game) {
@@ -111,7 +112,7 @@ console.log("setGameObject",this.gameObj)
   }
 
   dragStartAction(event, ui) {
-    console.log("dragStart", this, this.dragStartPos, $(event.currentTarget));
+//    console.log("dragStart", this, this.dragStartPos, $(event.currentTarget));
     this.dragObject = $(event.currentTarget);
     let id = this.dragObject.attr("id");
     this.dragStartPos = ui.position;
@@ -123,35 +124,48 @@ console.log("setGameObject",this.gameObj)
 //        this.pointObj[destpt[i]].toggleClass("flash", true);
       }
     }
-    console.log("dragStart", id, ui.position, this.dragStartPos);
-    console.log("dragStart this.gameObj", this.gameObj);
+    console.log("dragStart", id, this.dragStartPt, this.dragStartPos);
+//    console.log("dragStart this.gameObj", this.gameObj);
     this.gameObj.pushXgidPosition();
   }
   dragStopAction(event, ui) {
     let id = this.dragObject.attr("id");
 console.log("dragStop", id, ui.position);
 //    this.pointObjAll.removeClass("flash");
+    this.dragStartPt = this.callStartPt(id);
     this.dragEndPt = this.calcPositio2Point(ui.position, this.player);
     const xg = this.gameObj.xgid;
     const ok = xg.isMovable(this.dragStartPt, this.dragEndPt);
+console.log("dragStopOK?", ok, this.dragStartPt, this.dragEndPt);
 
     if (ok) {
       const movestr = this.dragStartPt + "/" +this.dragEndPt;
-      this.gameObj.moveChequer(movestr, this.player);
+      this.gameObj.moveChequer(movestr, (this.player==1));
       this.gameObj.pushXgidPosition();
-      this.showPosition2(this.gameObj.xgid);
+console.log("dragStopOK", movestr, this.gameObj.xgid.xgidstr);
+      this.showBoard2(this.gameObj.xgid);
     } else {
       this.dragObject.animate(this.dragStartPos, 300);
     }
   }
 
+  callStartPt(id) {
+    const c = id.substr(1,1);
+    const player = (c == "w") ? 1 : 2;
+    const num = parseInt(id.substr(2) );
+    let point = this.chequer[player][num].point;
+    point = (point == 0) ? 25 : point;
+    const outpt = (player == 1) ? point : 25 - point;
+console.log("callStartPt", id, c, player, num, point, outpt);
+    return outpt;
+  }
   calcPositio2Point(position, player) {
     const pos2ptz = [13,14,15,16,17,18,25,19,20,21,22,23,24,0,12,11,10,9,8,7,25,6,5,4,3,2,1,0];
-    const px = (position.left / this.pointWidth);
+    const px = Math.floor(position.left / this.pointWidth);
     const py = Math.floor(position.top / this.mainBoardHeight * 2);
     const pt = pos2ptz[px + py * 14];
 
-console.log("calcPositio2Point", position, pt, player);
+console.log("calcPositio2Point", position, this.pointWidth, px, py, px+py*14, pt, player);
     if (pt == 0 || pt == 25) { return pt; }
     else {
       return (player == 1) ? pt : 25 - pt;
@@ -215,11 +229,14 @@ console.log("pieceWidthHeight", this.pieceWidth, this.pieceHeight, this.boffHeig
     this.cubeDisp.css(this.getPosObj(this.cubeX, this.cubeY[cubepos]));
     this.cubeDisp.removeClass("cubecenter turn1 turn2").addClass(this.cubePosClass[cubepos])
                  .toggleClass("cubeoffer", offer);
-console.log("showCube",cubepos, cubeval, offer, crawford, this.getPosObj(this.cubeX, this.cubeY[cubepos]));
+    if (offer) {
+      this.animateCube(500);
+    }
+//console.log("showCube",cubepos, cubeval, offer, crawford, this.getPosObj(this.cubeX, this.cubeY[cubepos]));
   }
 
   showDiceAll(turn, d1, d2) {
-console.log("showDiceAll",turn, d1, d2);
+//console.log("showDiceAll",turn, d1, d2);
     switch( BgUtil.cvtTurnXg2kv(turn) ) {
     case 0:
       this.showDice(1, d1, 0);
@@ -279,20 +296,19 @@ console.log("showDiceAll",turn, d1, d2);
           ex = this.pointx[26];
           sf = false;
           ey = (player == 1) ? this.offYpos[player] - (ptStack[pt] * this.boffHeight)
-                             : this.offYpos[player] + (ptStack[pt] * this.boffHeight);
-//          ey = this.offYpos[player] + (ptStack[pt] * this.boffHeight);
+                             : this.offYpos[player] + (ptStack[pt] * this.boffHeight); //player==2
         } else if (pt == 0 || pt == 25) { //on the bar
           ex = this.pointx[pt];
           sf = (st > this.barstackthreshold + 1);
           ty = (ptStack[pt] > this.barstackthreshold) ? this.barstackthreshold : ptStack[pt];
-          ey = (pt == 0) ? this.barYpos[1] + (ty * this.pieceHeight) : this.barYpos[2] - (ty * this.pieceHeight);
-          //ey = this.get_barYpos(ptStack[pt], pt);
+          ey = (pt == 0) ? this.barYpos[player] + (ty * this.pieceHeight)
+                         : this.barYpos[player] - (ty * this.pieceHeight); //pt==25
         } else { //in field
           ex = this.pointx[pt];
           sf = (st > this.pointstackthreshold + 1);
           ty = (ptStack[pt] > this.pointstackthreshold) ? this.pointstackthreshold : ptStack[pt];
-          ey = (pt > 12) ? this.yupper + (ty * this.pieceHeight) : this.ylower - (ty * this.pieceHeight);
-          //ey = this.get_ptYpos(ptStack[pt], pt);
+          ey = (pt > 12) ? this.yupper + (ty * this.pieceHeight)
+                         : this.ylower - (ty * this.pieceHeight);
         }
         ptStack[pt] += 1;
         const position = this.getPosObj(ex, ey);
@@ -308,20 +324,20 @@ console.log("showDiceAll",turn, d1, d2);
 
   }
 
-/***********************************/
+/***********************************
   get_barYpos(num, pt) {
     const ty = (num > this.barstackthreshold) ? this.barstackthreshold : num;
     const ey = (pt == 0) ? this.barYpos[2] - (ty * this.pieceHeight) : this.barYpos[1] + (ty * this.pieceHeight);
     return ey;
   }
-/**********************************/
-/***********************************/
+**********************************/
+/***********************************
   get_ptYpos(num, pt) {
     const ty = (num > this.pointstackthreshold) ? this.pointstackthreshold : num;
     const ey = (pt > 12) ? this.yupper + (ty * this.pieceHeight) : this.ylower - (ty * this.pieceHeight);
     return ey;
   }
-/*********************************/
+*********************************/
 
   animateDice(msec) {
     const animationclass = "faa-shake animated"; //ダイスを揺らすアニメーション
@@ -429,6 +445,7 @@ console.log("showDiceAll",turn, d1, d2);
       if (pt == 26 || pt == 27) { continue; }
       this.chequer[player][i].dom.draggable({disabled: false});
     }
+    this.player = player;
   }
 
 } //class BgBoard

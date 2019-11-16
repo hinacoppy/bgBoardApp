@@ -223,6 +223,7 @@ class Xgid {
         posary[bar] = this._incdec(posary[bar], +1, oppo);
       }
     }
+console.log("Xgid-moveChequer",pos, move, turn, fr, to, fpt, tpt, bar);
     return posary.join("");
   }
 
@@ -279,6 +280,7 @@ class Xgid {
         movable.push(p);
       }
     }
+console.log("Xgid-movablePoint", movable);
     return movable;
   }
 
