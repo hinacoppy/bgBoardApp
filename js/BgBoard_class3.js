@@ -4,53 +4,20 @@
 class BgBoard {
   constructor(game) {
     this.gameObj = game;
-//    this.gameObj = "";
     this.mainBoard = $('#board'); //need to define before prepareBoard()
-//    this.xgidstr = "XGID=--------------------------:0:0:0:00:0:0:0:0:0";
     this.bgBoardConfig();
-//    this.playcols = [" ", "w", "b"];
-//    this.toPointArray = new Array(28);
-//    this.leftrightFlag = false; //true: Left bearoff, false: Right bearoff
-    this.topbottomFlag = true; //true: player2 is bottom, player1 is top
-
-    this.chequer = [[],[],[]];
-    for (let j = 1; j < 3; j++) {
-      for (let i = 0; i < 15; i++) {
-        this.chequer[j][i] = new Chequer(j, i);
-      }
-    }
-
-    this.prepareBoard();
-//    this.openingRollFlag = false;
-    this.setDomNames(); //and another DOMs define after prepareBoard()
-    this.applyDomStyle();
+    this.setDomNameAndStyle();
+//    this.prepareBoard();
+//    this.setDomNames(); //and another DOMs define after prepareBoard()
+//    this.applyDomStyle();
 //    this.resetBoard();
-    this.setChequerDraggable();
-    this.dragStartPos = null;
-    this.dragObject = null;
+//    this.dragStartPos = null;
+//    this.dragObject = null;
     this.player = 0;
   } //end of constructor()
 
-  setGameObject(game) {
-    this.gameObj = game;
-console.log("setGameObject",this.gameObj)
-  }
-
-  setDomNames() {
-    this.cubeDisp = $('#cube');
-    this.diceimgs = [[],[$('#dice10'),$('#dice11')],[$('#dice20'),$('#dice21')]];
-    this.point = [];
-    for (let i = 1; i < 25; i++) {
-      this.point[i] = $('#pt'+i);
-    }
-    this.stacks = [];
-    for (let i = 0; i < 26; i++) {
-      this.stacks[i] = $('#st'+i);
-    }
-  }
-
   // Generate container and board image HTML
-  prepareBoard() {
+  __prepareBoard() {
     let i, j, k, xh = "";
     // cube
     xh += '<span id="cube" class="cubeclass fa-layers fa-fw cubecenter">';
@@ -94,7 +61,7 @@ console.log("setGameObject",this.gameObj)
     this.mainBoard.html(xh);
   }
 
-  setChequerDraggable() {
+  __setChequerDraggable() {
     $(".chequer").draggable({
       //event
       start: ( event, ui ) => {
@@ -111,12 +78,12 @@ console.log("setGameObject",this.gameObj)
     });
   }
 
-  dragStartAction(event, ui) {
+  __dragStartAction(event, ui) {
 //    console.log("dragStart", this, this.dragStartPos, $(event.currentTarget));
     this.dragObject = $(event.currentTarget);
     let id = this.dragObject.attr("id");
     this.dragStartPos = ui.position;
-    this.dragStartPt = this.calcPositio2Point(ui.position, this.player);
+    this.dragStartPt = this.calcPosition2Point(ui.position, this.player);
     if (this.gameObj.frashflg) {
       const xg = this.gameObj.xgid;
       const destpt = xg.movablePoint(this.dragStartPt);
@@ -128,12 +95,12 @@ console.log("setGameObject",this.gameObj)
 //    console.log("dragStart this.gameObj", this.gameObj);
     this.gameObj.pushXgidPosition();
   }
-  dragStopAction(event, ui) {
+  __dragStopAction(event, ui) {
     let id = this.dragObject.attr("id");
 console.log("dragStop", id, ui.position);
 //    this.pointObjAll.removeClass("flash");
     this.dragStartPt = this.callStartPt(id);
-    this.dragEndPt = this.calcPositio2Point(ui.position, this.player);
+    this.dragEndPt = this.calcPosition2Point(ui.position, this.player);
     const xg = this.gameObj.xgid;
     const ok = xg.isMovable(this.dragStartPt, this.dragEndPt);
 console.log("dragStopOK?", ok, this.dragStartPt, this.dragEndPt);
@@ -149,7 +116,7 @@ console.log("dragStopOK", movestr, this.gameObj.xgid.xgidstr);
     }
   }
 
-  callStartPt(id) {
+  __callStartPt(id) {
     const c = id.substr(1,1);
     const player = (c == "w") ? 1 : 2;
     const num = parseInt(id.substr(2) );
@@ -159,50 +126,69 @@ console.log("dragStopOK", movestr, this.gameObj.xgid.xgidstr);
 console.log("callStartPt", id, c, player, num, point, outpt);
     return outpt;
   }
-  calcPositio2Point(position, player) {
-    const pos2ptz = [13,14,15,16,17,18,25,19,20,21,22,23,24,0,12,11,10,9,8,7,25,6,5,4,3,2,1,0];
-    const px = Math.floor(position.left / this.pointWidth);
-    const py = Math.floor(position.top / this.mainBoardHeight * 2);
-    const pt = pos2ptz[px + py * 14];
 
-console.log("calcPositio2Point", position, this.pointWidth, px, py, px+py*14, pt, player);
-    if (pt == 0 || pt == 25) { return pt; }
-    else {
-      return (player == 1) ? pt : 25 - pt;
-    }
-  }
-
-  applyDomStyle() {
-//    this.mainBoard.width(this.boardWidth).height(this.boardHeight);
-//    $("#bar").css(this.getPosObj(this.pointx[0], 0));
-//    $("#offtray1").css(this.getPosObj(this.pointx[26], this.offYpos[1]));
-//    $("#offtray2").css(this.getPosObj(this.pointx[26], this.offYpos[2]));
-
-    //Cube and Dice
+  setDomNameAndStyle() {
+    //cube
+    let xh = '<span id="cube" class="cubeclass fa-layers fa-fw cubecenter">';
+    xh += '<i class="fas fa-square"></i>';
+    xh += '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8" style="font-weight:900">64</span>';
+    xh += '</span>';
+    this.mainBoard.append(xh);
+    this.cubeDisp = $('#cube');
     this.cubeDisp.css(this.getPosObj(this.cubeX, this.cubeY[0]));
+
+    //dice
+    let xh = '<span id="dice10" class="dice fa-layers fa-fw">';
+    xh += '<i class="fas fa-square" style="color:' + this.dicepipcolor[1] + '"></i>';
+    xh += '<i class="diceface fas" style="color:'+ this.turncolor[1] +'"></i></span>';
+    xh += '<span id="dice11" class="dice fa-layers fa-fw">';
+    xh += '<i class="fas fa-square" style="color:' + this.dicepipcolor[1] + '"></i>';
+    xh += '<i class="diceface fas" style="color:'+ this.turncolor[1] +'"></i></span>';
+    xh += '<span id="dice20" class="dice fa-layers fa-fw">';
+    xh += '<i class="fas fa-square" style="color:' + this.dicepipcolor[2] + '"></i>';
+    xh += '<i class="diceface fas" style="color:'+ this.turncolor[2] +'"></i></span>';
+    xh += '<span id="dice21" class="dice fa-layers fa-fw">';
+    xh += '<i class="fas fa-square" style="color:' + this.dicepipcolor[2] + '"></i>';
+    xh += '<i class="diceface fas" style="color:'+ this.turncolor[2] +'"></i></span>';
+    this.mainBoard.append(xh);
+    this.diceimgs = [[],[$('#dice10'),$('#dice11')],[$('#dice20'),$('#dice21')]];
     this.diceimgs[1][0].css(this.getPosObj(this.dice10x, this.dicey));
     this.diceimgs[1][1].css(this.getPosObj(this.dice11x, this.dicey));
     this.diceimgs[2][0].css(this.getPosObj(this.dice20x, this.dicey));
     this.diceimgs[2][1].css(this.getPosObj(this.dice21x, this.dicey));
 
-    //Point
+    //point triangles
+    this.point = [];
     for (let i = 1; i < 25; i++) {
-      let ey = (i > 12) ? 0 : this.mainBoardHeight - this.point[i].height();
-      this.point[i].css({left: this.pointx[i] , top:ey});
+      const ey = (i > 12) ? 0 : this.mainBoardHeight - this.point[i].height();
+      const colfig = ((i>12) ? 1 : 0) * 2 + (i % 2); //0=under+even, 1=under+odd, 2=upper+even, 3=upper+odd
+      const xh = '<div id="pt' + i + '" class="point ' + this.pointcolfigclass[colfig] + '"></div>';
+      this.mainBoard.append(xh);
+      this.point[i] = $('#pt' + i);
+      this.point[i].css(this.getPosObj(this.pointx[i], ey));
+    }
+    this.pointAll = $(".point");
+
+    //stack counter
+    this.stacks = [];
+    for (let i = 0; i < 26; i++) {
+      const xh = '<span id="st' + i + '" class="stack"></span>';
+      this.mainBoard.append(xh);
+      this.stacks[i] = $('#st' + i);
     }
 
     //Chequer
+    this.chequer = [[],[],[]];
     for (let j = 1; j < 3; j++) {
       for (let i = 0; i < 15; i++) {
+        this.chequer[j][i] = new Chequer(j, i);
+        const xh = this.chequer[j][i].domhtml;
+        this.mainBoard.append(xh);
         this.chequer[j][i].set_jQueryDom();
       }
     }
-//    this.pieceWidth = this.chequer[1][0].dom.show().width();
-//    this.pieceHeight = this.chequer[1][0].dom.show().height();
-//    this.boffHeight = this.pieceWidth / 3;
-console.log("pieceWidthHeight", this.pieceWidth, this.pieceHeight, this.boffHeight);
-  }
 
+  }
 
   resetBoard() {
     this.showBoard("XGID=--------------------------:0:0:0:00:0:0:0:0:0");
@@ -324,21 +310,6 @@ console.log("pieceWidthHeight", this.pieceWidth, this.pieceHeight, this.boffHeig
 
   }
 
-/***********************************
-  get_barYpos(num, pt) {
-    const ty = (num > this.barstackthreshold) ? this.barstackthreshold : num;
-    const ey = (pt == 0) ? this.barYpos[2] - (ty * this.pieceHeight) : this.barYpos[1] + (ty * this.pieceHeight);
-    return ey;
-  }
-**********************************/
-/***********************************
-  get_ptYpos(num, pt) {
-    const ty = (num > this.pointstackthreshold) ? this.pointstackthreshold : num;
-    const ey = (pt > 12) ? this.yupper + (ty * this.pieceHeight) : this.ylower - (ty * this.pieceHeight);
-    return ey;
-  }
-*********************************/
-
   animateDice(msec) {
     const animationclass = "faa-shake animated"; //ダイスを揺らすアニメーション
     this.diceimgs[1][0].addClass(animationclass);
@@ -371,10 +342,6 @@ console.log("pieceWidthHeight", this.pieceWidth, this.pieceHeight, this.boffHeig
     return defer.promise();
   }
 
-  getPosObj(x, y) {
-    return {left:x, top:y}
-  }
-
 
   bgBoardConfig() {
     this.mainBoardHeight = this.mainBoard.height()
@@ -387,18 +354,16 @@ console.log("pieceWidthHeight", this.pieceWidth, this.pieceHeight, this.boffHeig
     this.boffHeight = this.pieceWidth / 3 ; // bear off chequer height
     this.pointWidth = 6 * this.vw_ratio;
 
-    this.pointx = [36, 72, 66, 60, 54, 48, 42, 30, 24, 18, 12, 6, 0,
-                    0, 6, 12, 18, 24, 30, 42, 48, 54, 60, 66, 72, 36, 78];
+    this.pointx = [36, 72, 66, 60, 54, 48, 42, 30, 24, 18, 12,  6,  0,
+                        0,  6, 12, 18, 24, 30, 42, 48, 54, 60, 66, 72, 36, 78];
     for (let i=0; i< this.pointx.length; i++) {
       this.pointx[i] *= this.vw_ratio;
     }
 
     this.yupper = 0;
-//    this.ylower = this.mainBoardHeight - this.pieceHeight - this.vh_ratio; //はみだしを避けるため 1vh 上げる
     this.ylower = this.mainBoardHeight - this.pieceWidth;
 
     const tray2Y = 10;
-//    const tray1Y = this.mainBoardHeight - $("#offtray1").height() -  tray2Y;
     const tray1Y = this.mainBoardHeight - this.pieceWidth - tray2Y;
     this.offYpos = [null, tray1Y, tray2Y];
 
@@ -437,15 +402,31 @@ console.log("pieceWidthHeight", this.pieceWidth, this.pieceHeight, this.boffHeig
     return this.vh_ratio;
   }
 
-  setDraggableChequer(player, init = false) {
-    $(".chequer").draggable({disabled: true});
-    if (init) { return; }
-    for (let i = 0; i < 15; i++) {
-      const pt = this.chequer[player][i].point;
-      if (pt == 26 || pt == 27) { continue; }
-      this.chequer[player][i].dom.draggable({disabled: false});
+  getPosObj(x, y) {
+    return {left:x, top:y}
+  }
+
+  calcPosition2Point(position, player) {
+    const pos2ptz = [13,14,15,16,17,18,25,19,20,21,22,23,24,0,12,11,10,9,8,7,25,6,5,4,3,2,1,0];
+    const px = Math.floor(position.left / this.pointWidth);
+    const py = Math.floor(position.top / this.mainBoardHeight * 2);
+    const pt = pos2ptz[px + py * 14];
+
+console.log("calcPosition2Point", position, this.pointWidth, px, py, px+py*14, pt, player);
+    if (pt == 0 || pt == 25) { return pt; }
+    else {
+      return (player == 1) ? pt : 25 - pt;
     }
-    this.player = player;
+  }
+
+  frashOnMovablePoint(destpt) {
+    for (let i=0; i < destpt.length; i++) {
+      this.point[destpt[i]].toggleClass("flash", true);
+    }
+  }
+
+  frashOffMovablePoint() {
+    this.pointAll.removeClass("flash");
   }
 
 } //class BgBoard

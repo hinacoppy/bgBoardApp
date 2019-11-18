@@ -4,7 +4,7 @@ class BgGame {
     this.matchLength = 9;
     this.matchflg = true;
     this.matchwinflg = false;
-    this.gamescore = 2;
+    this.gamescore = 0;
 
     this.score = [0,4,6];
     this.cubeValue = 1; // =2^0
@@ -13,13 +13,13 @@ class BgGame {
     this.crawford = false;
     this.xgid = new Xgid();
     this.board = new BgBoard(this);
-//    this.board.setGameObject(this);
 
     this.setDomNames();
     this.setEventHandler();
     this.showpipflg = true;
     this.frashflg = true; //ドラッグ開始時に移動可能なポイントを光らせる
     this.useclockflg = false;
+    this.setChequerDraggable();
     this.beginNewGame(true); //スコアをリセットして新規ゲームを始める
   } //end of constructor()
 
@@ -46,9 +46,9 @@ class BgGame {
     this.pipinfo    = [undefined, $("#pip1"), $("#pip2")];
     this.matchinfo  = $("#matchinfo");
 
-    //grid area
-    this.center_right = $("#center_right");
-    this.center_left  = $("#center_left");
+//    //grid area
+//    this.center_right = $("#center_right");
+//    this.center_left  = $("#center_left");
 
     //panel
     this.panelholder  = $("#panelholder");
@@ -65,24 +65,28 @@ class BgGame {
     this.useclockflg = $("[name=useclock]").prop("checked");
     this.matchlen    = $("#matchlen");
     this.kifusource  = $("#kifusource");
+
+    //chequer
+    this.chequerall = $(".chequer");
   }
 
   setEventHandler() {
     //Button Click Event
-    this.rollbtn.    on('click', () => { this.rollAction(); });
+    this.rollbtn.    on('click', () => { this.rollAction(false); });
     this.doublebtn.  on('click', () => { this.doubleAction(); });
     this.resignbtn.  on('click', () => { this.resignAction(); });
     this.takebtn.    on('click', () => { this.takeAction(); });
     this.dropbtn.    on('click', () => { this.dropAction(); });
     this.donebtn.    on('click', () => { this.doneAction(); });
     this.undobtn.    on('click', () => { this.undoAction(); });
-    this.openrollbtn.on('click', () => { this.openrollAction(); });
+    this.openrollbtn.on('click', () => { this.rollAction(true); });
     this.gameendnextbtn.on('click', () => { this.gameendNextAction(); });
     this.gameendokbtn.on('click', () => { this.gameendOkAction(); });
 
+    this.setChequerDraggable();
+
     //設定画面
     this.settingbtn.on('click', () => {
-//      this.settings.alignCenter($('body')).slideToggle("normal"); //画面表示
       this.settings.css(this.calcCenterPosition("S", this.settings)).slideToggle("normal"); //画面表示
       this.settingbtn.prop("disabled", true);
     });
@@ -127,36 +131,38 @@ console.log("beginNewGame");
       this.xgid.matchsc = this.matchLength;
     }
     this.board.showBoard2(this.xgid);
-    this.board.setDraggableChequer(true, true);
+    this.setDraggableChequer(true, true);
     this.hideAllPanel();
     this.showOpenRollPanel();
   }
 
-  showOpenRollPanel() {
-    this.showElement(this.openrollbtn, 'R', true);
-  }
-
+/*****************************************
   openrollAction() {
     this.hideAllPanel();
+    this.undoStack = [];
     const dice = this.randomdice(true);
     this.player = (dice[0] > dice[1]);
     this.xgid.dice = dice[2];
-    this.xgidstrbf = this.xgid.xgidstr;
-console.log("openrollAction", this.player, this.xgidstrbf);
+//    this.xgidstrbf = this.xgid.xgidstr;
+console.log("openrollAction", this.player, this.xgid.xgidstr);
     this.board.showBoard2(this.xgid);
-    this.board.setDraggableChequer( this.player2idx(this.player) );
+    this.setDraggableChequer(this.player);
     this.addKifuXgid(this.xgid.xgidstr);
     this.showDoneUndoPanel(this.player, true);
   }
+******************************************/
 
-  rollAction() {
+  rollAction(openroll = false) {
     this.hideAllPanel();
     this.undoStack = [];
-    this.xgid.dice = this.randomdice()[2];
-    this.xgidstrbf = this.xgid.xgidstr;
-console.log("rollAction", this.player, this.xgid.dice, this.xgidstrbf);
+    const dice = this.randomdice(openroll);
+    this.xgid.dice = dice[2];
+    if (openroll) {
+      this.player = (dice[0] > dice[1]);
+    }
+console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgidstr);
     this.board.showBoard2(this.xgid);
-    this.board.setDraggableChequer( this.player2idx(this.player) );
+    this.setDraggableChequer(this.player);
     this.addKifuXgid(this.xgid.xgidstr);
     this.showDoneUndoPanel(this.player);
   }
@@ -171,42 +177,12 @@ console.log("undoAction", xgidstr);
     }
   }
 
-  pushXgidPosition() {
-console.log("pushXgidPosition", this.xgid.xgidstr);
-   this.undoStack.push(this.xgid.xgidstr);
-  }
-  popXgidPosition() {
-   return this.undoStack.pop();
-  }
-
-  addKifuXgid(xgid) {
-    this.kifusource.append(xgid + "\n");
-  }
-
-  player2xgturn(player) {
-    return (player) ? 1 : -1;
-  }
-  player2idx(player) {
-    return (player) ? 1 : 2;
-  }
-  player2flipclass(player) {
-    return (player) ? 'turn2' : 'turn1';
-  }
-  swapTurn() {
-    this.player = !this.player;
-  }
-  swapXgTurn() {
-    this.xgid.turn = -1 * this.xgid.turn;
-  }
-
   doneAction() {
 console.log("doneAction");
     this.hideAllPanel();
     this.swapTurn();
-    //★this.boardからXgidを取得
     this.xgid.dice = "00";
     this.xgid.turn = this.player2xgturn(this.player);
-//    this.swapXgTurn();
     this.showPipInfo();
     this.board.showBoard2(this.xgid);
     this.board.setDraggableChequer(true, true);
@@ -214,11 +190,21 @@ console.log("doneAction");
     this.showRollDoubleResignPanel(this.player);
   }
 
+  resignAction() {
+console.log("resignAction");
+    this.hideAllPanel();
+    this.swapTurn();
+    this.xgid.dice = "00";
+    this.calcScore(this.player);
+    this.board.showBoard2(this.xgid);
+    this.addKifuXgid(this.xgid.xgidstr);
+    this.showGameEndPanel(this.player);
+  }
+
   doubleAction() {
 console.log("doubleAction");
     this.hideAllPanel();
     this.swapTurn();
-    //★Xgidを編集
     this.xgid.dbloffer = true;
     this.xgid.cube += 1;
     this.xgid.cubepos = BgUtil.getXgOppo(this.xgid.turn);
@@ -228,30 +214,11 @@ console.log("doubleAction");
     this.showTakeDropPanel(this.player);
   }
 
-  resignAction() {
-console.log("resignAction");
-    this.hideAllPanel();
-    this.swapTurn();
-    //★得点計算
-    this.xgid.dice = "00";
-    this.calcScore(this.player);
-///    this.showScoreInfo();
-    this.board.showBoard2(this.xgid);
-    this.addKifuXgid(this.xgid.xgidstr);
-    this.showGameEndPanel(this.player);
-  }
-
   takeAction() {
 console.log("takeAction");
     this.hideAllPanel();
     this.swapTurn();
     this.swapXgTurn();
-    //★Xgid編集
-//    const cube = this.xgid.cube;
-//    const cubepos = this.xgid.cubepos;
-//    const turn = this.xgid.turn;
-//    this.xgid.cube += 1;
-//    this.xgid.cubepos = BgUtil.getXgOppo(this.xgid.turn);
     this.xgid.dice = "00";
     this.board.showBoard2(this.xgid);
     this.addKifuXgid(this.xgid.xgidstr);
@@ -262,25 +229,12 @@ console.log("takeAction");
 console.log("dropAction");
     this.hideAllPanel();
     this.swapTurn();
-    //★得点計算
     this.xgid.cube -= 1;
     this.xgid.dbloffer = false;
     this.calcScore(this.player);
-//    this.showScoreInfo();
     this.board.showBoard2(this.xgid);
     this.addKifuXgid(this.xgid.xgidstr);
     this.showGameEndPanel(this.player);
-  }
-
-  calcScore(player) {
-    this.gamescore = this.xgid.get_gamesc( this.player2xgturn(player) );
-    const w = this.player2idx( player);
-    const l = this.player2idx(!player);
-    this.score[w] += this.gamescore;
-    this.xgid.sc_me = this.score[1];
-    this.xgid.sc_yu = this.score[2];
-    this.xgid.crawford = this.xgid.checkCrawford(this.score[w], this.gamescore, this.score[l]);
-    this.matchwinflg = (this.matchLength != 0) && (this.score[w] >= this.matchLength);
   }
 
   gameendNextAction() {
@@ -289,6 +243,7 @@ console.log("gameendNextAction");
     this.showScoreInfo();
     this.beginNewGame(false);
   }
+
   gameendOkAction() {
 console.log("gameendOkAction");
     this.hideAllPanel();
@@ -297,17 +252,15 @@ console.log("gameendOkAction");
 
   bearoffAllAction() {
 console.log("bearoffAllAction");
-    //★得点計算
     this.calcScore(this.player); // this.player is winner
-//    this.showScoreInfo();
     this.addKifuXgid(this.xgid.xgidstr);
     this.showGameEndPanel(this.player);
   }
 
-  randomdice(opening = false) {
+  randomdice(openroll = false) {
     const d1 = Math.floor( Math.random() * 6 ) + 1;
     let   d2 = Math.floor( Math.random() * 6 ) + 1;
-    if (opening) { //オープニングロールでは同じ目を出さない
+    if (openroll) { //オープニングロールでは同じ目を出さない
       while (d1 == d2) {
         d2 = Math.floor( Math.random() * 6 ) + 1;
       }
@@ -326,6 +279,27 @@ console.log("randomdice", d1, d2, dicestr);
     this.scoreinfo[2].text(this.xgid.sc_yu);
   }
 
+  calcScore(player) {
+    this.gamescore = this.xgid.get_gamesc( this.player2xgturn(player) );
+    const w = this.player2idx( player);
+    const l = this.player2idx(!player);
+    this.score[w] += this.gamescore;
+    this.xgid.sc_me = this.score[1];
+    this.xgid.sc_yu = this.score[2];
+    this.xgid.crawford = this.xgid.checkCrawford(this.score[w], this.gamescore, this.score[l]);
+    this.matchwinflg = (this.matchLength != 0) && (this.score[w] >= this.matchLength);
+  }
+
+  canDouble(player) {
+    const candbl = (this.xgid.cubepos == 0) || (this.xgid.cubepos == this.xgid.turn);
+console.log("canDouble", candbl, this.xgid.cubepos , this.xgid.turn, player);
+    return candbl;
+  }
+
+  showOpenRollPanel() {
+    this.showElement(this.openrollbtn, 'R', true);
+  }
+
   showTakeDropPanel(player) {
 console.log("showTakeDropPanel", player);
     if (player) {
@@ -335,12 +309,6 @@ console.log("showTakeDropPanel", player);
       this.showElement(this.takebtn, 'L', player);
       this.showElement(this.dropbtn, 'R', player);
     }
-  }
-
-  canDouble(player) {
-    const candbl = (this.xgid.cubepos == 0) || (this.xgid.cubepos == this.xgid.turn);
-console.log("canDouble", candbl, this.xgid.cubepos , this.xgid.turn, player);
-    return candbl;
   }
 
   showRollDoubleResignPanel(player, doubleresignpanel = true) {
@@ -358,22 +326,14 @@ console.log("showRollDoubleResignPanel", player);
   showDoneUndoPanel(player, opening = false) {
 console.log("showDoneUndoPanel", player);
     if (player) {
-//      this.doneundo.css('margin-top', 0);
-//      this.doneundo.css('transform', 'translateY(0px)');
       this.showElement(this.doneundo, 'L', player);
     } else {
-//      this.doneundo.css('margin-top', 0);
-//      this.doneundo.css('transform', 'translateY(0px)');
       this.showElement(this.doneundo, 'R', player);
     }
     if (opening) { //オープニングロールのときは出目の大きい側に下にずらして表示
       if (player) {
-//        this.doneundo.css('margin-top', '24vh');
-//        this.doneundo.css('transform', 'translateY(100px)');
         this.showElement(this.doneundo, 'R', player, 12);
       } else {
-//        this.doneundo.css('margin-top', '-8vh');
-//        this.doneundo.css('transform', 'translateY(-100px)');
         this.showElement(this.doneundo, 'L', player, -12);
       }
     }
@@ -381,7 +341,7 @@ console.log("showDoneUndoPanel", player);
 
   showGameEndPanel(player) {
 console.log("showGameEndPanel", player);
-    const mes1 = "You WIN" + ((this.matchwinflg) ? " and MATCH" : "");
+    const mes1 = "You WIN" + ((this.matchwinflg) ? " and the MATCH" : "");
     this.gameend.children('.mes1').text(mes1);
 
     const mes2 = "Get " + this.gamescore + "pt";
@@ -398,32 +358,18 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
 
     const tn1 = (player) ? 'turn2' : 'turn1';
     const tn2 = (player) ? 'turn1' : 'turn2';
-//    this.gameend.removeClass(tn1).addClass(tn2).alignCenter($('body')).show();
     this.gameend.removeClass(tn1).addClass(tn2).css(this.calcCenterPosition("B", this.gameend)).show();
-  }
-
-  showElement(elem, pos, turn, yoffset=0) {
-    const disparea = (pos == 'L') ? this.center_left : this.center_right;
-    const tn1 = (turn) ? 'turn2' : 'turn1';
-    const tn2 = (turn) ? 'turn1' : 'turn2';
-//    elem.show().removeClass(tn1).addClass(tn2).alignCenter(disparea);
-    elem.show().removeClass(tn1).addClass(tn2).css(this.calcCenterPosition(pos, elem, yoffset));
   }
 
   hideAllPanel() {
     this.allpanel.hide();
   }
 
-  returnXgid(xgidstr) {
-    this.xgid = new Xgid(xgidstr);
-  }
-  moveChequer(move, player) {
-    let turn = this.player2xgturn(player);
-    let pos = this.xgid.position;
-    let posout = this.xgid.moveChequer(pos, move, turn);
-    this.xgid.position = posout;
-console.log("moveChequer",move, player, turn, pos, posout);
-    this.board.showBoard2(this.xgid);
+  showElement(elem, pos, turn, yoffset=0) {
+//    const disparea = (pos == 'L') ? this.center_left : this.center_right;
+    const tn1 = (turn) ? 'turn2' : 'turn1';
+    const tn2 = (turn) ? 'turn1' : 'turn2';
+    elem.show().removeClass(tn1).addClass(tn2).css(this.calcCenterPosition(pos, elem, yoffset));
   }
 
   calcCenterPosition(pos, elem, yoffset=0) {
@@ -461,24 +407,122 @@ console.log("moveChequer",move, player, turn, pos, posout);
 
     return {left:wx, top:wy};
   }
+
+  pushXgidPosition() {
+console.log("pushXgidPosition", this.xgid.xgidstr);
+   this.undoStack.push(this.xgid.xgidstr);
+  }
+  popXgidPosition() {
+   return this.undoStack.pop();
+  }
+
+  addKifuXgid(xgid) {
+    this.kifusource.append(xgid + "\n");
+  }
+
+  player2xgturn(player) {
+    return (player) ? 1 : -1;
+  }
+  player2idx(player) {
+    return (player) ? 1 : 2;
+  }
+  player2flipclass(player) {
+    return (player) ? 'turn2' : 'turn1';
+  }
+  swapTurn() {
+    this.player = !this.player;
+  }
+  swapXgTurn() {
+    this.xgid.turn = -1 * this.xgid.turn;
+  }
+
+  returnXgid(xgidstr) {
+    this.xgid = new Xgid(xgidstr);
+  }
+
+  moveChequer(move, player) {
+    let turn = this.player2xgturn(player);
+    let pos = this.xgid.position;
+    let posout = this.xgid.moveChequer(pos, move, turn);
+    this.xgid.position = posout;
+console.log("moveChequer",move, player, turn, pos, posout);
+    this.board.showBoard2(this.xgid);
+
+    if (this.xgid.get_boff(turn) == 0) { this.bearoffAllAction(); }
+  }
+
+  setChequerDraggable() {
+    this.chequerall.draggable({
+      //event
+      start: ( event, ui ) => { this.dragStartAction(event, ui); },
+      stop:  ( event, ui ) => { this.dragStopAction(event, ui); },
+      //options
+      containment: 'parent',
+      opacity: 0.6,
+      zIndex: 99,
+      revertDuration: 200
+    });
+  }
+
+  dragStartAction(event, ui) {
+    this.dragObject = $(event.currentTarget);
+//    const id = this.dragObject.attr("id");
+    this.dragStartPt = this.calcStartPt(this.dragObject); //dragStartPt is Xgid pt
+    this.frashMovablePoint(this.dragStartPt);
+console.log("dragStart", id, this.dragStartPt);
+//    this.pushXgidPosition();
+  }
+
+  dragStopAction(event, ui) {
+//    const id = this.dragObject.attr("id");
+console.log("dragStop", ui.position);
+//    this.dragStartPt = this.calcStartPt(this.dragObject);
+    this.board.frashOffMovablePoint();
+    this.dragEndPt = this.board.calcPosition2Point(ui.position, this.player);
+    const xg = this.xgid;
+    const ok = xg.isMovable(this.dragStartPt, this.dragEndPt);
+console.log("dragStopOK?", ok, this.dragStartPt, this.dragEndPt);
+
+    if (ok) {
+      const movestr = this.dragStartPt + "/" +this.dragEndPt;
+      this.moveChequer(movestr, this.player);
+      this.pushXgidPosition();
+console.log("dragStopOK", movestr, this.xgid.xgidstr);
+      this.showBoard2(this.xgid);
+    } else {
+      this.dragObject.animate(this.dragStartPos, 300);
+    }
+  }
+
+  calcStartPt(dragObj) {
+    const id = dragObj.attr("id");
+    const c = id.substr(1,1);
+    const player = (c == "w") ? 1 : 2;
+    const num = parseInt(id.substr(2) );
+    const bdpoint = this.board.chequer[player][num].point;
+    const outpt = (player == 1) ? bdpoint : 25 - bdpoint;
+console.log("calcStartPt", id, c, player, num, bdpoint, outpt);
+    return outpt;
+  }
+
+  setDraggableChequer(player, init = false) {
+    this.chequerall.draggable({disabled: true});
+    if (init) { return; }
+    const plyr = player2idx(player);
+    for (let i = 0; i < 15; i++) {
+      const pt = this.board.chequer[plyr][i].point;
+      if (pt == 26 || pt == 27) { continue; }
+      this.board.chequer[plyr][i].dom.draggable({disabled: false});
+    }
+  }
+
+  frashMovablePoint(startpt) {
+    if (this.frashflg) {
+      const xg = this.xgid;
+      const destpt = xg.movablePoint(this.dragStartPt);
+      this.board.frashOnMovablePoint(destpt);
+    }
+  }
+
+
 } //end of class BgGame
-
-//参考：https://qiita.com/ampersand/items/e8444779cd202d9cb084
-//親要素の中央に配置するためのjQuery拡張(追加関数)
-(function($){
-    $.fn.alignCenter = function(parent) {
-  //      this.each(function(){
-            const innerelem = $(this);
-            const wx = parent.offset().left + (parent.width() - innerelem.outerWidth(true)) / 2;
-            //if (wx < 0) { wx = 0; }
-            const wy = parent.offset().top + (parent.height() - innerelem.outerHeight(true)) / 2;
-            //if (wy < 0) { wy = 0; }
-//console.log("alignCenter", wx, wy, innerelem, parent);
-//console.log("alignCenter", parent.offset().left, parent.width(), innerelem.outerWidth(true));
-//console.log("alignCenter", parent.offset().top, parent.height(), innerelem.outerHeight(true));
-            innerelem.css({left:wx, top:wy});
-  //      });
-        return this;
-    };
-})(jQuery);
-
