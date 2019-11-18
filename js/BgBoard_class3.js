@@ -138,7 +138,7 @@ console.log("callStartPt", id, c, player, num, point, outpt);
     this.cubeDisp.css(this.getPosObj(this.cubeX, this.cubeY[0]));
 
     //dice
-    let xh = '<span id="dice10" class="dice fa-layers fa-fw">';
+    xh = '<span id="dice10" class="dice fa-layers fa-fw">';
     xh += '<i class="fas fa-square" style="color:' + this.dicepipcolor[1] + '"></i>';
     xh += '<i class="diceface fas" style="color:'+ this.turncolor[1] +'"></i></span>';
     xh += '<span id="dice11" class="dice fa-layers fa-fw">';
@@ -160,11 +160,11 @@ console.log("callStartPt", id, c, player, num, point, outpt);
     //point triangles
     this.point = [];
     for (let i = 1; i < 25; i++) {
-      const ey = (i > 12) ? 0 : this.mainBoardHeight - this.point[i].height();
       const colfig = ((i>12) ? 1 : 0) * 2 + (i % 2); //0=under+even, 1=under+odd, 2=upper+even, 3=upper+odd
       const xh = '<div id="pt' + i + '" class="point ' + this.pointcolfigclass[colfig] + '"></div>';
       this.mainBoard.append(xh);
       this.point[i] = $('#pt' + i);
+      const ey = (i > 12) ? 0 : this.mainBoardHeight - this.point[i].height();
       this.point[i].css(this.getPosObj(this.pointx[i], ey));
     }
     this.pointAll = $(".point");

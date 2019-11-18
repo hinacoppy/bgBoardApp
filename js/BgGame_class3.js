@@ -164,7 +164,7 @@ console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgids
     this.board.showBoard2(this.xgid);
     this.setDraggableChequer(this.player);
     this.addKifuXgid(this.xgid.xgidstr);
-    this.showDoneUndoPanel(this.player);
+    this.showDoneUndoPanel(this.player, openroll);
   }
 
   undoAction() {
@@ -185,7 +185,7 @@ console.log("doneAction");
     this.xgid.turn = this.player2xgturn(this.player);
     this.showPipInfo();
     this.board.showBoard2(this.xgid);
-    this.board.setDraggableChequer(true, true);
+    this.setDraggableChequer(true, true);
     this.addKifuXgid(this.xgid.xgidstr);
     this.showRollDoubleResignPanel(this.player);
   }
@@ -468,8 +468,9 @@ console.log("moveChequer",move, player, turn, pos, posout);
     this.dragObject = $(event.currentTarget);
 //    const id = this.dragObject.attr("id");
     this.dragStartPt = this.calcStartPt(this.dragObject); //dragStartPt is Xgid pt
+    this.dragStartPos = ui.position;
     this.frashMovablePoint(this.dragStartPt);
-console.log("dragStart", id, this.dragStartPt);
+console.log("dragStart", this.dragStartPt);
 //    this.pushXgidPosition();
   }
 
@@ -488,7 +489,7 @@ console.log("dragStopOK?", ok, this.dragStartPt, this.dragEndPt);
       this.moveChequer(movestr, this.player);
       this.pushXgidPosition();
 console.log("dragStopOK", movestr, this.xgid.xgidstr);
-      this.showBoard2(this.xgid);
+      this.board.showBoard2(this.xgid);
     } else {
       this.dragObject.animate(this.dragStartPos, 300);
     }
@@ -508,7 +509,7 @@ console.log("calcStartPt", id, c, player, num, bdpoint, outpt);
   setDraggableChequer(player, init = false) {
     this.chequerall.draggable({disabled: true});
     if (init) { return; }
-    const plyr = player2idx(player);
+    const plyr = this.player2idx(player);
     for (let i = 0; i < 15; i++) {
       const pt = this.board.chequer[plyr][i].point;
       if (pt == 26 || pt == 27) { continue; }
