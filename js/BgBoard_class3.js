@@ -7,125 +7,8 @@ class BgBoard {
     this.mainBoard = $('#board'); //need to define before prepareBoard()
     this.bgBoardConfig();
     this.setDomNameAndStyle();
-//    this.prepareBoard();
-//    this.setDomNames(); //and another DOMs define after prepareBoard()
-//    this.applyDomStyle();
-//    this.resetBoard();
-//    this.dragStartPos = null;
-//    this.dragObject = null;
     this.player = 0;
   } //end of constructor()
-
-  // Generate container and board image HTML
-  __prepareBoard() {
-    let i, j, k, xh = "";
-    // cube
-    xh += '<span id="cube" class="cubeclass fa-layers fa-fw cubecenter">';
-    xh += '<i class="fas fa-square"></i>';
-    xh += '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8" style="font-weight:900">64</span>';
-    xh += '</span>';
-
-    // dice
-    xh += '<span id="dice10" class="dice fa-layers fa-fw">';
-    xh += '<i class="fas fa-square" style="color:' + this.dicepipcolor[1] + '"></i>';
-    xh += '<i class="diceface fas" style="color:'+ this.turncolor[1] +'"></i></span>';
-    xh += '<span id="dice11" class="dice fa-layers fa-fw">';
-    xh += '<i class="fas fa-square" style="color:' + this.dicepipcolor[1] + '"></i>';
-    xh += '<i class="diceface fas" style="color:'+ this.turncolor[1] +'"></i></span>';
-    xh += '<span id="dice20" class="dice fa-layers fa-fw">';
-    xh += '<i class="fas fa-square" style="color:' + this.dicepipcolor[2] + '"></i>';
-    xh += '<i class="diceface fas" style="color:'+ this.turncolor[2] +'"></i></span>';
-    xh += '<span id="dice21" class="dice fa-layers fa-fw">';
-    xh += '<i class="fas fa-square" style="color:' + this.dicepipcolor[2] + '"></i>';
-    xh += '<i class="diceface fas" style="color:'+ this.turncolor[2] +'"></i></span>';
-    // point triangles
-    let colfig;
-    for (i = 1; i < 25; i++) {
-      k = 'pt' + i;
-      colfig = ((i>12) ? 1 : 0) * 2 + (i % 2); //0=under+even, 1=under+odd, 2=upper+even, 3=upper+odd
-      xh += '<div id="' + k + '" class="point ' + this.pointcolfigclass[colfig] + '"> </div>';
-    }
-    // stack counter
-    for (i = 0; i < 26; i++) {
-      k = 'st' + i;
-      xh += '<span id="' + k + '" class="stack"> </span>';
-    }
-    // chequer
-    for (j = 1; j < 3; j++) {
-      for (i = 0; i < 15; i++) {
-        const htm = this.chequer[j][i].domhtml;
-        xh += htm;
-      }
-    }
-
-    this.mainBoard.html(xh);
-  }
-
-  __setChequerDraggable() {
-    $(".chequer").draggable({
-      //event
-      start: ( event, ui ) => {
-        this.dragStartAction(event, ui);
-      },
-      stop: ( event, ui ) => {
-        this.dragStopAction(event, ui);
-      },
-      //options
-      containment: 'parent',
-      opacity: 0.6,
-      zIndex: 99,
-      revertDuration: 200
-    });
-  }
-
-  __dragStartAction(event, ui) {
-//    console.log("dragStart", this, this.dragStartPos, $(event.currentTarget));
-    this.dragObject = $(event.currentTarget);
-    let id = this.dragObject.attr("id");
-    this.dragStartPos = ui.position;
-    this.dragStartPt = this.calcPosition2Point(ui.position, this.player);
-    if (this.gameObj.frashflg) {
-      const xg = this.gameObj.xgid;
-      const destpt = xg.movablePoint(this.dragStartPt);
-      for (let i=0; i < destpt.length; i++) {
-//        this.pointObj[destpt[i]].toggleClass("flash", true);
-      }
-    }
-    console.log("dragStart", id, this.dragStartPt, this.dragStartPos);
-//    console.log("dragStart this.gameObj", this.gameObj);
-    this.gameObj.pushXgidPosition();
-  }
-  __dragStopAction(event, ui) {
-    let id = this.dragObject.attr("id");
-console.log("dragStop", id, ui.position);
-//    this.pointObjAll.removeClass("flash");
-    this.dragStartPt = this.callStartPt(id);
-    this.dragEndPt = this.calcPosition2Point(ui.position, this.player);
-    const xg = this.gameObj.xgid;
-    const ok = xg.isMovable(this.dragStartPt, this.dragEndPt);
-console.log("dragStopOK?", ok, this.dragStartPt, this.dragEndPt);
-
-    if (ok) {
-      const movestr = this.dragStartPt + "/" +this.dragEndPt;
-      this.gameObj.moveChequer(movestr, (this.player==1));
-      this.gameObj.pushXgidPosition();
-console.log("dragStopOK", movestr, this.gameObj.xgid.xgidstr);
-      this.showBoard2(this.gameObj.xgid);
-    } else {
-      this.dragObject.animate(this.dragStartPos, 300);
-    }
-  }
-
-  __callStartPt(id) {
-    const c = id.substr(1,1);
-    const player = (c == "w") ? 1 : 2;
-    const num = parseInt(id.substr(2) );
-    let point = this.chequer[player][num].point;
-    point = (point == 0) ? 25 : point;
-    const outpt = (player == 1) ? point : 25 - point;
-console.log("callStartPt", id, c, player, num, point, outpt);
-    return outpt;
-  }
 
   setDomNameAndStyle() {
     //cube
@@ -287,8 +170,8 @@ console.log("callStartPt", id, c, player, num, point, outpt);
           ex = this.pointx[pt];
           sf = (st > this.barstackthreshold + 1);
           ty = (ptStack[pt] > this.barstackthreshold) ? this.barstackthreshold : ptStack[pt];
-          ey = (pt == 0) ? this.barYpos[player] + (ty * this.pieceHeight)
-                         : this.barYpos[player] - (ty * this.pieceHeight); //pt==25
+          ey = (pt == 0) ? this.barYpos[player] - (ty * this.pieceHeight)
+                         : this.barYpos[player] + (ty * this.pieceHeight); //pt==25
         } else { //in field
           ex = this.pointx[pt];
           sf = (st > this.pointstackthreshold + 1);
@@ -354,6 +237,8 @@ console.log("callStartPt", id, c, player, num, point, outpt);
     this.boffHeight = this.pieceWidth / 3 ; // bear off chequer height
     this.pointWidth = 6 * this.vw_ratio;
 
+console.log("bgBoardConfig", this.mainBoardWidth, this.vw_ratio, this.pointWidth);
+
     this.pointx = [36, 72, 66, 60, 54, 48, 42, 30, 24, 18, 12,  6,  0,
                         0,  6, 12, 18, 24, 30, 42, 48, 54, 60, 66, 72, 36, 78];
     for (let i=0; i< this.pointx.length; i++) {
@@ -406,9 +291,29 @@ console.log("callStartPt", id, c, player, num, point, outpt);
     return {left:x, top:y}
   }
 
+  getBarPos(player) {
+    return this.getPosObj(this.pointx[25], this.barYpos[player]);
+  }
+
+  getOppoChequerAndGotoBar(pt, player) {
+    let obj;
+//console.log("getOppoChequerAndGotoBar", this.chequer[player]);
+    for (let i=0; i<15; i++) {
+console.log("getOppoChequerAndGotoBar", i, pt, player, this.chequer[player][i].point, pt);
+      if (this.chequer[player][i].point == pt) {
+        obj = this.chequer[player][i];
+        this.chequer[player][i].point = 25;
+        break;
+      }
+    }
+//    const obj = this.chequer[player].find((v) => v.point === pt);
+console.log("getOppoChequerAndGotoBar", obj, pt, player);
+    return obj;
+  }
+
   calcPosition2Point(position, player) {
     const pos2ptz = [13,14,15,16,17,18,25,19,20,21,22,23,24,0,12,11,10,9,8,7,25,6,5,4,3,2,1,0];
-    const px = Math.floor(position.left / this.pointWidth);
+    const px = Math.floor((position.left + this.pointWidth / 2) / this.pointWidth);
     const py = Math.floor(position.top / this.mainBoardHeight * 2);
     const pt = pos2ptz[px + py * 14];
 
@@ -417,6 +322,17 @@ console.log("calcPosition2Point", position, this.pointWidth, px, py, px+py*14, p
     else {
       return (player == 1) ? pt : 25 - pt;
     }
+  }
+
+  calcStartPt(dragObj) {
+    const id = dragObj.attr("id");
+    const c = id.substr(1,1);
+    const player = (c == "w") ? 1 : 2;
+    const num = parseInt(id.substr(2) );
+    const bdpoint = this.chequer[player][num].point;
+    const outpt = (player == 1) ? bdpoint : 25 - bdpoint;
+console.log("calcStartPt", id, c, player, num, bdpoint, outpt);
+    return outpt;
   }
 
   frashOnMovablePoint(destpt) {

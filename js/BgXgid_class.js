@@ -32,6 +32,7 @@ class Xgid {
     this._parse_xgid(this._xgid); // XGIDを解析
     this._parse_position(this._position); // ボード状態を解析
     this._calc_score(); // ゲームスコアを計算
+    this._usable_dice = []; //ムーブに使えるダイスリスト
   }
 
   // XGIDをパースし状態をローカル変数に格納
@@ -174,6 +175,7 @@ class Xgid {
   set maxcube(x)  { this._maxcube = x;  this._makeXgidStr(); }
   set crawford(x) { this._crawford = x; this._makeXgidStr(); }
   set dbloffer(x) { this._dbloffer = x; this._makeXgidStr(); }
+  set usabledice(x) { if (x) { this._setUsableDice(); } }
 
   //getter method
   get xgidstr()  { return this._xgid; }
@@ -204,6 +206,12 @@ class Xgid {
     return (numaft == 0) ? "-" : String.fromCharCode(numaft + charcd - 1);
   }
 
+  moveChequer2(move, turn) {
+    const posin = this.position;
+    this.position = this.moveChequer(posin, move, turn);
+    return this;
+  }
+
   moveChequer(pos, move, turn) {
     let frto, fr, to, fpt, tpt, bar;
     const oppo = (-1) * turn;
@@ -218,18 +226,25 @@ class Xgid {
         if (to != 0) {
           posary[tpt] = this._incdec(posary[tpt], +1, turn);
         }
+        //★TODO 使ったダイスを this._usable_dice[] から削除する
       } else { //hit move (to the bar)
         posary[fpt] = this._incdec(posary[fpt], -1, oppo);
         posary[bar] = this._incdec(posary[bar], +1, oppo);
       }
     }
-console.log("Xgid-moveChequer",pos, move, turn, fr, to, fpt, tpt, bar);
     return posary.join("");
   }
 
   isBlocked(pt) {
     pt = (this._turn == 1) ? pt : 25 - pt;
     return (this._ptno[pt] >= 2 && this._ptcol[pt] != this._turn);
+  }
+
+  isHitted(pt) {
+    pt = (this._turn == 1) ? pt : 25 - pt;
+    const ret =  (this._ptno[pt] == 1 && this._ptcol[pt] != this._turn);
+console.log("isHitted",pt, this._turn, this._ptno[pt], this._ptcol[pt], ret);
+    return ret;
   }
 
   isMovable(fr, to, strict=false) {
@@ -242,6 +257,7 @@ console.log("Xgid-moveChequer",pos, move, turn, fr, to, fpt, tpt, bar);
   }
 
   _isMovableWithDice(fr, to) {
+    //★TODO 使えるダイスは this._usable_dice[] から計算する
     const d1 = this.get_dice(1);
     const d2 = this.get_dice(2);
     let blocked = false;
@@ -274,14 +290,25 @@ console.log("Xgid-moveChequer",pos, move, turn, fr, to, fpt, tpt, bar);
     //frの駒が進めるポイントをリストで返す(前＆ブロックポイント以外)
     //strict=trueのときは、ダイスの目に従って進めるポイントを計算する
     let movable = [];
+    let pt;
     for (let p=0; p<fr; p++) {
       if (!this.isBlocked(p)) {
         if (strict && !this._isMovableWithDice(fr, p)) { continue; }
-        movable.push(p);
+        pt = (this._turn == 1) ? p : 25 - p;
+        movable.push(pt);
       }
     }
-console.log("Xgid-movablePoint", movable);
     return movable;
+  }
+
+  _setUsableDice() {
+    this._usable_dice = [];
+    this._usable_dice.push(this.get_dice(1));
+    this._usable_dice.push(this.get_dice(2));
+    if (d1 == d2) {
+      this._usable_dice.push(this.get_dice(1));
+      this._usable_dice.push(this.get_dice(1));
+    }
   }
 
 } //class Xgid
