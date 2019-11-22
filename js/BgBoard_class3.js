@@ -103,11 +103,9 @@ class BgBoard {
     if (offer) {
       this.animateCube(500);
     }
-//console.log("showCube",cubepos, cubeval, offer, crawford, this.getPosObj(this.cubeX, this.cubeY[cubepos]));
   }
 
   showDiceAll(turn, d1, d2) {
-//console.log("showDiceAll",turn, d1, d2);
     switch( BgUtil.cvtTurnXg2kv(turn) ) {
     case 0:
       this.showDice(1, d1, 0);
@@ -186,7 +184,6 @@ class BgBoard {
         this.chequer[player][i].position = position;
         this.chequer[player][i].zindex = 10 + ptStack[pt];
         this.chequer[player][i].dom.css(position).css("z-index", this.chequer[player][i].zindex);
-//console.log("showPosition2", player, i, position, ptStack[pt]);
         if (sf) {
           this.stacks[pt].text(st).css(position).css("color", this.stackinfocolor[player]);
         } else {
@@ -301,27 +298,16 @@ console.log("bgBoardConfig", this.mainBoardWidth, this.vw_ratio, this.pointWidth
     return this.getPosObj(this.pointx[25], this.barYpos[player]);
   }
 
-  ZZZ_getOppoChequerAndGotoBar(pt, player) {
-    let obj;
-//console.log("getOppoChequerAndGotoBar", this.chequer[player]);
-    for (let i=0; i<15; i++) {
-console.log("getOppoChequerAndGotoBar", i, pt, player, this.chequer[player][i].point, pt);
-      if (this.chequer[player][i].point == pt) {
-        obj = this.chequer[player][i];
-        this.chequer[player][i].point = (player == 1) ? 25 : 0;
-        break;
-      }
-    }
-//    const obj = this.chequer[player].find((v) => v.point === pt);
-console.log("getOppoChequerAndGotoBar", obj, pt, player);
-    return obj;
-  }
-
   getOppoChequerAndGotoBar(pt, player) {
-    const findChequer = (element => element.point == pt);
+    const findChequer = (element => {
+      const p = (player == 1) ? 25 - pt : pt;
+      return (element.point == p);
+    });
     const idx = this.chequer[player].findIndex(findChequer);
-    //const idx = this.chequer[player].findIndex(element => element.point == pt);
 console.log("getOppoChequerAndGotoBar", pt, player, idx);
+for(let i=0; i<15; i++) {
+  console.log("getOppoChequerAndGotoBar", this.chequer[player][i].domid, this.chequer[player][i].point);
+}
     if (idx != -1) {
       this.chequer[player][idx].point = (player == 1) ? 25 : 0;
 console.log("getOppoChequerAndGotoBar FOUND", this.chequer[player][idx].domid);
@@ -353,15 +339,6 @@ console.log("calcPosition2Point", position, this.pointWidth, px, py, px+py*14, p
     const outpt = (player == 1) ? bdpoint : 25 - bdpoint;
 console.log("calcStartPt", id, c, player, num, bdpoint, outpt);
     return outpt;
-  }
-
-  ZZZ_moveToChequerObject(obj, topt, stack) {
-    const id = obj.attr("id");
-    const c = id.substr(1,1);
-    const player = (c == "w") ? 1 : 2;
-    const num = parseInt(id.substr(2) );
-    this.chequer[player][num].point = topt;
-    this.chequer[player][num].stack = stack;
   }
 
   flashOnMovablePoint(destpt) {

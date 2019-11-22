@@ -34,6 +34,7 @@ class Xgid {
     this._calc_score(); // ゲームスコアを計算
     this._usable_dice = []; //ムーブに使えるダイスリスト
     this.zorome = false;
+    this._turnpos = ((p) => (this._turn == 1) ? p : 25 - p);
   }
 
   // XGIDをパースし状態をローカル変数に格納
@@ -208,7 +209,6 @@ class Xgid {
     return (numaft == 0) ? "-" : String.fromCharCode(numaft + charcd - 1);
   }
 
-  const _turnpos = ((p) => (this._turn == 1) ? p : 25 - p);
 
   moveChequer(move) {
     const pos = this.position; //debug後削除可
@@ -217,8 +217,6 @@ class Xgid {
     const frto = move.split("/");
     const fr = parseInt(frto[0]);
     const to = parseInt(frto[1]);
-//    const fpt = (turn == 1) ? fr : 25 - fr;
-//    const tpt = (turn == 1) ? to : 25 - to;
     const fpt = this._turnpos(fr);
     const tpt = this._turnpos(to);
     if (fr > to) { //normal move
@@ -229,7 +227,6 @@ class Xgid {
       this._use_dice(fr, to);
     } else { //hit move (to the bar)
       const oppo = (-1) * turn;
-//      const bar = (turn == 1) ? 0 : 25;
       const bar = this._turnpos(0);
       posary[fpt] = this._incdec(posary[fpt], -1, oppo);
       posary[bar] = this._incdec(posary[bar], +1, oppo);
@@ -257,14 +254,12 @@ console.log("moveChequer", pos, move, turn, fr, to, fpt, tpt, posary.join(""));
   }
 
   isBlocked(p) {
-    if (pt == 0) { return false; }
-//    pt = (this._turn == 1) ? pt : 25 - pt;
-    const pt = this._turnpos(pt);
+    if (p == 0) { return false; }
+    const pt = this._turnpos(p);
     return (this._ptno[pt] >= 2 && this._ptcol[pt] != this._turn);
   }
 
   isHitted(p) {
-//    pt = (this._turn == 1) ? pt : 25 - pt;
     const pt = this._turnpos(p);
     const ret =  (this._ptno[pt] == 1 && this._ptcol[pt] != this._turn);
 console.log("isHitted",pt, this._turn, this._ptno[pt], this._ptcol[pt], ret);
@@ -279,14 +274,12 @@ console.log("isMovable",fr, to, strict, movable);
 
   _isMovableWithDice(fr, to) {
     //オンザバーのときはそれしか動かせない
-//    const bar = (this._turn == 1) ? 25 : 0;
     const bar = this._turnpos(25);
     if (fr != 25 && this.get_ptno(bar) > 0) { return false; }
 
     //ベアオフのときはベアインしていることが必要
     if (to == 0) {
       for (let q=7; q<=25; q++) {
-//        const qt = (this.turn == 1) ? q : 25 - q;
         const qt = this._turnpos(q);
         if (this.get_ptcol(qt) == this.turn && this.get_ptno(qt) > 0) { return false; }
       }

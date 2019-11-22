@@ -9,7 +9,7 @@ class BgGame {
     this.matchwinflg = false;
     this.gamescore = 0;
 
-    this.score = [0,4,6];
+    this.score = [0,0,0];
     this.cubeValue = 1; // =2^0
     this.xgidstrbf = "";
     this.undoStack = [];
@@ -47,10 +47,6 @@ class BgGame {
     this.scoreinfo  = [undefined, $("#score1"), $("#score2")];
     this.pipinfo    = [undefined, $("#pip1"), $("#pip2")];
     this.matchinfo  = $("#matchinfo");
-
-//    //grid area
-//    this.center_right = $("#center_right");
-//    this.center_left  = $("#center_left");
 
     //panel
     this.panelholder  = $("#panelholder");
@@ -124,12 +120,11 @@ class BgGame {
     this.matchLength = this.matchlen.val();
     const matchinfotxt = (this.matchLength == 0) ? "$" : this.matchLength;
     this.matchinfo.text(matchinfotxt);
-//console.log("initGameOption", this.matchlen.val())
   }
 
   beginNewGame(newmatch = false) {
 console.log("beginNewGame");
-    const xgidstr = "XGID=bb----------gF--aa------AE:0:0:0:00:0:0:0:0:0"
+    const xgidstr = "XGID=bb-----CAA--gF--aa------A-:0:0:0:00:0:0:0:0:0"
 //    const xgidstr = "XGID=-b----E-C---eE---c-e----B-:0:0:1:00:0:0:0:0:10"
     this.xgid = new Xgid(xgidstr);
     if (newmatch) {
@@ -140,22 +135,6 @@ console.log("beginNewGame");
     this.hideAllPanel();
     this.showOpenRollPanel();
   }
-
-/*****************************************
-  openrollAction() {
-    this.hideAllPanel();
-    this.undoStack = [];
-    const dice = this.randomdice(true);
-    this.player = (dice[0] > dice[1]);
-    this.xgid.dice = dice[2];
-//    this.xgidstrbf = this.xgid.xgidstr;
-console.log("openrollAction", this.player, this.xgid.xgidstr);
-    this.board.showBoard2(this.xgid);
-    this.setDraggableChequer(this.player);
-    this.addKifuXgid(this.xgid.xgidstr);
-    this.showDoneUndoPanel(this.player, true);
-  }
-******************************************/
 
   async rollAction(openroll = false) {
     this.hideAllPanel();
@@ -267,13 +246,10 @@ console.log("bearoffAllAction");
 
   randomdice(openroll = false) {
     const random6 = (() => Math.floor( Math.random() * 6 ) + 1);
-//    const d1 = Math.floor( Math.random() * 6 ) + 1;
-//    let   d2 = Math.floor( Math.random() * 6 ) + 1;
     const d1 = random6();
     let   d2 = random6();
     if (openroll) { //オープニングロールでは同じ目を出さない
       while (d1 == d2) {
-//        d2 = Math.floor( Math.random() * 6 ) + 1;
         d2 = random6();
       }
     }
@@ -368,9 +344,6 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
     this.gameendnextbtn.toggle(!this.matchwinflg);
     this.gameendokbtn.toggle(this.matchwinflg);
 
-//    const tn1 = (player) ? 'turn2' : 'turn1';
-//    const tn2 = (player) ? 'turn1' : 'turn2';
-//    this.gameend.removeClass(tn1).addClass(tn2).css(this.calcCenterPosition("B", this.gameend)).show();
     this.gameend.show().toggleClass('turn1', player).toggleClass('turn2', !player)
                 .css(this.calcCenterPosition("B", this.gameend));
   }
@@ -380,10 +353,6 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
   }
 
   showElement(elem, pos, player, yoffset=0) {
-//    const disparea = (pos == 'L') ? this.center_left : this.center_right;
-//    const tn1 = (player) ? 'turn2' : 'turn1';
-//    const tn2 = (player) ? 'turn1' : 'turn2';
-//    elem.show().removeClass(tn1).addClass(tn2).css(this.calcCenterPosition(pos, elem, yoffset));
     elem.show().toggleClass('turn1', player).toggleClass('turn2', !player)
         .css(this.calcCenterPosition(pos, elem, yoffset));
   }
@@ -492,17 +461,17 @@ console.log("dragStopOK?", ok, hit, this.dragStartPt, this.dragEndPt);
         const oppoplayer = this.player2idx(!this.player);
         const oppoChequer = this.board.getOppoChequerAndGotoBar(this.dragEndPt, oppoplayer);
         const barPt = this.board.getBarPos(oppoplayer);
-        oppoChequer.dom.animate(barPt, 300, function(){ this.board.showBoard2(this.xgid); });
+        oppoChequer.dom.animate(barPt, 300, () => { this.board.showBoard2(this.xgid); });
         const bar = (this.player) ? 25 : 0;
-//        this.board.moveToChequerObject(oppoChequer.dom, bar, this.xgid.get_ptno[bar]);
 console.log("dragStopHIT", movestr, this.xgid.xgidstr);
       }
       const movestr = this.dragStartPt + "/" + this.dragEndPt;
       this.xgid = this.xgid.moveChequer(movestr);
       this.pushXgidPosition();
 console.log("dragStopOK ", movestr, this.xgid.xgidstr);
-      this.board.showBoard2(this.xgid);
-//      this.board.moveToChequerObject(this.dragObject, this.dragEndPt,  this.xgid.get_ptno[this.dragEndPt]);
+      if (!hit) {
+        this.board.showBoard2(this.xgid);
+      }
     } else {
       this.dragObject.animate(this.dragStartPos, 300);
     }
@@ -539,6 +508,5 @@ console.log("flashOnMovablePoint", startpt, destpt, dest2);
   flashOffMovablePoint() {
     this.board.flashOffMovablePoint();
   }
-
 
 } //end of class BgGame
