@@ -1,3 +1,6 @@
+// BgGame_class.js
+'use strict';
+
 class BgGame {
   constructor() {
     this.player = false; //true=player1, false=player2
@@ -17,7 +20,6 @@ class BgGame {
     this.setDomNames();
     this.setEventHandler();
     this.showpipflg = true;
-    this.frashflg = true; //ドラッグ開始時に移動可能なポイントを光らせる
     this.useclockflg = false;
     this.setChequerDraggable();
     this.beginNewGame(true); //スコアをリセットして新規ゲームを始める
@@ -63,6 +65,7 @@ class BgGame {
     this.settings    = $("#settings");
     this.showpipflg  = $("[name=showpip]").prop("checked");
     this.useclockflg = $("[name=useclock]").prop("checked");
+    this.flashflg    = $("[name=flashdest]").prop("checked"); //ドラッグ開始時に移動可能なポイントを光らせる
     this.matchlen    = $("#matchlen");
     this.kifusource  = $("#kifusource");
 
@@ -116,7 +119,7 @@ class BgGame {
     $(".clock").toggle(this.useclockflg);
     $(".pip").toggle(!this.useclockflg); //クロックモードのときはピップ表示しない
 
-    this.frashflg = $("[name=frashdest]").prop("checked");
+    this.flashflg = $("[name=flashdest]").prop("checked");
 
     this.matchLength = this.matchlen.val();
     const matchinfotxt = (this.matchLength == 0) ? "$" : this.matchLength;
@@ -154,11 +157,13 @@ console.log("openrollAction", this.player, this.xgid.xgidstr);
   }
 ******************************************/
 
-  rollAction(openroll = false) {
+  async rollAction(openroll = false) {
     this.hideAllPanel();
     this.undoStack = [];
     const dice = this.randomdice(openroll);
     this.xgid.dice = dice[2];
+    this.xgid.usabledice = true;
+    this.board.animateDice(800);
     this.board.showBoard2(this.xgid);
     if (openroll) {
       this.player = (dice[0] > dice[1]);
@@ -261,11 +266,15 @@ console.log("bearoffAllAction");
   }
 
   randomdice(openroll = false) {
-    const d1 = Math.floor( Math.random() * 6 ) + 1;
-    let   d2 = Math.floor( Math.random() * 6 ) + 1;
+    const random6 = (() => Math.floor( Math.random() * 6 ) + 1);
+//    const d1 = Math.floor( Math.random() * 6 ) + 1;
+//    let   d2 = Math.floor( Math.random() * 6 ) + 1;
+    const d1 = random6();
+    let   d2 = random6();
     if (openroll) { //オープニングロールでは同じ目を出さない
       while (d1 == d2) {
-        d2 = Math.floor( Math.random() * 6 ) + 1;
+//        d2 = Math.floor( Math.random() * 6 ) + 1;
+        d2 = random6();
       }
     }
     const dicestr = String(d1) + String(d2);
@@ -359,20 +368,24 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
     this.gameendnextbtn.toggle(!this.matchwinflg);
     this.gameendokbtn.toggle(this.matchwinflg);
 
-    const tn1 = (player) ? 'turn2' : 'turn1';
-    const tn2 = (player) ? 'turn1' : 'turn2';
-    this.gameend.removeClass(tn1).addClass(tn2).css(this.calcCenterPosition("B", this.gameend)).show();
+//    const tn1 = (player) ? 'turn2' : 'turn1';
+//    const tn2 = (player) ? 'turn1' : 'turn2';
+//    this.gameend.removeClass(tn1).addClass(tn2).css(this.calcCenterPosition("B", this.gameend)).show();
+    this.gameend.show().toggleClass('turn1', player).toggleClass('turn2', !player)
+                .css(this.calcCenterPosition("B", this.gameend));
   }
 
   hideAllPanel() {
     this.allpanel.hide();
   }
 
-  showElement(elem, pos, turn, yoffset=0) {
+  showElement(elem, pos, player, yoffset=0) {
 //    const disparea = (pos == 'L') ? this.center_left : this.center_right;
-    const tn1 = (turn) ? 'turn2' : 'turn1';
-    const tn2 = (turn) ? 'turn1' : 'turn2';
-    elem.show().removeClass(tn1).addClass(tn2).css(this.calcCenterPosition(pos, elem, yoffset));
+//    const tn1 = (player) ? 'turn2' : 'turn1';
+//    const tn2 = (player) ? 'turn1' : 'turn2';
+//    elem.show().removeClass(tn1).addClass(tn2).css(this.calcCenterPosition(pos, elem, yoffset));
+    elem.show().toggleClass('turn1', player).toggleClass('turn2', !player)
+        .css(this.calcCenterPosition(pos, elem, yoffset));
   }
 
   calcCenterPosition(pos, elem, yoffset=0) {
@@ -452,71 +465,49 @@ console.log("pushXgidPosition", this.xgid.xgidstr);
       containment: 'parent',
       opacity: 0.6,
       zIndex: 99,
-      revertDuration: 200
+      //revertDuration: 200
     });
   }
 
   dragStartAction(event, ui) {
     this.dragObject = $(event.currentTarget);
-//    this.dragStartPt = this.calcStartPt(this.dragObject); //dragStartPt is Xgid pt
-    this.dragStartPt = this.board.calcStartPt(this.dragObject); //dragStartPt is Xgid pt
+    this.dragStartPt = this.board.calcStartPt(this.dragObject); //dragStartPt is player relative
     this.dragStartPos = ui.position;
-    this.frashOnMovablePoint(this.dragStartPt);
+    this.flashOnMovablePoint(this.dragStartPt);
 console.log("dragStart", this.dragStartPt);
-//    this.pushXgidPosition();
   }
 
   dragStopAction(event, ui) {
-//console.log("dragStop", ui.position);
-    this.frashOffMovablePoint();
+    this.flashOffMovablePoint();
     this.dragEndPt = this.board.calcPosition2Point(ui.position, this.player2idx(this.player));
     const xg = this.xgid;
-    const ok = xg.isMovable(this.dragStartPt, this.dragEndPt);
+    const ok = xg.isMovable(this.dragStartPt, this.dragEndPt, this.flashflg);
     const hit = xg.isHitted(this.dragEndPt);
 console.log("dragStopOK?", ok, hit, this.dragStartPt, this.dragEndPt);
 
     if (ok) {
-      let movestr = this.dragStartPt + "/" +this.dragEndPt;
       if (hit) {
-        const oppoPt = 25 - this.dragEndPt;
-        const oppoPl = this.player2idx(!this.player);
-        movestr += "*";
-      //  this.moveChequer(movestr, this.player);
-        const oppoChequer = this.board.getOppoChequerAndGotoBar(oppoPt, oppoPl);
-        const barPt = this.board.getBarPos(oppoPl);
-//console.log("dragStopHIT", oppoChequer.dom, barPt);
-        oppoChequer.dom.animate(barPt, 300);
+        const movestr = this.dragEndPt + "/25";
+        this.xgid = this.xgid.moveChequer(movestr);
+        const oppoplayer = this.player2idx(!this.player);
+        const oppoChequer = this.board.getOppoChequerAndGotoBar(this.dragEndPt, oppoplayer);
+        const barPt = this.board.getBarPos(oppoplayer);
+        oppoChequer.dom.animate(barPt, 300, function(){ this.board.showBoard2(this.xgid); });
+        const bar = (this.player) ? 25 : 0;
+//        this.board.moveToChequerObject(oppoChequer.dom, bar, this.xgid.get_ptno[bar]);
+console.log("dragStopHIT", movestr, this.xgid.xgidstr);
       }
-      this.moveChequer(movestr, this.player);
+      const movestr = this.dragStartPt + "/" + this.dragEndPt;
+      this.xgid = this.xgid.moveChequer(movestr);
       this.pushXgidPosition();
-console.log("dragStopOK", movestr, this.xgid.xgidstr);
+console.log("dragStopOK ", movestr, this.xgid.xgidstr);
       this.board.showBoard2(this.xgid);
+//      this.board.moveToChequerObject(this.dragObject, this.dragEndPt,  this.xgid.get_ptno[this.dragEndPt]);
     } else {
       this.dragObject.animate(this.dragStartPos, 300);
     }
-  }
-
-  moveChequer(move, player) {
-    const turn = this.player2xgturn(player);
-    const pos = this.xgid.position;
-//    const posout = this.xgid.moveChequer(pos, move, turn);
-    this.xgid = this.xgid.moveChequer2(move, turn);
-//    this.xgid.position = posout;
-console.log("moveChequer",move, player, turn, pos, this.xgid.xgidstr);
-    this.board.showBoard2(this.xgid);
-
+    const turn = this.player2xgturn(this.player);
     if (this.xgid.get_boff(turn) == 15) { this.bearoffAllAction(); }
-  }
-
-  __calcStartPt(dragObj) {
-    const id = dragObj.attr("id");
-    const c = id.substr(1,1);
-    const player = (c == "w") ? 1 : 2;
-    const num = parseInt(id.substr(2) );
-    const bdpoint = this.board.chequer[player][num].point;
-    const outpt = (player == 1) ? bdpoint : 25 - bdpoint;
-console.log("calcStartPt", id, c, player, num, bdpoint, outpt);
-    return outpt;
   }
 
   setDraggableChequer(player, init = false) {
@@ -530,14 +521,23 @@ console.log("calcStartPt", id, c, player, num, bdpoint, outpt);
     }
   }
 
-  frashOnMovablePoint(startpt) {
-    if (this.frashflg) {
-      const destpt = this.xgid.movablePoint(this.dragStartPt, this.frashflg);
-      this.board.frashOnMovablePoint(destpt);
+  flashOnMovablePoint(startpt) {
+    if (this.flashflg) {
+      let dest2 = [];
+      const destpt = this.xgid.movablePoint(this.dragStartPt, this.flashflg);
+      if (this.player) { dest2 = destpt; }
+      else {
+        for (const p of destpt) {
+          const pt = (p == 0) ? 0 : 25 - p;
+          dest2.push(pt);
+        }
+      }
+console.log("flashOnMovablePoint", startpt, destpt, dest2);
+      this.board.flashOnMovablePoint(dest2);
     }
   }
-  frashOffMovablePoint() {
-    this.board.frashOffMovablePoint();
+  flashOffMovablePoint() {
+    this.board.flashOffMovablePoint();
   }
 
 

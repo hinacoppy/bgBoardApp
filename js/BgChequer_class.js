@@ -5,10 +5,10 @@ class Chequer {
   constructor(player, idx) { //player = 1 or 2, idx = 0..14
     this._player = player;
     this._idx = idx;
-    this._idsep = ["z", "w", "b"];
-    this._turncolor = ["", "#9ce", "#456"]; // color code name
-    this._color = this._turncolor[player];
-    this._domid = "p" + this._idsep[player] + idx;
+    const _idsep = ["z", "w", "b"];
+    const _turncolor = ["", "#9ce", "#456"];
+    this._color = _turncolor[player];
+    this._domid = "p" + _idsep[player] + idx;
     this._domhtml = this._makeDomHtml();
     this._dom = null;
     this._position = {left:0, top:0};

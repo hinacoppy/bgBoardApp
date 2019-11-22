@@ -71,6 +71,8 @@ class BgBoard {
       }
     }
 
+    this.offtray = [null, $('#offtray1'), $('#offtray2')];
+
   }
 
   resetBoard() {
@@ -187,6 +189,10 @@ class BgBoard {
 //console.log("showPosition2", player, i, position, ptStack[pt]);
         if (sf) {
           this.stacks[pt].text(st).css(position).css("color", this.stackinfocolor[player]);
+        } else {
+          if (pt != 26 && pt != 27) {
+            this.stacks[pt].text("");
+          }
         }
       }
     }
@@ -295,20 +301,34 @@ console.log("bgBoardConfig", this.mainBoardWidth, this.vw_ratio, this.pointWidth
     return this.getPosObj(this.pointx[25], this.barYpos[player]);
   }
 
-  getOppoChequerAndGotoBar(pt, player) {
+  ZZZ_getOppoChequerAndGotoBar(pt, player) {
     let obj;
 //console.log("getOppoChequerAndGotoBar", this.chequer[player]);
     for (let i=0; i<15; i++) {
 console.log("getOppoChequerAndGotoBar", i, pt, player, this.chequer[player][i].point, pt);
       if (this.chequer[player][i].point == pt) {
         obj = this.chequer[player][i];
-        this.chequer[player][i].point = 25;
+        this.chequer[player][i].point = (player == 1) ? 25 : 0;
         break;
       }
     }
 //    const obj = this.chequer[player].find((v) => v.point === pt);
 console.log("getOppoChequerAndGotoBar", obj, pt, player);
     return obj;
+  }
+
+  getOppoChequerAndGotoBar(pt, player) {
+    const findChequer = (element => element.point == pt);
+    const idx = this.chequer[player].findIndex(findChequer);
+    //const idx = this.chequer[player].findIndex(element => element.point == pt);
+console.log("getOppoChequerAndGotoBar", pt, player, idx);
+    if (idx != -1) {
+      this.chequer[player][idx].point = (player == 1) ? 25 : 0;
+console.log("getOppoChequerAndGotoBar FOUND", this.chequer[player][idx].domid);
+      return this.chequer[player][idx];
+    } else {
+      return null;
+    }
   }
 
   calcPosition2Point(position, player) {
@@ -335,14 +355,26 @@ console.log("calcStartPt", id, c, player, num, bdpoint, outpt);
     return outpt;
   }
 
-  frashOnMovablePoint(destpt) {
+  ZZZ_moveToChequerObject(obj, topt, stack) {
+    const id = obj.attr("id");
+    const c = id.substr(1,1);
+    const player = (c == "w") ? 1 : 2;
+    const num = parseInt(id.substr(2) );
+    this.chequer[player][num].point = topt;
+    this.chequer[player][num].stack = stack;
+  }
+
+  flashOnMovablePoint(destpt) {
     for (let i=0; i < destpt.length; i++) {
       this.point[destpt[i]].toggleClass("flash", true);
+      if (destpt[i] == 0) { this.offtray[this.player].toggleClass("flash", true); }
     }
   }
 
-  frashOffMovablePoint() {
+  flashOffMovablePoint() {
     this.pointAll.removeClass("flash");
+    this.offtray[1].removeClass("flash");
+    this.offtray[2].removeClass("flash");
   }
 
 } //class BgBoard

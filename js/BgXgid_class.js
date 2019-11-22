@@ -33,6 +33,7 @@ class Xgid {
     this._parse_position(this._position); // ボード状態を解析
     this._calc_score(); // ゲームスコアを計算
     this._usable_dice = []; //ムーブに使えるダイスリスト
+    this.zorome = false;
   }
 
   // XGIDをパースし状態をローカル変数に格納
@@ -65,6 +66,7 @@ class Xgid {
     if (dice1 > dice2) { this._dice_odr = dice2 + dice1; }
     this._dice_ary = [0, parseInt(dice1), parseInt(dice2)];
     this._dbloffer = false;
+    this.zorome = (dice1 == dice2);
   }
 
   //ポジション情報をパースし状態をローカル変数に格納
@@ -206,42 +208,64 @@ class Xgid {
     return (numaft == 0) ? "-" : String.fromCharCode(numaft + charcd - 1);
   }
 
-  moveChequer2(move, turn) {
-    const posin = this.position;
-    this.position = this.moveChequer(posin, move, turn);
-    return this;
-  }
+  const _turnpos = ((p) => (this._turn == 1) ? p : 25 - p);
 
-  moveChequer(pos, move, turn) {
-    let frto, fr, to, fpt, tpt, bar;
-    const oppo = (-1) * turn;
-    let posary = pos.split("");
-    for (let mv of BgUtil.cleanupMoveStr(move, this._xgid)) {
-      frto = mv.split("/");
-      fr = parseInt(frto[0]); fpt = (turn == 1) ? fr : 25 - fr;
-      to = parseInt(frto[1]); tpt = (turn == 1) ? to : 25 - to; bar = (turn == 1) ? 0 : 25;
-      if (isNaN(fr)) { break; }
-      if (fr > to) { //normal move
-        posary[fpt] = this._incdec(posary[fpt], -1, turn);
-        if (to != 0) {
-          posary[tpt] = this._incdec(posary[tpt], +1, turn);
-        }
-        //★TODO 使ったダイスを this._usable_dice[] から削除する
-      } else { //hit move (to the bar)
-        posary[fpt] = this._incdec(posary[fpt], -1, oppo);
-        posary[bar] = this._incdec(posary[bar], +1, oppo);
+  moveChequer(move) {
+    const pos = this.position; //debug後削除可
+    const turn = this.turn;
+    const posary = this.position.split("");
+    const frto = move.split("/");
+    const fr = parseInt(frto[0]);
+    const to = parseInt(frto[1]);
+//    const fpt = (turn == 1) ? fr : 25 - fr;
+//    const tpt = (turn == 1) ? to : 25 - to;
+    const fpt = this._turnpos(fr);
+    const tpt = this._turnpos(to);
+    if (fr > to) { //normal move
+      posary[fpt] = this._incdec(posary[fpt], -1, turn);
+      if (to != 0) {
+        posary[tpt] = this._incdec(posary[tpt], +1, turn);
       }
+      this._use_dice(fr, to);
+    } else { //hit move (to the bar)
+      const oppo = (-1) * turn;
+//      const bar = (turn == 1) ? 0 : 25;
+      const bar = this._turnpos(0);
+      posary[fpt] = this._incdec(posary[fpt], -1, oppo);
+      posary[bar] = this._incdec(posary[bar], +1, oppo);
     }
-    return posary.join("");
+console.log("moveChequer", pos, move, turn, fr, to, fpt, tpt, posary.join(""));
+    this.position = posary.join("");
+    return this;
+
   }
 
-  isBlocked(pt) {
-    pt = (this._turn == 1) ? pt : 25 - pt;
+  _use_dice(fr, to) {
+    const dd = fr - to;
+    const idx = this._usable_dice.findIndex(d => d == dd);
+    if (idx != -1) {
+      this._usable_dice.splice(idx, 1); //見つかればそれを削除
+    } else if (to == 0) {
+      this._usable_dice.splice(-1, 1); //ベアオフなら大きい目から使う
+    } else if (dd == this._usable_dice[0] + this._usable_dice[1]) {
+      this._usable_dice.splice(0, 2); //目を組み合わせて使う
+    } else if (dd == this._usable_dice[0] + this._usable_dice[1] + this._usable_dice[2]) {
+      this._usable_dice.splice(0, 3); //ゾロ目のときは前から使う
+    } else if (dd == this._usable_dice[0] + this._usable_dice[1] + this._usable_dice[2] + this._usable_dice[3]) {
+      this._usable_dice.splice(0, 4);
+    }
+  }
+
+  isBlocked(p) {
+    if (pt == 0) { return false; }
+//    pt = (this._turn == 1) ? pt : 25 - pt;
+    const pt = this._turnpos(pt);
     return (this._ptno[pt] >= 2 && this._ptcol[pt] != this._turn);
   }
 
-  isHitted(pt) {
-    pt = (this._turn == 1) ? pt : 25 - pt;
+  isHitted(p) {
+//    pt = (this._turn == 1) ? pt : 25 - pt;
+    const pt = this._turnpos(p);
     const ret =  (this._ptno[pt] == 1 && this._ptcol[pt] != this._turn);
 console.log("isHitted",pt, this._turn, this._ptno[pt], this._ptcol[pt], ret);
     return ret;
@@ -249,40 +273,45 @@ console.log("isHitted",pt, this._turn, this._ptno[pt], this._ptcol[pt], ret);
 
   isMovable(fr, to, strict=false) {
     const movable = this.movablePoint(fr, strict);
+console.log("isMovable",fr, to, strict, movable);
     return movable.includes(to);
   }
 
-  _topt(f, d) {
-    return (f - d < 0) ? 0 : (f - d);
-  }
-
   _isMovableWithDice(fr, to) {
-    //★TODO 使えるダイスは this._usable_dice[] から計算する
-    const d1 = this.get_dice(1);
-    const d2 = this.get_dice(2);
-    let blocked = false;
-    let movable = [];
-    let p;
+    //オンザバーのときはそれしか動かせない
+//    const bar = (this._turn == 1) ? 25 : 0;
+    const bar = this._turnpos(25);
+    if (fr != 25 && this.get_ptno(bar) > 0) { return false; }
 
-    p = this._topt(fr, d1);
-    if (!this.isBlocked(p)) { movable.push(p); }
-    p = this._topt(fr, d2);
-    if (!this.isBlocked(p)) { movable.push(p); }
-    if (movable.length == 0) { blocked = true; }
-
-    p = this._topt(fr, d1 + d2);
-    if (!this.isBlocked(p) && !blocked) { movable.push(p); }
-    else { blocked = true; }
-
-    if (d1 == d2) {
-      p = this._topt(fr, d1 + d1 + d1);
-      if (!this.isBlocked(p) && !blocked) { movable.push(p); }
-      else { blocked = true; }
-
-      p = this._topt(fr, d1 + d1 + d1 + d1);
-      if (!this.isBlocked(p) && !blocked) { movable.push(p); }
+    //ベアオフのときはベアインしていることが必要
+    if (to == 0) {
+      for (let q=7; q<=25; q++) {
+//        const qt = (this.turn == 1) ? q : 25 - q;
+        const qt = this._turnpos(q);
+        if (this.get_ptcol(qt) == this.turn && this.get_ptno(qt) > 0) { return false; }
+      }
     }
 
+    let piplist = [];
+    let w = 0;
+    for (const d of this._usable_dice) {
+      w += d;
+      if (!piplist.includes(d)) { piplist.push(d); }
+      if (!piplist.includes(w)) { piplist.push(w); }
+    }
+
+    const _topt = ((f, d) => (f - d < 0) ? 0 : (f - d));
+    const delta = (this.zorome) ? 2 : 1;
+    let blocked = 0;
+    let movable = [];
+    for (const d of piplist.sort((a, b) => a - b)) {
+      const p = _topt(fr, d); //定数関数で計算
+      if (blocked < 2 && !this.isBlocked(p)) {
+         movable.push(p);
+      } else {
+         blocked += delta;
+      }
+    }
     return movable.includes(to);
   }
 
@@ -290,12 +319,10 @@ console.log("isHitted",pt, this._turn, this._ptno[pt], this._ptcol[pt], ret);
     //frの駒が進めるポイントをリストで返す(前＆ブロックポイント以外)
     //strict=trueのときは、ダイスの目に従って進めるポイントを計算する
     let movable = [];
-    let pt;
     for (let p=0; p<fr; p++) {
       if (!this.isBlocked(p)) {
         if (strict && !this._isMovableWithDice(fr, p)) { continue; }
-        pt = (this._turn == 1) ? p : 25 - p;
-        movable.push(pt);
+        movable.push(p);
       }
     }
     return movable;
@@ -305,7 +332,7 @@ console.log("isHitted",pt, this._turn, this._ptno[pt], this._ptcol[pt], ret);
     this._usable_dice = [];
     this._usable_dice.push(this.get_dice(1));
     this._usable_dice.push(this.get_dice(2));
-    if (d1 == d2) {
+    if (this.zorome) {
       this._usable_dice.push(this.get_dice(1));
       this._usable_dice.push(this.get_dice(1));
     }
