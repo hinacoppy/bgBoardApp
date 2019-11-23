@@ -54,7 +54,7 @@ class BgBoard {
 
     //stack counter
     this.stacks = [];
-    for (let i = 0; i < 26; i++) {
+    for (let i = 0; i < 28; i++) {
       const xh = '<span id="st' + i + '" class="stack"></span>';
       this.mainBoard.append(xh);
       this.stacks[i] = $('#st' + i);
@@ -184,12 +184,9 @@ class BgBoard {
         this.chequer[player][i].position = position;
         this.chequer[player][i].zindex = 10 + ptStack[pt];
         this.chequer[player][i].dom.css(position).css("z-index", this.chequer[player][i].zindex);
+        this.stacks[pt].text("");
         if (sf) {
           this.stacks[pt].text(st).css(position).css("color", this.stackinfocolor[player]);
-        } else {
-          if (pt != 26 && pt != 27) {
-            this.stacks[pt].text("");
-          }
         }
       }
     }
@@ -341,10 +338,11 @@ console.log("calcStartPt", id, c, player, num, bdpoint, outpt);
     return outpt;
   }
 
-  flashOnMovablePoint(destpt) {
+  flashOnMovablePoint(destpt, player) {
     for (let i=0; i < destpt.length; i++) {
-      this.point[destpt[i]].toggleClass("flash", true);
-      if (destpt[i] == 0) { this.offtray[this.player].toggleClass("flash", true); }
+//      this.point[destpt[i]].toggleClass("flash", true);
+      if (destpt[i] == 0) { this.offtray[player].toggleClass("flash", true); }
+      else { this.point[destpt[i]].toggleClass("flash", true); }
     }
   }
 

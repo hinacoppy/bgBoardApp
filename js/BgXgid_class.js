@@ -32,8 +32,8 @@ class Xgid {
     this._parse_xgid(this._xgid); // XGIDを解析
     this._parse_position(this._position); // ボード状態を解析
     this._calc_score(); // ゲームスコアを計算
-    this._usable_dice = []; //ムーブに使えるダイスリスト
-    this.zorome = false;
+    this.zorome = (this.get_dice(1) == this.get_dice(2));
+    this._usable_dice = this._setUsableDice(); //ムーブに使えるダイスリスト
     this._turnpos = ((p) => (this._turn == 1) ? p : 25 - p);
   }
 
@@ -178,7 +178,7 @@ class Xgid {
   set maxcube(x)  { this._maxcube = x;  this._makeXgidStr(); }
   set crawford(x) { this._crawford = x; this._makeXgidStr(); }
   set dbloffer(x) { this._dbloffer = x; this._makeXgidStr(); }
-  set usabledice(x) { if (x) { this._setUsableDice(); } }
+  set usabledice(x) { this._usable_dice = this._setUsableDice(); }
 
   //getter method
   get xgidstr()  { return this._xgid; }
@@ -240,16 +240,17 @@ console.log("moveChequer", pos, move, turn, fr, to, fpt, tpt, posary.join(""));
   _use_dice(fr, to) {
     const dd = fr - to;
     const idx = this._usable_dice.findIndex(d => d == dd);
+console.log("_use_dice", fr, to, dd, idx, this._usable_dice);
     if (idx != -1) {
       this._usable_dice.splice(idx, 1); //見つかればそれを削除
-    } else if (to == 0) {
-      this._usable_dice.splice(-1, 1); //ベアオフなら大きい目から使う
     } else if (dd == this._usable_dice[0] + this._usable_dice[1]) {
-      this._usable_dice.splice(0, 2); //目を組み合わせて使う
+      this._usable_dice.splice(0, 2);   //目を組み合わせて使う
     } else if (dd == this._usable_dice[0] + this._usable_dice[1] + this._usable_dice[2]) {
-      this._usable_dice.splice(0, 3); //ゾロ目のときは前から使う
+      this._usable_dice.splice(0, 3);   //ゾロ目のときは前から使う
     } else if (dd == this._usable_dice[0] + this._usable_dice[1] + this._usable_dice[2] + this._usable_dice[3]) {
       this._usable_dice.splice(0, 4);
+    } else if (to == 0) {
+      this._usable_dice.splice(-1, 1);  //上記で使えなかったときは大きい目から使う
     }
   }
 
@@ -272,6 +273,10 @@ console.log("isMovable",fr, to, strict, movable);
     return movable.includes(to);
   }
 
+//★TODO 片方の目しか使えないときは大きい目を使わなければならない
+//★TODO 動かせる目があるときは必ず使わなければならない
+//例：XGID=-abHDA--a--a----abb-ba-b-A:0:0:1:61:0:0:0:5:0  OK:25/18 21/20 NG:25/24
+
   _isMovableWithDice(fr, to) {
     //オンザバーのときはそれしか動かせない
     const bar = this._turnpos(25);
@@ -285,26 +290,37 @@ console.log("isMovable",fr, to, strict, movable);
       }
     }
 
+console.log("_isMovableWithDice", fr, to, this._usable_dice);
     let piplist = [];
     let w = 0;
     for (const d of this._usable_dice) {
-      w += d;
+      if (this.get_ptno(bar) >= 2) { w  = d; }
+      else                         { w += d; }
       if (!piplist.includes(d)) { piplist.push(d); }
       if (!piplist.includes(w)) { piplist.push(w); }
     }
 
-    const _topt = ((f, d) => (f - d < 0) ? 0 : (f - d));
+    const f_topt = ((f, d) => (f - d < 0) ? 0 : (f - d));
+    const f_existBacker = ((f) => {
+      for (let q = f+1; q<25; q++) {
+        const p = this._turnpos(q);
+        if (this._ptcol[p] == this._turn && this._ptno[p] > 0) { return true; }
+      }
+      return false;
+    });
     const delta = (this.zorome) ? 2 : 1;
     let blocked = 0;
     let movable = [];
     for (const d of piplist.sort((a, b) => a - b)) {
-      const p = _topt(fr, d); //定数関数で計算
+      const p = f_topt(fr, d); //定数関数で計算
+      if (fr-d < 0 && f_existBacker(fr)) { continue; }
       if (blocked < 2 && !this.isBlocked(p)) {
          movable.push(p);
       } else {
          blocked += delta;
       }
     }
+console.log("_isMovableWithDice", movable, f_existBacker(fr));
     return movable.includes(to);
   }
 
@@ -321,14 +337,44 @@ console.log("isMovable",fr, to, strict, movable);
     return movable;
   }
 
-  _setUsableDice() {
-    this._usable_dice = [];
-    this._usable_dice.push(this.get_dice(1));
-    this._usable_dice.push(this.get_dice(2));
-    if (this.zorome) {
-      this._usable_dice.push(this.get_dice(1));
-      this._usable_dice.push(this.get_dice(1));
+  moveFinished() {
+//    const f_topt = ((f, d) => (f - d < 0) ? 0 : (f - d));
+    if (this._usable_dice.length == 0) { return true; } //使える目がなくなった時
+    for (let q=1; q<25; q++) { //動かせる先がなくなった時
+      const pt = this._turnpos(q);
+      if (this._ptcol[pt] != this.turn) { continue; }
+      for (const d of this._usable_dice) {
+//        const ds = f_topt(pt, d);
+        const ds = (pt - d < 0) ? 0 : (pt - d);
+        if (this.isMovable(pt, ds, true)) { return false; }
+      }
     }
+    return true;
+  }
+
+  _setUsableDice() {
+    let usabledice = [];
+    usabledice.push(this.get_dice(1));
+    usabledice.push(this.get_dice(2));
+    if (this.zorome) {
+      usabledice.push(this.get_dice(1));
+      usabledice.push(this.get_dice(1));
+    }
+    return usabledice.sort(); //ベアオフで後ろから使うように昇順にしておく
+  }
+
+  initialize(pos="--------------------------", newmatch=false, matchlen=0) {
+    this.position = pos;
+    this.matchsc  = matchlen;
+    this.sc_me    = (newmatch) ? 0: this.sc_me;
+    this.sc_yu    = (newmatch) ? 0: this.sc_yu;
+    this.crawford = (newmatch) ? false : this.crawford;
+    this.cube     = 0;
+    this.cubepos  = 0;
+    this.turn     = 0;
+    this.dice     = "00";
+    this.jb       = 0;
+    this.maxcube  = 0;
   }
 
 } //class Xgid

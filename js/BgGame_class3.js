@@ -4,7 +4,7 @@
 class BgGame {
   constructor() {
     this.player = false; //true=player1, false=player2
-    this.matchLength = 9;
+    this.matchLength = 5;
     this.matchflg = true;
     this.matchwinflg = false;
     this.gamescore = 0;
@@ -38,7 +38,7 @@ class BgGame {
     this.cancelbtn   = $("#cancelbtn");
     this.settingbtn  = $("#settingbtn");
     this.openrollbtn = $("#openingroll");
-    this.resetscorebtn = $("#resetscorebtn");
+//    this.resetscorebtn = $("#resetscorebtn");
     this.gameendnextbtn= $("#gameendnextbtn");
     this.gameendokbtn  = $("#gameendokbtn");
 
@@ -89,11 +89,11 @@ class BgGame {
       this.settings.css(this.calcCenterPosition("S", this.settings)).slideToggle("normal"); //画面表示
       this.settingbtn.prop("disabled", true);
     });
-    this.resetscorebtn.on('click', () => {
-      this.score = [0,0,0];
-      this.scoreinfo[1].text(0);
-      this.scoreinfo[2].text(0);
-    });
+//    this.resetscorebtn.on('click', () => {
+//      this.score = [0,0,0];
+//      this.scoreinfo[1].text(0);
+//      this.scoreinfo[2].text(0);
+//    });
     this.newgamebtn.on('click', () => {
       this.settings.slideToggle("normal"); //画面を消す
       this.settingbtn.prop("disabled", false);
@@ -108,32 +108,33 @@ class BgGame {
   }
 
   initGameOption() {
-    this.showpipflg  = $("[name=showpip]").prop("checked");
-    $(".pip").toggle(this.showpipflg);
+    this.useclockflg = $("[name=useclock]") .prop("checked");
+    this.showpipflg  = $("[name=showpip]")  .prop("checked");
+    this.flashflg    = $("[name=flashdest]").prop("checked");
 
-    this.useclockflg = $("[name=useclock]").prop("checked");
     $(".clock").toggle(this.useclockflg);
-    $(".pip").toggle(!this.useclockflg); //クロックモードのときはピップ表示しない
-
-    this.flashflg = $("[name=flashdest]").prop("checked");
+    $(".pip").toggle(this.showpipflg && !this.useclockflg); //クロックモードのときはピップ表示しない
 
     this.matchLength = this.matchlen.val();
     const matchinfotxt = (this.matchLength == 0) ? "$" : this.matchLength;
     this.matchinfo.text(matchinfotxt);
+    this.score = [0,0,0];
+    this.scoreinfo[1].text(0);
+    this.scoreinfo[2].text(0);
+//console.log("initGameOption", this.showpipflg, this.useclockflg, this.flashflg, this.matchLength);
   }
 
   beginNewGame(newmatch = false) {
-console.log("beginNewGame");
-    const xgidstr = "XGID=bb-----CAA--gF--aa------A-:0:0:0:00:0:0:0:0:0"
-//    const xgidstr = "XGID=-b----E-C---eE---c-e----B-:0:0:1:00:0:0:0:0:10"
-    this.xgid = new Xgid(xgidstr);
-    if (newmatch) {
-      this.xgid.matchsc = this.matchLength;
-    }
+//console.log("beginNewGame");
+//    const initpos   = "-bbCEABCA--g---aab--------";
+    const initpos = "-b----E-C---eE---c-e----B-";
+    this.xgid.initialize(initpos, newmatch, this.matchLength);
     this.board.showBoard2(this.xgid);
+    this.showPipInfo();
     this.setDraggableChequer(true, true);
     this.hideAllPanel();
     this.showOpenRollPanel();
+console.log("beginNewGame", this.xgid.xgidstr, this.xgid.matchsc);
   }
 
   async rollAction(openroll = false) {
@@ -151,6 +152,7 @@ console.log("beginNewGame");
 console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgidstr);
     this.setDraggableChequer(this.player);
     this.addKifuXgid(this.xgid.xgidstr);
+    this.pushXgidPosition();
     this.showDoneUndoPanel(this.player, openroll);
   }
 
@@ -159,6 +161,8 @@ console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgids
     if (this.undoStack.length > 0) {
       const xgidstr = this.popXgidPosition();
       this.xgid = new Xgid(xgidstr);
+      this.xgid.usabledice = true;
+      this.pushXgidPosition();
 console.log("undoAction", xgidstr);
       this.board.showBoard2(this.xgid);
     }
@@ -259,8 +263,8 @@ console.log("randomdice", d1, d2, dicestr);
   }
 
   showPipInfo() {
-    this.pipinfo[1].text(this.xgid.get_pip(-1));
-    this.pipinfo[2].text(this.xgid.get_pip(+1));
+    this.pipinfo[1].text(this.xgid.get_pip(+1));
+    this.pipinfo[2].text(this.xgid.get_pip(-1));
   }
   showScoreInfo() {
     this.scoreinfo[1].text(this.xgid.sc_me);
@@ -271,15 +275,16 @@ console.log("randomdice", d1, d2, dicestr);
     this.gamescore = this.xgid.get_gamesc( this.player2xgturn(player) );
     const w = this.player2idx( player);
     const l = this.player2idx(!player);
+    this.xgid.crawford = this.xgid.checkCrawford(this.score[w], this.gamescore, this.score[l]);
     this.score[w] += this.gamescore;
     this.xgid.sc_me = this.score[1];
     this.xgid.sc_yu = this.score[2];
-    this.xgid.crawford = this.xgid.checkCrawford(this.score[w], this.gamescore, this.score[l]);
     this.matchwinflg = (this.matchLength != 0) && (this.score[w] >= this.matchLength);
+console.log("calcScore", player, this.xgid.crawford, this.score[w], this.gamescore, this.score[l], this.score);
   }
 
   canDouble(player) {
-    const candbl = (this.xgid.cubepos == 0) || (this.xgid.cubepos == this.xgid.turn);
+    const candbl = !this.xgid.crawford && (this.xgid.cubepos == 0) || (this.xgid.cubepos == this.xgid.turn);
 console.log("canDouble", candbl, this.xgid.cubepos , this.xgid.turn, player);
     return candbl;
   }
@@ -301,7 +306,7 @@ console.log("showTakeDropPanel", player);
 
   showRollDoubleResignPanel(player, doubleresignpanel = true) {
 console.log("showRollDoubleResignPanel", player);
-    this.doublebtn.toggle( this.canDouble(player) );
+    this.doublebtn.prop("disabled", !this.canDouble(player) );
     if (player) {
       this.showElement(this.rollbtn, 'R', player);
       if (doubleresignpanel) { this.showElement(this.doubleresign, 'L', player); }
@@ -313,6 +318,7 @@ console.log("showRollDoubleResignPanel", player);
 
   showDoneUndoPanel(player, opening = false) {
 console.log("showDoneUndoPanel", player);
+    this.donebtn.prop("disabled", (!this.xgid.moveFinished() && this.flashflg) );
     if (player) {
       this.showElement(this.doneundo, 'L', player);
     } else {
@@ -398,7 +404,9 @@ console.log("pushXgidPosition", this.xgid.xgidstr);
    this.undoStack.push(this.xgid.xgidstr);
   }
   popXgidPosition() {
-   return this.undoStack.pop();
+    const r = this.undoStack.pop();
+console.log("popXgidPosition", r);
+    return r;
   }
 
   addKifuXgid(xgid) {
@@ -467,7 +475,7 @@ console.log("dragStopHIT", movestr, this.xgid.xgidstr);
       }
       const movestr = this.dragStartPt + "/" + this.dragEndPt;
       this.xgid = this.xgid.moveChequer(movestr);
-      this.pushXgidPosition();
+//      this.pushXgidPosition();
 console.log("dragStopOK ", movestr, this.xgid.xgidstr);
       if (!hit) {
         this.board.showBoard2(this.xgid);
@@ -475,6 +483,8 @@ console.log("dragStopOK ", movestr, this.xgid.xgidstr);
     } else {
       this.dragObject.animate(this.dragStartPos, 300);
     }
+console.log("dragStop button", this.xgid.moveFinished() , this.flashflg);
+    this.donebtn.prop("disabled", (!this.xgid.moveFinished() && this.flashflg) );
     const turn = this.player2xgturn(this.player);
     if (this.xgid.get_boff(turn) == 15) { this.bearoffAllAction(); }
   }
@@ -502,7 +512,7 @@ console.log("dragStopOK ", movestr, this.xgid.xgidstr);
         }
       }
 console.log("flashOnMovablePoint", startpt, destpt, dest2);
-      this.board.flashOnMovablePoint(dest2);
+      this.board.flashOnMovablePoint(dest2, this.player2idx(this.player));
     }
   }
   flashOffMovablePoint() {

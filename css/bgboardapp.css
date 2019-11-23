@@ -62,21 +62,21 @@ body{
   top: 70vh;
   left: 86vw;
   width: 13vw;
-  height: 30vh;
+/*  height: 30vh;*/
 }
 #player2{
   position: absolute;
   top: 0;
   left: 86vw;
   width: 13vw;
-  height: 30vh;
+/*  height: 30vh;*/
 }
 #nav{
   position: absolute;
   top: 35vh;
   left: 86vw;
 /*  width: 13vw;*/
-  height: 30vh;
+/*  height: 30vh;*/
   display: flex__;
 /*  justify-content: center;*/
   align-items: center;
@@ -130,8 +130,14 @@ body{
   font-size:2vw;
   white-space: nowrap;
 }
+.oparationbtn:disabled {
+  color:#666;
+  background-color:#999;
+  border-color: #666;
+}
 .area{
   position:absolute;
+  z-index: 50;
 /*  display:none;*/
 }
 
@@ -148,6 +154,7 @@ body{
 .dice{
   position:absolute;
   font-size:5vw;
+  z-index: 40;
 }
 
 .stack{
