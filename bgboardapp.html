@@ -37,22 +37,22 @@
 </nav>
 
 <section id="panelholder" style="display:none">
-<button id="rollbtn" class="oparationbtn area"><i class="fas fa-dice"></i> Roll</button>
-<span id="doubleresign" class="area">
+<button id="rollbtn" class="oparationbtn panel"><i class="fas fa-dice"></i> Roll</button>
+<span id="doubleresign" class="panel">
 <button id="doublebtn" class="oparationbtn"><i class="fas fa-dice-d6"></i> Double</button> &emsp;
 <button id="resignbtn" class="oparationbtn"><i class="fas fa-flag" style="color:white"></i> Resign</button>
 </span>
 
-<button id="takebtn" class="oparationbtn area"><i class="fas fa-thumbs-up"></i> Take</button>
-<button id="dropbtn" class="oparationbtn area"><i class="fas fa-thumbs-down"></i> Pass</button>
+<button id="takebtn" class="oparationbtn panel"><i class="fas fa-thumbs-up"></i> Take</button>
+<button id="dropbtn" class="oparationbtn panel"><i class="fas fa-thumbs-down"></i> Pass</button>
 
-<div id="doneundo" class="area">
+<div id="doneundo" class="panel">
 <button id="donebtn" class="oparationbtn"><i class="fas fa-check-circle"></i> Done</button> &emsp;
 <button id="undobtn" class="oparationbtn"><i class="fas fa-undo"></i> Undo</button>
 </div>
-<button id="openingroll" class="oparationbtn area"><i class="fas fa-dice"></i> Opening Roll</button>
+<button id="openingroll" class="oparationbtn panel"><i class="fas fa-dice"></i> Opening Roll</button>
 
-<div id="gameend" class="area settings">
+<div id="gameend" class="panel settings">
 <p class="mes1">You WIN and the MATCH</p>
 <p class="mes2">Get <span>2</span>pt</p>
 <p class="mes3"><span>7</span> - <span>5</span> &emsp; (<span>9</span>pt)</p>
@@ -113,11 +113,11 @@ Match length:
 <script src="js/jquery-ui.min.js"></script>
 <script src="js/jquery.ui.touch-punch.min.js"></script>
 <!-- <script src="js/inobounce.min.js"></script> -->
-<script src="js/BgGame_class3.js"></script>
 <script src="js/BgBoard_class3.js"></script>
 <script src="js/BgChequer_class.js"></script>
 <script src="js/BgXgid_class.js"></script>
 <script src="js/BgUtil_class.js"></script>
+<script src="js/BgGame_class3.js"></script>
 <script>
 //iNoBounce.enable();
 var bgGame = new BgGame();

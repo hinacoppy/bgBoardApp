@@ -24,7 +24,7 @@ class Xgid {
     this._ptcol = new Array(26);
     this._pip = [0, 0];
     this._boff = [0, 0];
-    this._gamesc = [0, 0];
+    this._gamesc = [[], []];
     this._bgarea = [0, 0]; // BG負けエリアの駒の数
     this._gmarea = [0, 0]; //  G負けエリアの駒の数
     this._dbloffer = false;
@@ -117,16 +117,16 @@ class Xgid {
     // 負け側の駒を数えて、勝ち側のスコアを計算する
     const cubeprice = Math.pow(2, this._cube);
     const contact = this._have_contact();
-    if (this._boff[0] > 0)        { this._gamesc[1] = 1 * cubeprice; }
-    else if (contact)             { this._gamesc[1] = 3 * cubeprice; }
-    else if (this._bgarea[0] > 0) { this._gamesc[1] = 3 * cubeprice; }
-    else if (this._gmarea[0] > 0) { this._gamesc[1] = 2 * cubeprice; }
-    else                          { this._gamesc[1] = 1 * cubeprice; }
-    if (this._boff[1] > 0)        { this._gamesc[0] = 1 * cubeprice; }
-    else if (contact)             { this._gamesc[0] = 3 * cubeprice; }
-    else if (this._bgarea[1] > 0) { this._gamesc[0] = 3 * cubeprice; }
-    else if (this._gmarea[1] > 0) { this._gamesc[0] = 2 * cubeprice; }
-    else                          { this._gamesc[0] = 1 * cubeprice; }
+    if (this._boff[0] > 0)        { this._gamesc[1] = [cubeprice, 1]; }
+    else if (contact)             { this._gamesc[1] = [cubeprice, 3]; }
+    else if (this._bgarea[0] > 0) { this._gamesc[1] = [cubeprice, 3]; }
+    else if (this._gmarea[0] > 0) { this._gamesc[1] = [cubeprice, 2]; }
+    else                          { this._gamesc[1] = [cubeprice, 1]; }
+    if (this._boff[1] > 0)        { this._gamesc[0] = [cubeprice, 1]; }
+    else if (contact)             { this._gamesc[0] = [cubeprice, 3]; }
+    else if (this._bgarea[1] > 0) { this._gamesc[0] = [cubeprice, 3]; }
+    else if (this._gmarea[1] > 0) { this._gamesc[0] = [cubeprice, 2]; }
+    else                          { this._gamesc[0] = [cubeprice, 1]; }
   }
 
   _have_contact() {
@@ -162,7 +162,7 @@ class Xgid {
   get_ptcol(p)   { return this._ptcol[p]; }
   get_pip(t)     { return (t == -1) ? this._pip[1] : (t == 1) ? this._pip[0] : 0; }
   get_boff(t)    { return (t == -1) ? this._boff[1] : (t == 1) ? this._boff[0] : 0; }
-  get_gamesc(t)  { return (t == -1) ? this._gamesc[1] : (t == 1) ? this._gamesc[0] : 0; }
+  get_gamesc(t)  { return (t == -1) ? this._gamesc[1] : (t == 1) ? this._gamesc[0] : [0,0]; }
   get_dbloffer() { return this._dbloffer; }
 
   //setter method

@@ -4,24 +4,25 @@
 class BgGame {
   constructor() {
     this.player = false; //true=player1, false=player2
+//    this.matchflg = true;
+    this.gamescore = [];
     this.matchLength = 5;
-    this.matchflg = true;
-    this.matchwinflg = false;
-    this.gamescore = 0;
-
     this.score = [0,0,0];
+    this.matchwinflg = false;
     this.cubeValue = 1; // =2^0
-    this.xgidstrbf = "";
-    this.undoStack = [];
+//    this.xgidstrbf = "";
     this.crawford = false;
     this.xgid = new Xgid();
     this.board = new BgBoard(this);
+    this.undoStack = [];
 
     this.setDomNames();
     this.setEventHandler();
     this.showpipflg = true;
     this.useclockflg = false;
+    this.flashflg = true;
     this.setChequerDraggable();
+    this.initGameOption();
     this.beginNewGame(true); //スコアをリセットして新規ゲームを始める
   } //end of constructor()
 
@@ -41,6 +42,7 @@ class BgGame {
 //    this.resetscorebtn = $("#resetscorebtn");
     this.gameendnextbtn= $("#gameendnextbtn");
     this.gameendokbtn  = $("#gameendokbtn");
+    this.diceAsBtn  = $("#dice10,#dice11,#dice20,#dice21");
 
     //infos
     this.playerinfo = [undefined, $("#playerinfo1"), $("#playerinfo2")];
@@ -50,7 +52,7 @@ class BgGame {
 
     //panel
     this.panelholder  = $("#panelholder");
-    this.allpanel     = $(".area");
+    this.allpanel     = $(".panel");
     this.doubleresign = $("#doubleresign");
     this.doneundo     = $("#doneundo");
     this.gameend      = $("#gameend");
@@ -81,6 +83,7 @@ class BgGame {
     this.openrollbtn.on('click', () => { this.rollAction(true); });
     this.gameendnextbtn.on('click', () => { this.gameendNextAction(); });
     this.gameendokbtn.on('click', () => { this.gameendOkAction(); });
+    this.diceAsBtn.on('click', () => { this.diceClickAction(); });
 
     this.setChequerDraggable();
 
@@ -121,7 +124,7 @@ class BgGame {
     this.score = [0,0,0];
     this.scoreinfo[1].text(0);
     this.scoreinfo[2].text(0);
-//console.log("initGameOption", this.showpipflg, this.useclockflg, this.flashflg, this.matchLength);
+console.log("initGameOption", this.showpipflg, this.useclockflg, this.flashflg, this.matchLength);
   }
 
   beginNewGame(newmatch = false) {
@@ -179,6 +182,15 @@ console.log("doneAction");
     this.setDraggableChequer(true, true);
     this.addKifuXgid(this.xgid.xgidstr);
     this.showRollDoubleResignPanel(this.player);
+  }
+
+  diceClickAction() {
+    const doneflg = this.donebtn.prop("disabled");
+console.log("diceClickAction", doneflg);
+    if (!doneflg) {
+//    if (!this.donebtn.prop("disabled")) {
+      this.doneAction();
+    }
   }
 
   resignAction() {
@@ -275,12 +287,13 @@ console.log("randomdice", d1, d2, dicestr);
     this.gamescore = this.xgid.get_gamesc( this.player2xgturn(player) );
     const w = this.player2idx( player);
     const l = this.player2idx(!player);
-    this.xgid.crawford = this.xgid.checkCrawford(this.score[w], this.gamescore, this.score[l]);
-    this.score[w] += this.gamescore;
+    const scr = this.gamescore[0] * this.gamescore[1];
+    this.xgid.crawford = this.xgid.checkCrawford(this.score[w], scr, this.score[l]);
+    this.score[w] += scr;
     this.xgid.sc_me = this.score[1];
     this.xgid.sc_yu = this.score[2];
     this.matchwinflg = (this.matchLength != 0) && (this.score[w] >= this.matchLength);
-console.log("calcScore", player, this.xgid.crawford, this.score[w], this.gamescore, this.score[l], this.score);
+console.log("calcScore", player, this.xgid.crawford, this.score[w], this.gamescore, this.score[l], this.score,  this.matchwinflg, this.matchLength);
   }
 
   canDouble(player) {
@@ -333,20 +346,25 @@ console.log("showDoneUndoPanel", player);
     }
   }
 
-  showGameEndPanel(player) {
+  makeGameEndPanal(player) {
 console.log("showGameEndPanel", player);
     const mes1 = "You WIN" + ((this.matchwinflg) ? " and the MATCH" : "");
     this.gameend.children('.mes1').text(mes1);
-
-    const mes2 = "Get " + this.gamescore + "pt";
+    const winlevel = ["", "SINGLE", "GAMMON", "BACK GAMMON"];
+    const res = winlevel[this.gamescore[1]];
+    const mes2 = "Get " + this.gamescore[0] * this.gamescore[1] + "pt (" + res + ")";
     this.gameend.children('.mes2').text(mes2);
 
     const p1 = this.player2idx(player);
     const p2 = this.player2idx(!player);
-    const mes3 = this.score[p1] + " - " + this.score[p2] + ((!this.matchflg) ? "" : "&emsp;(" +this.matchLength + "pt)");
+    const mes3 = this.score[p1] + " - " + this.score[p2] + ((this.matchLength == 0) ? "" : "&emsp;(" +this.matchLength + "pt)");
     this.gameend.children('.mes3').html(mes3);
 
 console.log("showGameEndPanel", mes1, mes2, mes3);
+  }
+
+  showGameEndPanel(player) {
+    this.makeGameEndPanal(player);
     this.gameendnextbtn.toggle(!this.matchwinflg);
     this.gameendokbtn.toggle(this.matchwinflg);
 

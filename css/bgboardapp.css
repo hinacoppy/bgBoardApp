@@ -135,7 +135,7 @@ body{
   background-color:#999;
   border-color: #666;
 }
-.area{
+.panel{
   position:absolute;
   z-index: 50;
 /*  display:none;*/
