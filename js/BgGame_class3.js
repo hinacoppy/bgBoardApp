@@ -4,13 +4,11 @@
 class BgGame {
   constructor() {
     this.player = false; //true=player1, false=player2
-//    this.matchflg = true;
     this.gamescore = [];
     this.matchLength = 5;
     this.score = [0,0,0];
     this.matchwinflg = false;
     this.cubeValue = 1; // =2^0
-//    this.xgidstrbf = "";
     this.crawford = false;
     this.xgid = new Xgid();
     this.board = new BgBoard(this);
@@ -18,10 +16,11 @@ class BgGame {
 
     this.setDomNames();
     this.setEventHandler();
+    this.setChequerDraggable();
     this.showpipflg = true;
     this.useclockflg = false;
     this.flashflg = true;
-    this.setChequerDraggable();
+    this.outerDragFlag = false; //駒でない部分をタップしてドラッグを始めたら true
     this.initGameOption();
     this.beginNewGame(true); //スコアをリセットして新規ゲームを始める
   } //end of constructor()
@@ -43,11 +42,13 @@ class BgGame {
     this.gameendnextbtn= $("#gameendnextbtn");
     this.gameendokbtn  = $("#gameendokbtn");
     this.diceAsBtn  = $("#dice10,#dice11,#dice20,#dice21");
+    this.pointTriangle = $(".point");
 
     //infos
     this.playerinfo = [undefined, $("#playerinfo1"), $("#playerinfo2")];
     this.scoreinfo  = [undefined, $("#score1"), $("#score2")];
     this.pipinfo    = [undefined, $("#pip1"), $("#pip2")];
+    this.timerinfo    = [undefined, $("#timer1"), $("#timer2")];
     this.matchinfo  = $("#matchinfo");
 
     //panel
@@ -84,8 +85,8 @@ class BgGame {
     this.gameendnextbtn.on('click', () => { this.gameendNextAction(); });
     this.gameendokbtn.on('click', () => { this.gameendOkAction(); });
     this.diceAsBtn.on('click', () => { this.diceClickAction(); });
-
-    this.setChequerDraggable();
+    this.pointTriangle.on('touchstart mousedown', (e) => { this.pointTouchStartAction(e); });
+    this.pointTriangle.on('touchend mouseup', (e) => { this.pointTouchEndAction(e); });
 
     //設定画面
     this.settingbtn.on('click', () => {
@@ -134,7 +135,7 @@ console.log("initGameOption", this.showpipflg, this.useclockflg, this.flashflg, 
     this.xgid.initialize(initpos, newmatch, this.matchLength);
     this.board.showBoard2(this.xgid);
     this.showPipInfo();
-    this.setDraggableChequer(true, true);
+    this.swapChequerDraggable(true, true);
     this.hideAllPanel();
     this.showOpenRollPanel();
 console.log("beginNewGame", this.xgid.xgidstr, this.xgid.matchsc);
@@ -150,10 +151,10 @@ console.log("beginNewGame", this.xgid.xgidstr, this.xgid.matchsc);
     this.board.showBoard2(this.xgid);
     if (openroll) {
       this.player = (dice[0] > dice[1]);
-      this.xgid.turn = this.player2xgturn(this.player);
+      this.xgid.turn = BgUtil.cvtTurnGm2Xg(this.player);
     }
 console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgidstr);
-    this.setDraggableChequer(this.player);
+    this.swapChequerDraggable(this.player);
     this.addKifuXgid(this.xgid.xgidstr);
     this.pushXgidPosition();
     this.showDoneUndoPanel(this.player, openroll);
@@ -165,6 +166,7 @@ console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgids
       const xgidstr = this.popXgidPosition();
       this.xgid = new Xgid(xgidstr);
       this.xgid.usabledice = true;
+      this.donebtn.prop("disabled", (!this.xgid.moveFinished() && this.flashflg) );
       this.pushXgidPosition();
 console.log("undoAction", xgidstr);
       this.board.showBoard2(this.xgid);
@@ -176,11 +178,11 @@ console.log("doneAction");
     this.hideAllPanel();
     this.swapTurn();
     this.xgid.dice = "00";
-    this.xgid.turn = this.player2xgturn(this.player);
+    this.xgid.turn = BgUtil.cvtTurnGm2Xg(this.player);
     this.showPipInfo();
     this.board.showBoard2(this.xgid);
-    this.setDraggableChequer(true, true);
-    this.addKifuXgid(this.xgid.xgidstr);
+    this.swapChequerDraggable(true, true);
+//    this.addKifuXgid(this.xgid.xgidstr);
     this.showRollDoubleResignPanel(this.player);
   }
 
@@ -235,6 +237,7 @@ console.log("dropAction");
     this.xgid.cube -= 1;
     this.xgid.dbloffer = false;
     this.calcScore(this.player);
+    this.swapXgTurn();
     this.board.showBoard2(this.xgid);
     this.addKifuXgid(this.xgid.xgidstr);
     this.showGameEndPanel(this.player);
@@ -244,6 +247,7 @@ console.log("dropAction");
 console.log("gameendNextAction");
     this.hideAllPanel();
     this.showScoreInfo();
+    this.addKifuXgid("\n");
     this.beginNewGame(false);
   }
 
@@ -284,9 +288,9 @@ console.log("randomdice", d1, d2, dicestr);
   }
 
   calcScore(player) {
-    this.gamescore = this.xgid.get_gamesc( this.player2xgturn(player) );
-    const w = this.player2idx( player);
-    const l = this.player2idx(!player);
+    this.gamescore = this.xgid.get_gamesc( BgUtil.cvtTurnGm2Xg(player) );
+    const w = BgUtil.cvtTurnGm2Bd( player);
+    const l = BgUtil.cvtTurnGm2Bd(!player);
     const scr = this.gamescore[0] * this.gamescore[1];
     this.xgid.crawford = this.xgid.checkCrawford(this.score[w], scr, this.score[l]);
     this.score[w] += scr;
@@ -330,8 +334,10 @@ console.log("showRollDoubleResignPanel", player);
   }
 
   showDoneUndoPanel(player, opening = false) {
-console.log("showDoneUndoPanel", player);
-    this.donebtn.prop("disabled", (!this.xgid.moveFinished() && this.flashflg) );
+const moveFinished = this.xgid.moveFinished();
+    this.donebtn.prop("disabled", (!moveFinished && this.flashflg) );
+//    this.donebtn.prop("disabled", (!this.xgid.moveFinished() && this.flashflg) );
+console.log("showDoneUndoPanel", player, moveFinished , this.flashflg);
     if (player) {
       this.showElement(this.doneundo, 'L', player);
     } else {
@@ -355,8 +361,8 @@ console.log("showGameEndPanel", player);
     const mes2 = "Get " + this.gamescore[0] * this.gamescore[1] + "pt (" + res + ")";
     this.gameend.children('.mes2').text(mes2);
 
-    const p1 = this.player2idx(player);
-    const p2 = this.player2idx(!player);
+    const p1 = BgUtil.cvtTurnGm2Bd(player);
+    const p2 = BgUtil.cvtTurnGm2Bd(!player);
     const mes3 = this.score[p1] + " - " + this.score[p2] + ((this.matchLength == 0) ? "" : "&emsp;(" +this.matchLength + "pt)");
     this.gameend.children('.mes3').html(mes3);
 
@@ -430,7 +436,7 @@ console.log("popXgidPosition", r);
   addKifuXgid(xgid) {
     this.kifusource.append(xgid + "\n");
   }
-
+/***********************************
   player2xgturn(player) {
     return (player) ? 1 : -1;
   }
@@ -440,15 +446,16 @@ console.log("popXgidPosition", r);
   player2flipclass(player) {
     return (player) ? 'turn2' : 'turn1';
   }
+  returnXgid(xgidstr) {
+    this.xgid = new Xgid(xgidstr);
+  }
+*********************************/
+
   swapTurn() {
     this.player = !this.player;
   }
   swapXgTurn() {
     this.xgid.turn = -1 * this.xgid.turn;
-  }
-
-  returnXgid(xgidstr) {
-    this.xgid = new Xgid(xgidstr);
   }
 
   setChequerDraggable() {
@@ -466,15 +473,17 @@ console.log("popXgidPosition", r);
 
   dragStartAction(event, ui) {
     this.dragObject = $(event.currentTarget);
-    this.dragStartPt = this.board.calcStartPt(this.dragObject); //dragStartPt is player relative
-    this.dragStartPos = ui.position;
+    const id = this.dragObject.attr("id");
+    this.dragStartPt = this.board.getDragStartPoint(id, BgUtil.cvtTurnGm2Bd(this.player));
+    if (!this.outerDragFlag) { this.dragStartPos = ui.position; }
+    this.outerDragFlag = false;
     this.flashOnMovablePoint(this.dragStartPt);
-console.log("dragStart", this.dragStartPt);
+console.log("dragStart", this.dragStartPt, this.dragObject, event);
   }
 
   dragStopAction(event, ui) {
     this.flashOffMovablePoint();
-    this.dragEndPt = this.board.calcPosition2Point(ui.position, this.player2idx(this.player));
+    this.dragEndPt = this.board.getDragEndPoint(ui.position, BgUtil.cvtTurnGm2Bd(this.player));
     const xg = this.xgid;
     const ok = xg.isMovable(this.dragStartPt, this.dragEndPt, this.flashflg);
     const hit = xg.isHitted(this.dragEndPt);
@@ -484,16 +493,16 @@ console.log("dragStopOK?", ok, hit, this.dragStartPt, this.dragEndPt);
       if (hit) {
         const movestr = this.dragEndPt + "/25";
         this.xgid = this.xgid.moveChequer(movestr);
-        const oppoplayer = this.player2idx(!this.player);
-        const oppoChequer = this.board.getOppoChequerAndGotoBar(this.dragEndPt, oppoplayer);
+        const oppoplayer = BgUtil.cvtTurnGm2Bd(!this.player);
+        const oppoChequer = this.board.getChequerHitted(this.dragEndPt, oppoplayer);
         const barPt = this.board.getBarPos(oppoplayer);
-        oppoChequer.dom.animate(barPt, 300, () => { this.board.showBoard2(this.xgid); });
-        const bar = (this.player) ? 25 : 0;
+        if (oppoChequer) {
+          oppoChequer.dom.animate(barPt, 300, () => { this.board.showBoard2(this.xgid); });
+        }
 console.log("dragStopHIT", movestr, this.xgid.xgidstr);
       }
       const movestr = this.dragStartPt + "/" + this.dragEndPt;
       this.xgid = this.xgid.moveChequer(movestr);
-//      this.pushXgidPosition();
 console.log("dragStopOK ", movestr, this.xgid.xgidstr);
       if (!hit) {
         this.board.showBoard2(this.xgid);
@@ -503,14 +512,14 @@ console.log("dragStopOK ", movestr, this.xgid.xgidstr);
     }
 console.log("dragStop button", this.xgid.moveFinished() , this.flashflg);
     this.donebtn.prop("disabled", (!this.xgid.moveFinished() && this.flashflg) );
-    const turn = this.player2xgturn(this.player);
+    const turn = BgUtil.cvtTurnGm2Xg(this.player);
     if (this.xgid.get_boff(turn) == 15) { this.bearoffAllAction(); }
   }
 
-  setDraggableChequer(player, init = false) {
+  swapChequerDraggable(player, init = false) {
     this.chequerall.draggable({disabled: true});
     if (init) { return; }
-    const plyr = this.player2idx(player);
+    const plyr = BgUtil.cvtTurnGm2Bd(player);
     for (let i = 0; i < 15; i++) {
       const pt = this.board.chequer[plyr][i].point;
       if (pt == 26 || pt == 27) { continue; }
@@ -530,11 +539,38 @@ console.log("dragStop button", this.xgid.moveFinished() , this.flashflg);
         }
       }
 console.log("flashOnMovablePoint", startpt, destpt, dest2);
-      this.board.flashOnMovablePoint(dest2, this.player2idx(this.player));
+      this.board.flashOnMovablePoint(dest2, BgUtil.cvtTurnGm2Bd(this.player));
     }
   }
   flashOffMovablePoint() {
     this.board.flashOffMovablePoint();
   }
+
+  pointTouchEndAction() {
+//    this.flashOffMovablePoint();
+  }
+
+  pointTouchStartAction(event) {
+    const id = event.currentTarget.id;
+    const pt = parseInt(id.substr(2));
+    const chker = this.board.getChequerOnDragging(pt, BgUtil.cvtTurnGm2Bd(this.player));
+console.log("pointTouchStartAction", id, pt, chker);
+
+    if (chker) { //chker may be undefined
+      const chkerdom = chker.dom;
+      if (chkerdom.data('ui-draggable')) {
+        this.dragStartPos = chker.position;
+        this.outerDragFlag = true;
+        const xx = event.pageX - 30;
+        const yy = event.pageY - 30;
+        chkerdom.css({left: xx, top: yy});
+        event.type = "mousedown.draggable";
+        event.target = chkerdom;
+        chkerdom.trigger(e);
+console.log("pointTouchStartAction", chkerdom);
+      }
+    }
+  }
+
 
 } //end of class BgGame

@@ -6,7 +6,7 @@ class Chequer {
     this._player = player;
     this._idx = idx;
     const _idsep = ["z", "w", "b"];
-    const _turncolor = ["", "#9ce", "#456"];
+    const _turncolor = ["", "#9ce", "#ce9"];
     this._color = _turncolor[player];
     this._domid = "p" + _idsep[player] + idx;
     this._domhtml = this._makeDomHtml();

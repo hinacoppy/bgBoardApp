@@ -290,10 +290,11 @@ console.log("isMovable",fr, to, strict, movable);
       }
     }
 
-console.log("_isMovableWithDice", fr, to, this._usable_dice);
+//console.log("_isMovableWithDice", fr, to, this._usable_dice);
     let piplist = [];
     let w = 0;
     for (const d of this._usable_dice) {
+      //オンザバーに2個以上あるときは、ダイスの目を組み合わせて使えない。ex.2ゾロで21ptに出られない
       if (this.get_ptno(bar) >= 2) { w  = d; }
       else                         { w += d; }
       if (!piplist.includes(d)) { piplist.push(d); }
@@ -308,6 +309,7 @@ console.log("_isMovableWithDice", fr, to, this._usable_dice);
       }
       return false;
     });
+
     const delta = (this.zorome) ? 2 : 1;
     let blocked = 0;
     let movable = [];
@@ -320,7 +322,7 @@ console.log("_isMovableWithDice", fr, to, this._usable_dice);
          blocked += delta;
       }
     }
-console.log("_isMovableWithDice", movable, f_existBacker(fr));
+//console.log("_isMovableWithDice", movable, f_existBacker(fr));
     return movable.includes(to);
   }
 

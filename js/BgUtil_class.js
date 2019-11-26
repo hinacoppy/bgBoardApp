@@ -23,24 +23,47 @@ class BgUtil {
     return Math.floor(Math.log2(val));
   }
 
-  static cvtTurnXg2kv(t) { //cvt XGID's turn to ThisApp's turn
+  static cvtTurnXg2Bd(t) { //cvt Xgid turn to Board turn
     const hash = { "0":0, "1":1, "-1":2 };
     return hash[t];
   }
 
-  static cvtTurnKv2xg(t) { //cvt ThisApp's turn to XGID's turn
+  static cvtTurnBd2Xg(t) { //cvt Board turn to Xgid turn
     const hash = { "0":0, "1":1, "2":-1 };
     return hash[t];
   }
 
-  static getOppo(t) { //get Oponent turn number
+  static cvtTurnGm2Bd(t) { //cvt Game turn to Board turn
+    return (t) ? 1 : 2;
+  }
+
+  static cvtTurnBd2Gm(t) { //cvt Board turn to Game turn
+    const hash = { "0":null, "1":true, "2":false };
+    return hash[t];
+  }
+
+  static cvtTurnGm2Xg(t) { //cvt Game turn to Xgid turn
+    return (t) ? 1 : -1;
+  }
+
+  static cvtTurnXg2Gm(t) { //cvt Xgid turn to Game turn
+    const hash = { "0":null, "1":true, "-1":false };
+    return hash[t];
+  }
+
+  static getBdOppo(t) { //get Oponent turn number (BoardObj)
     const hash = { "0":0, "1":2, "2":1 };
     return hash[t];
   }
 
-  static getXgOppo(t) { //get Oponent turn number
+  static getXgOppo(t) { //get Oponent turn number (XgidObj)
     const hash = { "0":0, "1":-1, "-1":1 };
     return hash[t];
+  }
+
+  static getGmOppo(t) { //get Oponent turn number (GameObj)
+    // true -> false, false -> true
+    return !t;
   }
 
   static findLine(ary, str) {
