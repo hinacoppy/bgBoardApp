@@ -564,7 +564,7 @@ console.log("pointTouchStartAction", id, pt, chker);
         const xx = event.pageX - 30;
         const yy = event.pageY - 30;
         chkerdom.css({left: xx, top: yy});
-        event.type = "mousedown.draggable";
+        event.type = "mousedown.touchstart.draggable";
         event.target = chkerdom;
         chkerdom.trigger(e);
 console.log("pointTouchStartAction", chkerdom);
