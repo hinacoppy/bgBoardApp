@@ -5,18 +5,18 @@
 
 /* document outline ----------------------------------------- */
 *{
-  user-select:none;
+  user-select:none; /* タップ、ドラッグで文字選択しないように */
 }
 html{
-  height: 100%;
-  overflow: hidden;
-  overscroll-behavior: none;
+  height:100%;
+  overflow:hidden;
+  overscroll-behavior:none; /* バウンススクロールを抑止(only for Android) */
 }
 body{
-  margin: 0;
-  padding: 0;
-  min-height: 100%;
-  height: 100%;
+  margin:0;
+  padding:0;
+  min-height:100%;
+  height:100%;
   font-family:'Arial', 'Meiryo UI';
 }
 
@@ -24,190 +24,182 @@ body{
 /* 以下すべて相対サイズにし、レスポンシブ対応可能にしておく */
 
 .container{
-  position: relative;
+  position:relative;
 }
 #board{
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 84vw;
-  height: 100vh;
+  position:absolute;
+  top:0;
+  left:0;
+  width:84vw;
+  height:100vh;
 }
 #bar{
-  position: absolute;
-  left: 36vw;
-  top: 0;
-  width: 6vw;
-  height: 100vh;
-  background-color: #760;
+  position:absolute;
+  left:36vw;
+  top:0;
+  width:6vw;
+  height:100vh;
+  background-color:#760;
 }
 #offtray1{
-  position: absolute;
-  left: 78vw;
-  top: 50vh;
+  position:absolute;
+  left:78vw;
+  top:50vh;
 }
 #offtray2{
-  position: absolute;
-  left: 78vw;
-  top: 0;
+  position:absolute;
+  left:78vw;
+  top:0;
 }
 .offtray{
-  width: 6vw;
-  height: 48vh;
-  border: 6px solid #220;
-  background-color: #760;
+  width:6vw;
+  height:48vh;
+  border:6px solid #220;
+  background-color:#760;
 }
 #player1{
-  position: absolute;
-  top: 70vh;
-  left: 86vw;
-  width: 13vw;
-/*  height: 30vh;*/
+  position:absolute;
+  top:70vh;
+  left:86vw;
+  width:13vw;
 }
 #player2{
-  position: absolute;
-  top: 0;
-  left: 86vw;
-  width: 13vw;
-/*  height: 30vh;*/
+  position:absolute;
+  top:0;
+  left:86vw;
+  width:13vw;
 }
 #nav{
-  position: absolute;
-  top: 35vh;
-  left: 86vw;
-/*  width: 13vw;*/
-/*  height: 30vh;*/
-  display: flex__;
-/*  justify-content: center;*/
-  align-items: center;
+  position:absolute;
+  top:35vh;
+  left:86vw;
+  display:flex__;
+/*  justify-content:center;*/
+  align-items:center;
 }
 .nav{
-  transform: rotateZ(-90deg);
-  text-align: center;
-  align-items: center;
-  background-color: #fcc;
+  transform:rotateZ(-90deg);
+  text-align:center;
+  align-items:center;
 }
 
 .playerinfo{
-  transform: rotateZ(-90deg);
-  text-align: center;
-  display: flex__;
-/*  justify-content: center;*/
-  align-items: center;
+  transform:rotateZ(-90deg);
+  text-align:center;
+  display:flex__;
+/*  justify-content:center;*/
+  align-items:center;
 }
 
 .score{
-  display: block;
-  background-color: gray;
-  color: white;
-  width: 20vh;
-  height: 5vw;
-  line-height: 5vw;
-  text-align: center;
+  display:block;
+  background-color:#877;
+  color:white;
+  width:24vh;
+  height:6vw;
+  line-height:6vw;
+  text-align:center;
   font-size:5vw;
 }
 .pip{
-  display: block;
-  background-color: #4aa;
-  color: white;
-  width: 10vh;
-  height: 3vw;
-  line-height: 3vw;
-  text-align: center;
-  font-size:1vw;
+  display:block;
+  background-color:#4aa;
+  color:white;
+  width:18vh;
+  height:4vw;
+  line-height:4vw;
+  text-align:center;
+  font-size:3vw;
 }
 .clock{
-  display: none;
+  display:none;
+  background-color:#a4a;
+  color:white;
+  width:18vh;
+  height:4vw;
+  line-height:4vw;
+  text-align:center;
+  font-size:3vw;
 }
 
 .oparationbtn{
-/*  display: inline-block;*/
   background-color:#adf;
   border:3px solid #29f;
   color:#29f;
   border-radius:20px;
   padding:2vh 2vw;
   font-size:2vw;
-  white-space: nowrap;
+  white-space:nowrap;
 }
 .oparationbtn:disabled {
   color:#666;
   background-color:#999;
-  border-color: #666;
+  border-color:#666;
 }
 .panel{
   position:absolute;
-  z-index: 50;
+  z-index:50;
 /*  display:none;*/
 }
 
 /* Board Object settings ------------------------------------- */
 .cubeclass{
   position:absolute;
-  color: #6c4;
+  color:#e9c;
   font-size:5vw;
 }
 .cubeoffer{
-  color: violet;
+  color:#04f;
 }
-
 .dice{
   position:absolute;
   font-size:5vw;
-  z-index: 40;
+  z-index:40;
 }
-
 .stack{
-  position: absolute;
-  display: inline-block;
-  text-align: center;
-  font-weight: bold;
-  font-size: 2vw;
-/*  padding-top: 2px;*/
-  line-height: 6vw;
-  width: 6vw;
-  height: 6vw;
-  z-index: 30;
-  pointer-events: none; /* through drag event into chequer below */
+  position:absolute;
+  display:inline-block;
+  text-align:center;
+  font-weight:bold;
+  font-size:2vw;
+/*  padding-top:2px;*/
+  line-height:6vw;
+  width:6vw;
+  height:6vw;
+  z-index:30;
+  pointer-events:none; /* through drag event into chequer below */
 }
 
 .cubecenter{
-  transform: rotateZ(-90deg);
+  transform:rotateZ(-90deg);
 }
 .turn1{
-  transform: rotateZ(0deg);
+  transform:rotateZ(0deg);
 }
 .turn2{
-  transform: rotateZ(180deg);
+  transform:rotateZ(180deg);
 }
 .col_player1{
-  color: #9ce;
+  color:#9ce;
 }
 .col_player2{
-  color: #456;
+  color:#456;
 }
 .chequer{
   display:block;
   position:absolute;
-  width: 6vw;
+  width:6vw;
   font-size:5vw;
 }
 
 /* Point Triangles ------------------------------------- */
 .point{
-  position: absolute;
-  width: 6vw;
-  height: 40vh;
+  position:absolute;
+  width:6vw;
+  height:40vh;
 }
-.__point:hover {
-  opacity: 0.6;
-/*  box-shadow: 0 0 20px rgba(0, 0, 0, .6);*/
-}
-
 .flash{
-/*  background-color: #435; */
-  opacity: 0.4;
- /* ★TODO */
+  opacity:0.4;
 }
 .triange_dnev{
   background:linear-gradient(to top    left,  #844 50%, transparent 50%) top left/  50.1% 100% no-repeat,
@@ -228,54 +220,53 @@ body{
 
 /* settingwindow decorations ------------------------------------- */
 .settings{
-  position: absolute;
-  display: none;
-  z-index: 99;
-  background-color: #dff;
-  border: 3px solid #00f;
-  padding: 2vh 4vw;
-  font-size: 1.8vw;
+  position:absolute;
+  display:none;
+  z-index:99;
+  background-color:#dff;
+  border:3px solid #00f;
+  padding:2vh 4vw;
+  font-size:1.8vw;
 }
 .popuptitle{
-  font-size: 2.2vw;
-  color: #fff;
-  background-color: #46f;
-  padding: 2vh 2vw;
-  margin-bottom: 2vh;
+  font-size:2.2vw;
+  color:#fff;
+  background-color:#46f;
+  padding:2vh 2vw;
+  margin-bottom:2vh;
 }
 
 /* toggle switch ----------------------------------------- */
 input {
-  display: none;
+  display:none;
 }
 .togglelabel {
-  display: block;
-  width: 300px;
-  position: relative;
-  padding: 15px 30px 15px 62px;
-  border: 3px solid #fff;
-  border-radius: 100px;
-  color: #fff;
-  background-color: #999;  /*#6a8494;*/
-/*  box-shadow: 0 0 20px rgba(0, 0, 0, .2);*/
-  white-space: nowrap;
-  transition: background-color .2s, box-shadow .2s;
+  display:block;
+  width:300px;
+  position:relative;
+  padding:15px 30px 15px 62px;
+  border:3px solid #fff;
+  border-radius:100px;
+  color:#fff;
+  background-color:#999;
+  white-space:nowrap;
+  transition:background-color .2s, box-shadow .2s;
 }
 .togglelabel::before {
-  content: '';
-  display: block;
-  position: absolute;
-  top: 10px;
-  bottom: 10px;
-  left: 10px;
-  width: 32px;
-  border: 3px solid #fff;
-  border-radius: 100px;
-  transition: background-color .2s;
+  content:'';
+  display:block;
+  position:absolute;
+  top:10px;
+  bottom:10px;
+  left:10px;
+  width:32px;
+  border:3px solid #fff;
+  border-radius:100px;
+  transition:background-color .2s;
 }
 .switch:checked + label {
-  background-color: #29f; /*#ab576c;*/
+  background-color:#29f;
 }
 .switch:checked + label::before {
-  background-color: #fff;
+  background-color:#fff;
 }

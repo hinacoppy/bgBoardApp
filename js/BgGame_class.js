@@ -39,6 +39,7 @@ class BgGame {
     this.settingbtn  = $("#settingbtn");
     this.openrollbtn = $("#openingroll");
 //    this.resetscorebtn = $("#resetscorebtn");
+    this.convertkifubtn = $("#convertkifubtn");
     this.gameendnextbtn= $("#gameendnextbtn");
     this.gameendokbtn  = $("#gameendokbtn");
     this.diceAsBtn  = $("#dice10,#dice11,#dice20,#dice21");
@@ -66,7 +67,8 @@ class BgGame {
     this.useclockflg = $("[name=useclock]").prop("checked");
     this.flashflg    = $("[name=flashdest]").prop("checked"); //ドラッグ開始時に移動可能なポイントを光らせる
     this.matchlen    = $("#matchlen");
-    this.kifusource  = $("#kifusource");
+    this.kifuxgid    = $("#kifuxgid");
+    this.kifumat     = $("#kifumat");
 
     //chequer
     this.chequerall = $(".chequer");
@@ -85,8 +87,11 @@ class BgGame {
     this.gameendnextbtn.on('click', () => { this.gameendNextAction(); });
     this.gameendokbtn.on('click', () => { this.gameendOkAction(); });
     this.diceAsBtn.on('click', () => { this.diceClickAction(); });
-    this.pointTriangle.on('touchstart mousedown', (e) => { this.pointTouchStartAction(e); });
-    this.pointTriangle.on('touchend mouseup', (e) => { this.pointTouchEndAction(e); });
+
+    if (!BgUtil.isIOS()) { //iOSのときはポイントクリックでチェッカーを拾わない
+      this.pointTriangle.on('touchstart mousedown', (e) => { this.pointTouchStartAction(e); });
+      this.pointTriangle.on('touchend mouseup', (e) => { this.pointTouchEndAction(e); });
+    }
 
     //設定画面
     this.settingbtn.on('click', () => {
@@ -104,6 +109,7 @@ class BgGame {
       this.initGameOption();
       this.beginNewGame(true);
     });
+    this.convertkifubtn.on('click', () => { this.convertKifuAction(); });
     this.cancelbtn.on('click', () => {
       this.settings.slideToggle("normal"); //画面を消す
       this.settingbtn.prop("disabled", false);
@@ -125,6 +131,9 @@ class BgGame {
     this.score = [0,0,0];
     this.scoreinfo[1].text(0);
     this.scoreinfo[2].text(0);
+    this.kifuxgid.val("");
+    this.kifumat.val("");
+
 console.log("initGameOption", this.showpipflg, this.useclockflg, this.flashflg, this.matchLength);
   }
 
@@ -434,8 +443,10 @@ console.log("popXgidPosition", r);
   }
 
   addKifuXgid(xgid) {
-    this.kifusource.append(xgid + "\n");
+    this.kifuxgid.append(xgid + "\n");
+//    this.kifuxgid.val( this.kifuxgid.val() + xgid + "\n"); //★FIX ME  textarea -> div
   }
+
 /***********************************
   player2xgturn(player) {
     return (player) ? 1 : -1;
@@ -564,7 +575,7 @@ console.log("pointTouchStartAction", id, pt, chker);
         const xx = event.pageX - 30;
         const yy = event.pageY - 30;
         chkerdom.css({left: xx, top: yy});
-        event.type = "mousedown.touchstart.draggable";
+        event.type = "mousedown.draggable";
         event.target = chkerdom;
         chkerdom.trigger(e);
 console.log("pointTouchStartAction", chkerdom);
@@ -572,5 +583,14 @@ console.log("pointTouchStartAction", chkerdom);
     }
   }
 
+  convertKifuAction() {
+    const xgidkifu = this.kifuxgid.val();
+    const matkifu = this.convertKifu(xgidkifu);
+    this.kifumat.val( matkifu );
+  }
+  convertKifu(xgidkifu) {
+    //★TODO
+    return "MAT KIFU\n" + xgidkifu;
+  }
 
 } //end of class BgGame

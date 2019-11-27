@@ -66,6 +66,12 @@ class BgUtil {
     return !t;
   }
 
+  //UserAgentを確認し、iOSか否かを判断する
+  static isIOS() {
+    const ua = window.navigator.userAgent.toLowerCase();
+    return (ua.indexOf('iphone') !== -1 || ua.indexOf('ipod') !== -1 || ua.indexOf('ipad') !== -1);
+  }
+
   static findLine(ary, str) {
     let idx = 0;
     for (let n of ary) {

@@ -62,7 +62,7 @@
 </section>
 
 <aside id="settings" class="settings" style="display:none">
-<h2>### Backgammon Score board App Settings ###</h2>
+<h2>### Backgammon Board App Settings ###</h2>
 <p>
 Match length:
 <select id="matchlen" name="matchlen">
@@ -98,13 +98,17 @@ Match length:
 </p>
 
 <aside class="aside">
-<textarea id="kifusource" cols="70" rows="5"></textarea>
+<textarea id="kifuxgid" cols="70" rows="5" style="display:none;"></textarea>
+<textarea id="kifumat" cols="70" rows="5" style="display:none;"></textarea>
 </aside>
 
 <br><br>
 <!--<button id="resetscorebtn" class="oparationbtn"><i class="fas fa-eraser"></i> Reset Score</button> &emsp;&emsp;&emsp;&emsp;-->
 <button id="newgamebtn" class="oparationbtn"><i class="fas fa-check"></i> New Game</button> &emsp;&emsp;&emsp;&emsp;
-<button id="cancelbtn" class="oparationbtn"><i class="fas fa-times"></i> Cancel</button>
+<!-- <button id="convertkifubtn" class="oparationbtn"><i class="fas fa-check"></i> Convert Kifu</button> &emsp;&emsp;&emsp;&emsp; -->
+<button id="cancelbtn" class="oparationbtn"><i class="fas fa-times"></i> Cancel</button> &emsp;&emsp;&emsp;&emsp;
+<a href="help.html" target="help"><button id="helpbtn" class="oparationbtn"><i class="fas fa-question"></i> Help</button></a>
+
 </aside>
 
 
@@ -112,14 +116,16 @@ Match length:
 <script src="js/jquery-3.4.1.min.js"></script>
 <script src="js/jquery-ui.min.js"></script>
 <script src="js/jquery.ui.touch-punch.min.js"></script>
-<!-- <script src="js/inobounce.min.js"></script> -->
-<script src="js/BgBoard_class3.js"></script>
+<script src="js/inobounce.min.js"></script>
+<script src="js/BgBoard_class.js"></script>
 <script src="js/BgChequer_class.js"></script>
 <script src="js/BgXgid_class.js"></script>
 <script src="js/BgUtil_class.js"></script>
-<script src="js/BgGame_class3.js"></script>
+<script src="js/BgGame_class.js"></script>
 <script>
-//iNoBounce.enable();
+if (BgUtil.isIOS()) {
+  iNoBounce.enable();
+}
 var bgGame = new BgGame();
 </script>
 </body>
