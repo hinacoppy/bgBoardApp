@@ -328,7 +328,7 @@ console.log("getChequerOnDragging", pt, player, chker);
 
   getChequerHitted(ptt, player) {
     const pt = (player == 1) ? 25 - ptt : ptt;
-    const chker = this.chequer[player].findIndex(elem => elem.point == pt);
+    const chker = this.chequer[player].find(elem => elem.point == pt);
 console.log("getOppoChequerAndGotoBar", ptt, pt, player, chker);
     return chker;
   }
