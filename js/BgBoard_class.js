@@ -7,7 +7,6 @@ class BgBoard {
     this.mainBoard = $('#board'); //need to define before bgBoardConfig()
     this.bgBoardConfig();
     this.setDomNameAndStyle();
-    this.player = 0;
   } //end of constructor()
 
   setDomNameAndStyle() {
@@ -75,16 +74,6 @@ class BgBoard {
     this.offtray = [null, $('#offtray1'), $('#offtray2')];
 
   }
-
-/**********************************
-  resetBoard() {
-    this.showBoard("XGID=--------------------------:0:0:0:00:0:0:0:0:0");
-  }
-
-  showBoard(xgidstr) { // input for XGID string
-    this.showBoard2( new Xgid(xgidstr) );
-  }
-**************************************/
 
   showBoard2(xg) { // input for XGID object
     this.xgidstr = xg.xgidstr;

@@ -231,7 +231,6 @@ class Xgid {
       posary[fpt] = this._incdec(posary[fpt], -1, oppo);
       posary[bar] = this._incdec(posary[bar], +1, oppo);
     }
-console.log("moveChequer", pos, move, turn, fr, to, fpt, tpt, posary.join(""));
     this.position = posary.join("");
     return this;
 
@@ -240,7 +239,6 @@ console.log("moveChequer", pos, move, turn, fr, to, fpt, tpt, posary.join(""));
   _use_dice(fr, to) {
     const dd = fr - to;
     const idx = this._usable_dice.findIndex(d => d == dd);
-console.log("_use_dice", fr, to, dd, idx, this._usable_dice);
     if (idx != -1) {
       this._usable_dice.splice(idx, 1); //見つかればそれを削除
     } else if (dd == this._usable_dice[0] + this._usable_dice[1]) {
@@ -263,13 +261,11 @@ console.log("_use_dice", fr, to, dd, idx, this._usable_dice);
   isHitted(p) {
     const pt = this._turnpos(p);
     const ret =  (this._ptno[pt] == 1 && this._ptcol[pt] != this._turn);
-console.log("isHitted",pt, this._turn, this._ptno[pt], this._ptcol[pt], ret);
     return ret;
   }
 
   isMovable(fr, to, strict=false) {
     const movable = this.movablePoint(fr, strict);
-console.log("isMovable",fr, to, strict, movable);
     return movable.includes(to);
   }
 
@@ -290,7 +286,6 @@ console.log("isMovable",fr, to, strict, movable);
       }
     }
 
-//console.log("_isMovableWithDice", fr, to, this._usable_dice);
     let piplist = [];
     let w = 0;
     for (const d of this._usable_dice) {
@@ -322,7 +317,6 @@ console.log("isMovable",fr, to, strict, movable);
          blocked += delta;
       }
     }
-//console.log("_isMovableWithDice", movable, f_existBacker(fr));
     return movable.includes(to);
   }
 
@@ -340,13 +334,11 @@ console.log("isMovable",fr, to, strict, movable);
   }
 
   moveFinished() {
-//    const f_topt = ((f, d) => (f - d < 0) ? 0 : (f - d));
     if (this._usable_dice.length == 0) { return true; } //使える目がなくなった時
     for (let q=1; q<25; q++) { //動かせる先がなくなった時
+      if (this._ptcol[q] != this.turn) { continue; }
       const pt = this._turnpos(q);
-      if (this._ptcol[pt] != this.turn) { continue; }
       for (const d of this._usable_dice) {
-//        const ds = f_topt(pt, d);
         const ds = (pt - d < 0) ? 0 : (pt - d);
         if (this.isMovable(pt, ds, true)) { return false; }
       }
