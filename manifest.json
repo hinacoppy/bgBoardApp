@@ -1,8 +1,8 @@
 {
   "name": "Backgammon Board App",
-  "short_name": "BgBoardApp",
-  "start_url": "/BgBoardApp/index.html",
-  "scope": "/BgBoardApp/",
+  "short_name": "bgBoardApp",
+  "start_url": "/bgBoardApp/index.html",
+  "scope": "/bgBoardApp/",
   "display": "fullscreen",
   "background_color": "#fff",
   "theme_color": "#fff",

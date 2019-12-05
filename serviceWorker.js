@@ -6,26 +6,26 @@ const CACHE_NAME = "board-v1";
 const ORIGIN = (location.hostname == 'localhost') ? '' : location.protocol + '//' + location.hostname;
 
 const STATIC_FILES = [
-  ORIGIN + '/BgBoardApp/',
-  ORIGIN + '/BgBoardApp/index.html',
-  ORIGIN + '/BgBoardApp/manifest.json',
-  ORIGIN + '/BgBoardApp/icon/favicon.ico',
-  ORIGIN + '/BgBoardApp/icon/apple-touch-icon.png',
-  ORIGIN + '/BgBoardApp/icon/android-chrome-96x96.png',
-  ORIGIN + '/BgBoardApp/icon/android-chrome-192x192.png',
-  ORIGIN + '/BgBoardApp/icon/android-chrome-512x512.png',
-  ORIGIN + '/BgBoardApp/css/bgboardapp.css',
-  ORIGIN + '/BgBoardApp/css/font-awesome-animation.min.css',
-  ORIGIN + '/BgBoardApp/js/fontawesome-all.min.js',
-  ORIGIN + '/BgBoardApp/js/jquery-3.4.1.min.js',
-  ORIGIN + '/BgBoardApp/js/jquery-ui.min.js',
-  ORIGIN + '/BgBoardApp/js/jquery.ui.touch-punch.min.js',
-  ORIGIN + '/BgBoardApp/js/inobounce.min.js',
-  ORIGIN + '/BgBoardApp/js/BgBoard_class.js',
-  ORIGIN + '/BgBoardApp/js/BgChequer_class.js',
-  ORIGIN + '/BgBoardApp/js/BgXgid_class.js',
-  ORIGIN + '/BgBoardApp/js/BgUtil_class.js',
-  ORIGIN + '/BgBoardApp/js/BgGame_class.js'
+  ORIGIN + '/bgBoardApp/',
+  ORIGIN + '/bgBoardApp/index.html',
+  ORIGIN + '/bgBoardApp/manifest.json',
+  ORIGIN + '/bgBoardApp/icon/favicon.ico',
+  ORIGIN + '/bgBoardApp/icon/apple-touch-icon.png',
+  ORIGIN + '/bgBoardApp/icon/android-chrome-96x96.png',
+  ORIGIN + '/bgBoardApp/icon/android-chrome-192x192.png',
+  ORIGIN + '/bgBoardApp/icon/android-chrome-512x512.png',
+  ORIGIN + '/bgBoardApp/css/bgboardapp.css',
+  ORIGIN + '/bgBoardApp/css/font-awesome-animation.min.css',
+  ORIGIN + '/bgBoardApp/js/fontawesome-all.min.js',
+  ORIGIN + '/bgBoardApp/js/jquery-3.4.1.min.js',
+  ORIGIN + '/bgBoardApp/js/jquery-ui.min.js',
+  ORIGIN + '/bgBoardApp/js/jquery.ui.touch-punch.min.js',
+  ORIGIN + '/bgBoardApp/js/inobounce.min.js',
+  ORIGIN + '/bgBoardApp/js/BgBoard_class.js',
+  ORIGIN + '/bgBoardApp/js/BgChequer_class.js',
+  ORIGIN + '/bgBoardApp/js/BgXgid_class.js',
+  ORIGIN + '/bgBoardApp/js/BgUtil_class.js',
+  ORIGIN + '/bgBoardApp/js/BgGame_class.js'
 ];
 
 const CACHE_KEYS = [
