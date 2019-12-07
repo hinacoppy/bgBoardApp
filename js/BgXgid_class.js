@@ -335,15 +335,15 @@ class Xgid {
 
   moveFinished() {
     if (this._usable_dice.length == 0) { return true; } //使える目がなくなった時
-    for (let q=1; q<25; q++) { //動かせる先がなくなった時
-      if (this._ptcol[q] != this.turn) { continue; }
+    for (let q = 1; q <= 25; q++) {
+      if (this._ptcol[q] != this.turn) { continue; } //自駒のある所を探して
       const pt = this._turnpos(q);
       for (const d of this._usable_dice) {
         const ds = (pt - d < 0) ? 0 : (pt - d);
-        if (this.isMovable(pt, ds, true)) { return false; }
+        if (this.isMovable(pt, ds, true)) { return false; } //自駒がダイスの目に従って動かせればfalse
       }
     }
-    return true;
+    return true; //全く動かせる先がなければtrue
   }
 
   _setUsableDice() {
