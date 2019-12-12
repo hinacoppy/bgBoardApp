@@ -123,16 +123,8 @@ Match length:
 <script src="js/BgXgid_class.js"></script>
 <script src="js/BgUtil_class.js"></script>
 <script src="js/BgGame_class.js"></script>
+<script src="js/start-serviceWorker.js"></script>
 <script>
-if (navigator.serviceWorker) {
-  navigator.serviceWorker.register("./serviceWorker.js")
-    .then(function(registration) {
-      registration.update();
-    }).catch(function(error) {
-      console.warn("serviceWorker error.", error);
-    });
-}
-
 if (BgUtil.isIOS()) {
   iNoBounce.enable();
 }
