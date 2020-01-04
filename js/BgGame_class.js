@@ -139,8 +139,8 @@ console.log("initGameOption", this.showpipflg, this.useclockflg, this.flashflg, 
 
   beginNewGame(newmatch = false) {
 //console.log("beginNewGame");
-    const initpos   = "-bbCG--CA--g--------------";
-//    const initpos = "-b----E-C---eE---c-e----B-";
+//    const initpos   = "-bbCG--CA--g--------------";
+    const initpos = "-b----E-C---eE---c-e----B-";
     this.xgid.initialize(initpos, newmatch, this.matchLength);
     this.board.showBoard2(this.xgid);
     this.showPipInfo();
