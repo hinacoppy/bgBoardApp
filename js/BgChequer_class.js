@@ -6,8 +6,8 @@ class Chequer {
     this._player = player;
     this._idx = idx;
     const _idsep = ["z", "w", "b"];
-    const _turncolor = ["", "#9ce", "#ce9"];
-    this._color = _turncolor[player];
+    const _turnclass = ["", "turncol1", "turncol2"];
+    this._turncol = _turnclass[player];
     this._domid = "p" + _idsep[player] + idx;
     this._domhtml = this._makeDomHtml();
     this._dom = null;
@@ -19,11 +19,7 @@ class Chequer {
   }
 
   _makeDomHtml() {
-    let xh;
-    xh  = '<span id="' + this._domid + '" class="chequer fa-layers fa-fw">';
-    xh += '<i class="fas fa-circle" style="color:gray"></i>';
-    xh += '<i class="fas fa-circle" style="color:'+ this._color +'" data-fa-transform="shrink-1"></i>';
-    xh += '</span>';
+    const xh = '<div id="' + this._domid + '" class="chequer ' + this._turncol + '"></div>';
     return xh;
   }
 
