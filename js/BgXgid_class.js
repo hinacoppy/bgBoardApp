@@ -75,6 +75,8 @@ class Xgid {
   _parse_position(pt) {
     this._pip[0]  = this._pip[1]  = 0;
     this._boff[0] = this._boff[1] = 15;
+    this._bgarea[0] = this._bgarea[1] = 0;
+    this._gmarea[0] = this._gmarea[1] = 0;
 
     const posary = pt.split("");  // 一文字ずつに分解
     for (let i=0; i<=25; i++) {
@@ -118,11 +120,13 @@ class Xgid {
     const cubeprice = Math.pow(2, this._cube);
     const contact = this._have_contact();
     if (this._boff[0] > 0)        { this._gamesc[1] = [cubeprice, 1]; }
+    else if (this._dbloffer)      { this._gamesc[1] = [cubeprice, 1]; }
     else if (contact)             { this._gamesc[1] = [cubeprice, 3]; }
     else if (this._bgarea[0] > 0) { this._gamesc[1] = [cubeprice, 3]; }
     else if (this._gmarea[0] > 0) { this._gamesc[1] = [cubeprice, 2]; }
     else                          { this._gamesc[1] = [cubeprice, 1]; }
     if (this._boff[1] > 0)        { this._gamesc[0] = [cubeprice, 1]; }
+    else if (this._dbloffer)      { this._gamesc[0] = [cubeprice, 1]; }
     else if (contact)             { this._gamesc[0] = [cubeprice, 3]; }
     else if (this._bgarea[1] > 0) { this._gamesc[0] = [cubeprice, 3]; }
     else if (this._gmarea[1] > 0) { this._gamesc[0] = [cubeprice, 2]; }
@@ -162,12 +166,12 @@ class Xgid {
   get_ptcol(p)   { return this._ptcol[p]; }
   get_pip(t)     { return (t == -1) ? this._pip[1] : (t == 1) ? this._pip[0] : 0; }
   get_boff(t)    { return (t == -1) ? this._boff[1] : (t == 1) ? this._boff[0] : 0; }
-  get_gamesc(t)  { return (t == -1) ? this._gamesc[1] : (t == 1) ? this._gamesc[0] : [0,0]; }
+  get_gamesc(t)  { this._calc_score(); return (t == -1) ? this._gamesc[1] : (t == 1) ? this._gamesc[0] : [0,0]; }
   get_dbloffer() { return this._dbloffer; }
 
   //setter method
-  set position(x) { this._position = x; this._makeXgidStr(); this._parse_position(x); this._calc_score(); }
-  set cube(x)     { this._cube = x;     this._makeXgidStr(); this._calc_score(); }
+  set position(x) { this._position = x; this._makeXgidStr(); this._parse_position(x); }
+  set cube(x)     { this._cube = x;     this._makeXgidStr(); }
   set cubepos(x)  { this._cubepos = x;  this._makeXgidStr(); }
   set turn(x)     { this._turn = x;     this._makeXgidStr(); }
   set dice(x)     { this._set_dice(x);  this._makeXgidStr(); }

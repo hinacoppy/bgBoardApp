@@ -139,7 +139,7 @@ console.log("initGameOption", this.showpipflg, this.useclockflg, this.flashflg, 
 
   beginNewGame(newmatch = false) {
 //console.log("beginNewGame");
-//    const initpos   = "-bbCG--CA--g--------------";
+//    const initpos   = "-bbAA------g--bb----------";
     const initpos = "-b----E-C---eE---c-e----B-";
     this.xgid.initialize(initpos, newmatch, this.matchLength);
     this.board.showBoard2(this.xgid);
@@ -209,7 +209,7 @@ console.log("resignAction");
     this.hideAllPanel();
     this.swapTurn();
     this.xgid.dice = "00";
-    this.calcScore(this.player, false);
+    this.calcScore(this.player);
     this.board.showBoard2(this.xgid);
     this.addKifuXgid(this.xgid.xgidstr);
     this.showGameEndPanel(this.player);
@@ -244,8 +244,8 @@ console.log("dropAction");
     this.hideAllPanel();
     this.swapTurn();
     this.xgid.cube -= 1;
+    this.calcScore(this.player); //dblofferフラグをリセットする前に計算する必要あり
     this.xgid.dbloffer = false;
-    this.calcScore(this.player, true);
     this.swapXgTurn();
     this.board.showBoard2(this.xgid);
     this.addKifuXgid(this.xgid.xgidstr);
@@ -268,7 +268,7 @@ console.log("gameendOkAction");
 
   bearoffAllAction() {
 console.log("bearoffAllAction");
-    this.calcScore(this.player, false); // this.player is winner
+    this.calcScore(this.player); // this.player is winner
     this.addKifuXgid(this.xgid.xgidstr);
     this.showGameEndPanel(this.player);
   }
@@ -296,11 +296,11 @@ console.log("randomdice", d1, d2, dicestr);
     this.scoreinfo[2].text(this.xgid.sc_yu);
   }
 
-  calcScore(player, drop=false) {
+  calcScore(player) {
     this.gamescore = this.xgid.get_gamesc( BgUtil.cvtTurnGm2Xg(player) );
     const w = BgUtil.cvtTurnGm2Bd( player);
     const l = BgUtil.cvtTurnGm2Bd(!player);
-    const scr = this.gamescore[0] * ((drop) ? 1 : this.gamescore[1]);
+    const scr = this.gamescore[0] * this.gamescore[1];
     this.xgid.crawford = this.xgid.checkCrawford(this.score[w], scr, this.score[l]);
     this.score[w] += scr;
     this.xgid.sc_me = this.score[1];
