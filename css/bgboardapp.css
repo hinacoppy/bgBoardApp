@@ -19,67 +19,23 @@ body{
   height:100%;
   font-family:'Arial', 'Meiryo UI';
 }
-
-/* Game Display Layout settings ------------------------------------- */
-/* 以下すべて相対サイズにし、レスポンシブ対応可能にしておく */
-:root{
-  --point-width:6vw;
-  --board-height:100vh;
-  --board-width:84vw;
-  --board-frame-size:0;
-  --point-height:45vh;
-  --offtray-height:49vh;
-  --cube-size:5.7vw;
-
-  /* GPS/GMA */
-  --board-color:#fbeeda;
-  --board-frame:#8d5a32;
-  --triangle-odd:#a3a3a3;
-  --triangle-evn:#dab484;
-  --offtray-color:#c1a276;
-  --bar-color:#8d5a32;
-  --label-color:#ffffff;
-  --cube-base:#d6d6d6;
-  --cube-text:#000000;
-  --cube-offer-text:#a6f6a6;
-  --cube-offer-base:#a6a6f6;
-  --stack1:#ffffff;
-  --stack2:#000000;
-  --chequer1:#1a1b1b;
-  --chequer2:#fdfdf0;
-  --diceface1:#1a1b1b;
-  --diceface2:#fdfdf0;
-  --dicepip1:#ffffff;
-  --dicepip2:#000000;
-}
-
 .container{
-  position:relative;
 }
-#board{
-  position:absolute;
-  top:0;
-  left:0;
-  width:var(--board-width);
-  height:var(--board-height);
+
+/* Constant definision for bgBoard.css ------------------------------ */
+:root{
+  --boardHeightNum: 100;
+  --boardWidthNum: 84;
+  --pointWidthNum: 6;
+  --cubeSizeNum: 5.7;
+  --frameSizeNum: 0;
+  --offtrayMarginNum: 5;
+  --offtrayHeightNum: 49; /* bgBoardApp=49, other=boardHeightNum */
+  --cubeFontSizeNum: 4;
+  --labelFontSizeNum: 0.7;
+  --stackFontSizeNum: 2.0;
 }
-.bar{
-  position:absolute;
-  width:var(--point-width);
-  height:var(--board-height);
-  background-color:var(--board-frame);
-}
-.offtray{
-  position:absolute;
-  width:var(--point-width);
-  height:var(--offtray-height);
-  background-color:var(--offtray-color);
-  border:6px solid var(--board-frame);
-}
-#offtray1{
-}
-#offtray2{
-}
+
 #nav{
   position:absolute;
   top:35vh;
@@ -166,129 +122,6 @@ body{
   z-index:50;
 /*  display:none;*/
 }
-
-/* Board Object settings ------------------------------------- */
-.cube{
-  position:absolute;
-  border-radius:15px; /* 角丸表示 */
-  border:1px solid gray;
-  text-align:center;
-  font-weight:bold;
-  font-size:4vw;
-  width:var(--cube-size);
-  height:var(--cube-size);
-  line-height:var(--cube-size);
-  color:var(--cube-text);
-  background-color:var(--cube-base);
-}
-.cubeoffer{
-  color:var(--cube-offer-text);
-  background-color:var(--cube-offer-base);
-}
-.dice{
-  position:absolute;
-  z-index:40;
-}
-.diceface1{
-  width:var(--point-width);
-  height:var(--point-width);
-  stroke:var(--dicepip1);
-  fill:var(--diceface1);
-}
-.diceface2{
-  width:var(--point-width);
-  height:var(--point-width);
-  stroke:var(--dicepip2);
-  fill:var(--diceface2);
-}
-.dicepip1{
-  color:var(--dicepip1);
-}
-.dicepip2{
-  color:var(--dicepip2);
-}
-.stackcol1{
-  color:var(--stack1);
-}
-.stackcol2{
-  color:var(--stack2);
-}
-.stack{
-  position:absolute;
-  display:inline-block;
-  text-align:center;
-  font-weight:bold;
-  font-size:2vw;
-  line-height:var(--point-width);
-  width:var(--point-width);
-  height:var(--point-width);
-  z-index:30;
-  pointer-events:none; /* through drag event into chequer below */
-}
-
-.cubepos0{
-  transform:rotateZ(-90deg);
-}
-.cubepos1{
-  transform:rotateZ(0deg);
-}
-.cubepos2{
-  transform:rotateZ(180deg);
-}
-.bearoff{
-  transform:rotateX(70deg);
-}
-.turn1{
-  transform:rotateZ(0deg);
-}
-.turn2{
-  transform:rotateZ(180deg);
-}
-.turncol1{
-  background-color:var(--chequer1);
-}
-.turncol2{
-  background-color:var(--chequer2);
-}
-.chequer{
-  position:absolute;
-  width:var(--point-width);
-  height:var(--point-width);
-  border-radius:50%;
-  border:1px solid gray;
-  background-image: linear-gradient(rgba(255,255,255,.3) 0%,transparent 50%,transparent 50%,rgba(0,0,0,.1) 100%);
-  box-shadow: 0  2px  2px 0 rgba(255,255,255, .1) inset,
-              0  2px 10px 0 rgba(255,255,255, .2) inset,
-              0 -2px  2px 0 rgba(  0,  0,  0, .1) inset;
-  z-index:10;
-}
-
-/* Point Triangles ------------------------------------- */
-.point{
-  position:absolute;
-  width:var(--point-width);
-  height:var(--point-height);
-}
-.flash{
-  opacity:0.4;
-}
-.pt_dnev{
-  background:linear-gradient(to top    left,  var(--triangle-odd) 50%, transparent 50%) top left/  50.1% 100% no-repeat,
-             linear-gradient(to top    right, var(--triangle-odd) 50%, transparent 50%) top right/ 50.1% 100% no-repeat;
-}
-.pt_dnod{
-  background:linear-gradient(to top    left,  var(--triangle-evn) 50%, transparent 50%) top left/  50.1% 100% no-repeat,
-             linear-gradient(to top    right, var(--triangle-evn) 50%, transparent 50%) top right/ 50.1% 100% no-repeat;
-}
-.pt_upev{
-  background:linear-gradient(to bottom left,  var(--triangle-odd) 50%, transparent 50%) top left/  50.1% 100% no-repeat,
-             linear-gradient(to bottom right, var(--triangle-odd) 50%, transparent 50%) top right/ 50.1% 100% no-repeat;
-}
-.pt_upod{
-  background:linear-gradient(to bottom left,  var(--triangle-evn) 50%, transparent 50%) top left/  50.1% 100% no-repeat,
-             linear-gradient(to bottom right, var(--triangle-evn) 50%, transparent 50%) top right/ 50.1% 100% no-repeat;
-}
-
 
 /* settingwindow decorations ------------------------------------- */
 .settings{

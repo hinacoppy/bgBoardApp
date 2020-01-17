@@ -9,15 +9,14 @@
   <meta name="author" content="(C)hinacoppy 2019">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/bgboardapp.css">
-  <link rel="stylesheet" href="css/font-awesome-animation.min.css">
+  <link rel="stylesheet" href="/css/bgBoard.css">
+  <link rel="stylesheet" href="/css/font-awesome-animation.min.css">
   <link rel="icon" href="icon/favicon.ico">
   <link rel="apple-touch-icon" href="icon/apple-touch-icon.png">
   <title>bgBoardApp</title>
 </head>
 <body class="container">
-<section id="board" class="boardarea"></section>
-<!-- Items insert from setDomNameAndStyle() method in BgBoard_class -->
-
+<section id="board" class="board boardStyle1"></section>
 
 <div id="player1" class="nav">
 <div id="score1" class="score">0</div>
@@ -110,22 +109,22 @@ Match length:
 </aside>
 
 
-<script src="js/fontawesome-all.min.js" defer></script>
-<script src="js/jquery-3.4.1.min.js"></script>
-<script src="js/jquery-ui.min.js"></script>
-<script src="js/jquery.ui.touch-punch.min.js"></script>
-<script src="js/inobounce.min.js"></script>
-<script src="js/BgBoard_class.js"></script>
-<script src="js/BgChequer_class.js"></script>
-<script src="js/BgXgid_class.js"></script>
-<script src="js/BgUtil_class.js"></script>
+<script src="/js/fontawesome-all.min.js" defer></script>
+<script src="/js/jquery-3.4.1.min.js"></script>
+<script src="/js/jquery-ui.min.js"></script>
+<script src="/js/jquery.ui.touch-punch.min.js"></script>
+<script src="/js/inobounce.min.js"></script>
+<script src="/js/BgUtil_class.js"></script>
+<script src="/js/BgXgid_class.js"></script>
+<script src="/js/BgChequer_class.js"></script>
+<script src="/js/BgBoard_class.js"></script>
 <script src="js/BgGame_class.js"></script>
-<script src="js/start-serviceWorker.js"></script>
 <script>
 if (BgUtil.isIOS()) {
   iNoBounce.enable();
 }
 var bgGame = new BgGame();
 </script>
+<script src="/js/start-serviceWorker.js"></script>
 </body>
 </html>

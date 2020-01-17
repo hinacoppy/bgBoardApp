@@ -11,8 +11,9 @@ class BgGame {
     this.cubeValue = 1; // =2^0
     this.crawford = false;
     this.xgid = new Xgid();
-    this.board = new BgBoard(this);
+    this.board = new BgBoard("bgBoardApp", this);
     this.undoStack = [];
+    this.animDelay = 800;
 
     this.setDomNames();
     this.setEventHandler();
@@ -156,8 +157,8 @@ console.log("beginNewGame", this.xgid.xgidstr, this.xgid.matchsc);
     const dice = this.randomdice(openroll);
     this.xgid.dice = dice[2];
     this.xgid.usabledice = true;
-    this.board.animateDice(800);
     this.board.showBoard2(this.xgid);
+    await this.board.animateDice(this.animDelay);
     if (openroll) {
       this.player = (dice[0] > dice[1]);
       this.xgid.turn = BgUtil.cvtTurnGm2Xg(this.player);
@@ -215,7 +216,7 @@ console.log("resignAction");
     this.showGameEndPanel(this.player);
   }
 
-  doubleAction() {
+  async doubleAction() {
 console.log("doubleAction");
     this.hideAllPanel();
     this.swapTurn();
@@ -224,6 +225,7 @@ console.log("doubleAction");
     this.xgid.cubepos = BgUtil.getXgOppo(this.xgid.turn);
     this.swapXgTurn();
     this.board.showBoard2(this.xgid); //double offer
+    await this.board.animateCube(this.animDelay); //キューブを揺すのはshowBoard()の後
     this.addKifuXgid(this.xgid.xgidstr);
     this.showTakeDropPanel(this.player);
   }
@@ -503,7 +505,7 @@ console.log("dragStopOK?", ok, hit, this.dragStartPt, this.dragEndPt);
     if (ok) {
       if (hit) {
         const movestr = this.dragEndPt + "/25";
-        this.xgid = this.xgid.moveChequer(movestr);
+        this.xgid = this.xgid.moveChequer2(movestr);
         const oppoplayer = BgUtil.cvtTurnGm2Bd(!this.player);
         const oppoChequer = this.board.getChequerHitted(this.dragEndPt, oppoplayer);
         const barPt = this.board.getBarPos(oppoplayer);
@@ -513,7 +515,7 @@ console.log("dragStopOK?", ok, hit, this.dragStartPt, this.dragEndPt);
 console.log("dragStopHIT", movestr, this.xgid.xgidstr);
       }
       const movestr = this.dragStartPt + "/" + this.dragEndPt;
-      this.xgid = this.xgid.moveChequer(movestr);
+      this.xgid = this.xgid.moveChequer2(movestr);
 console.log("dragStopOK ", movestr, this.xgid.xgidstr);
       if (!hit) {
         this.board.showBoard2(this.xgid);
