@@ -33,9 +33,14 @@ body{
   --offtrayHeightNum: 49; /* bgBoardApp=49, other=boardHeightNum */
   --cubeFontSizeNum: 4;
   --labelFontSizeNum: 0.7;
-  --stackFontSizeNum: 2.0;
+  --stackFontSizeNum: 3.0;
 }
-
+.turn1{
+  transform:rotateZ(0deg);
+}
+.turn2{
+  transform:rotateZ(180deg);
+}
 #nav{
   position:absolute;
   top:35vh;
