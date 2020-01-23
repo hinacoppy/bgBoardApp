@@ -117,6 +117,10 @@ class BgGame {
       this.settingbtn.prop("disabled", false);
     });
 
+    if (BgUtil.isIOS()) {
+      window.addEventListener("orientationchange", () => { this.board.showBoard2(this.xgid); }); 
+    }
+
   }
 
   initGameOption() {
