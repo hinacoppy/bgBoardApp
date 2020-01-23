@@ -118,7 +118,8 @@ class BgGame {
     });
 
     if (BgUtil.isIOS()) {
-      window.addEventListener("orientationchange", () => { this.board.showBoard2(this.xgid); }); 
+      //window.addEventListener("orientationchange", () => { this.board.showBoard2(this.xgid); alert("orientationchange");}
+      $(window).on("orientationchange", () => { this.board.showBoard2(this.xgid); alert("orientationchange");}); 
     }
 
   }
