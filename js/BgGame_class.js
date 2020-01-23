@@ -76,7 +76,7 @@ class BgGame {
   }
 
   setEventHandler() {
-    const clickEventType = (( window.ontouchstart!==null ) ? 'click':'touchend');
+    const clickEventType = 'click'; //(( window.ontouchstart!==null ) ? 'click':'touchend');
     //Button Click Event
     this.rollbtn.    on(clickEventType, () => { this.rollAction(false); });
     this.doublebtn.  on(clickEventType, () => { this.doubleAction(); });
@@ -117,9 +117,9 @@ class BgGame {
       this.settingbtn.prop("disabled", false);
     });
 
-    const rotateEvtType = (BgUtil.isIOS()) ? 'orientationchange' : 'resize';
+    const rotateEvtType = 'resize'; //(BgUtil.isIOS()) ? 'orientationchange' : 'resize';
     //window.addEventListener(rotateEvtType, () => { this.board.showBoard2(this.xgid); alert(rotateEvtType);}
-    $(window).on(rotateEvtType, () => { this.board.showBoard2(this.xgid); alert(rotateEvtType);}); 
+    $(window).on(rotateEvtType, () => { alert(rotateEvtType); this.board.showBoard2(this.xgid); }); 
 
   }
 
