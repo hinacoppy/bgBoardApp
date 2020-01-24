@@ -119,7 +119,11 @@ class BgGame {
 
     const rotateEvtType = 'resize'; //(BgUtil.isIOS()) ? 'orientationchange' : 'resize';
     //window.addEventListener(rotateEvtType, () => { this.board.showBoard2(this.xgid); alert(rotateEvtType);}
-    $(window).on(rotateEvtType, () => { alert(rotateEvtType); this.board.showBoard2(this.xgid); }); 
+    $(window).on(rotateEvtType, () => {
+       //alert(rotateEvtType);
+       this.board.bgBoardConfig();
+       this.board.showBoard2(this.xgid);
+    }); 
 
   }
 
