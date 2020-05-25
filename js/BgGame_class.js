@@ -121,8 +121,9 @@ class BgGame {
     //window.addEventListener(rotateEvtType, () => { this.board.showBoard2(this.xgid); alert(rotateEvtType);}
     $(window).on(rotateEvtType, () => {
        //alert(rotateEvtType);
-       this.board.bgBoardConfig();
-       this.board.showBoard2(this.xgid);
+       //this.board.bgBoardConfig();
+       //this.board.showBoard2(this.xgid);
+       this.board.redraw();
     }); 
 
   }
@@ -588,7 +589,7 @@ console.log("pointTouchStartAction", id, pt, chker);
         chkerdom.css({left: xx, top: yy});
         event.type = "mousedown.draggable";
         event.target = chkerdom;
-        chkerdom.trigger(e);
+        chkerdom.trigger(event);
 console.log("pointTouchStartAction", chkerdom);
       }
     }
