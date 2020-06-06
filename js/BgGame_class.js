@@ -92,7 +92,7 @@ class BgGame {
 
     if (!BgUtil.isIOS()) { //iOSのときはポイントクリックでチェッカーを拾わない
       this.pointTriangle.on('touchstart mousedown', (e) => { this.pointTouchStartAction(e); });
-      this.pointTriangle.on('touchend mouseup', (e) => { this.pointTouchEndAction(e); });
+      //this.pointTriangle.on('touchend mouseup', (e) => { this.pointTouchEndAction(e); });
     }
 
     //設定画面
@@ -150,7 +150,6 @@ console.log("initGameOption", this.showpipflg, this.useclockflg, this.flashflg, 
 
   beginNewGame(newmatch = false) {
 //console.log("beginNewGame");
-//    const initpos   = "-bbAA------g--bb----------";
     const initpos = "-b----E-C---eE---c-e----B-";
     this.xgid.initialize(initpos, newmatch, this.matchLength);
     this.board.showBoard2(this.xgid);
@@ -190,6 +189,7 @@ console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgids
       this.pushXgidPosition();
 console.log("undoAction", xgidstr);
       this.board.showBoard2(this.xgid);
+      this.swapChequerDraggable(this.player);
     }
   }
 
@@ -295,7 +295,7 @@ console.log("bearoffAllAction");
       }
     }
     const dicestr = String(d1) + String(d2);
-console.log("randomdice", d1, d2, dicestr);
+//console.log("randomdice", d1, d2, dicestr);
     return [d1, d2, dicestr];
   }
 
@@ -374,7 +374,7 @@ console.log("showDoneUndoPanel", player, moveFinished , this.flashflg);
   }
 
   makeGameEndPanal(player) {
-console.log("showGameEndPanel", player);
+//console.log("showGameEndPanel", player);
     const mes1 = "You WIN" + ((this.matchwinflg) ? " and the MATCH" : "");
     this.gameend.children('.mes1').text(mes1);
     const winlevel = ["", "SINGLE", "GAMMON", "BACK GAMMON"];
@@ -445,12 +445,12 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
   }
 
   pushXgidPosition() {
-console.log("pushXgidPosition", this.xgid.xgidstr);
+//console.log("pushXgidPosition", this.xgid.xgidstr);
    this.undoStack.push(this.xgid.xgidstr);
   }
   popXgidPosition() {
     const r = this.undoStack.pop();
-console.log("popXgidPosition", r);
+//console.log("popXgidPosition", r);
     return r;
   }
 
@@ -482,26 +482,93 @@ console.log("popXgidPosition", r);
   }
 
   setChequerDraggable() {
-    this.chequerall.draggable({
-      //event
-      start: ( event, ui ) => { this.dragStartAction(event, ui); },
-      stop:  ( event, ui ) => { this.dragStopAction(event, ui); },
-      //options
-      containment: 'parent',
-      opacity: 0.6,
-      zIndex: 99,
-      //revertDuration: 200
+    //関数内広域変数
+    var x;//要素内のクリックされた位置
+    var y;
+    var dragobj; //ドラッグ中のオブジェクト
+
+    //この関数内の処理は、パフォーマンスのため jQuery Free で記述
+
+    //ドラッグ開始時のコールバック関数
+    const evfn_dragstart = ((e) => {
+      dragobj = e.currentTarget; //dragする要素を取得し、広域変数に格納
+      if (!dragobj.classList.contains("draggable")) { return; } //draggableでないオブジェクトは無視
+
+      dragobj.classList.add("dragging"); //drag中フラグ(クラス追加/削除で制御)
+      dragobj.style.zIndex = 999;
+
+      //マウスイベントとタッチイベントの差異を吸収
+      const event = (e.type === "mousedown") ? e : e.changedTouches[0];
+
+      //要素内の相対座標を取得
+      x = event.pageX - dragobj.offsetLeft;
+      y = event.pageY - dragobj.offsetTop;
+
+      //イベントハンドラを登録
+      document.body.addEventListener("mousemove",  evfn_drag,    false);
+      document.body.addEventListener("mouseleave", evfn_dragend, false);
+      dragobj.      addEventListener("mouseup",    evfn_dragend, false);
+      document.body.addEventListener("touchmove",  evfn_drag,    false);
+      document.body.addEventListener("touchleave", evfn_dragend, false);
+      dragobj.      addEventListener("touchend",   evfn_dragend, false);
+
+      const ui = {position: { //dragStartAction()に渡すオブジェクトを作る
+                   left: dragobj.offsetLeft,
+                   top:  dragobj.offsetTop
+                 }};
+//console.log("evfn_dragstart", dragobj, event, x, y, event.pageX, event.pageY, event.clientX, event.screenX, event.offsetX);
+      this.dragStartAction(event, ui);
     });
+
+    //ドラッグ中のコールバック関数
+    const evfn_drag = ((e) => {
+      e.preventDefault(); //フリックしたときに画面を動かさないようにデフォルト動作を抑制
+
+      //マウスイベントとタッチイベントの差異を吸収
+      const event = (e.type === "mousemove") ? e : e.changedTouches[0];
+
+      //マウスが動いた場所に要素を動かす
+      dragobj.style.top  = event.pageY - y + "px";
+      dragobj.style.left = event.pageX - x + "px";
+//console.log("evfn_drag", x, y, event.pageX, event.pageY);
+    });
+
+    //ドラッグ終了時のコールバック関数
+    const evfn_dragend = ((e) => {
+      dragobj.classList.remove("dragging"); //drag中フラグを削除
+      dragobj.style.zIndex = null;
+
+      //イベントハンドラの削除
+      document.body.removeEventListener("mousemove",  evfn_drag,    false);
+      document.body.removeEventListener("mouseleave", evfn_dragend, false);
+      dragobj.      removeEventListener("mouseup",    evfn_dragend, false);
+      document.body.removeEventListener("touchmove",  evfn_drag,    false);
+      document.body.removeEventListener("touchleave", evfn_dragend, false);
+      dragobj.      removeEventListener("touchend",   evfn_dragend, false);
+
+      const ui = {position: { //dragStopAction()に渡すオブジェクトを作る
+                   left: dragobj.offsetLeft,
+                   top:  dragobj.offsetTop
+                 }};
+//console.log("evfn_dragend", dragobj, e, ui);
+      this.dragStopAction(e, ui);
+    });
+
+    //dragできるオブジェクトにdragstartイベントを設定
+    for(const elm of this.chequerall) {
+      elm.addEventListener("mousedown",  evfn_dragstart, false);
+      elm.addEventListener("touchstart", evfn_dragstart, false);
+    }
   }
 
   dragStartAction(event, ui) {
-    this.dragObject = $(event.currentTarget);
-    const id = this.dragObject.attr("id");
+    this.dragObject = $(event.currentTarget); //dragStopAction()で使うがここで取り出しておかなければならない
+    const id = event.currentTarget.id;
     this.dragStartPt = this.board.getDragStartPoint(id, BgUtil.cvtTurnGm2Bd(this.player));
     if (!this.outerDragFlag) { this.dragStartPos = ui.position; }
     this.outerDragFlag = false;
     this.flashOnMovablePoint(this.dragStartPt);
-console.log("dragStart", this.dragStartPt, this.dragObject, event);
+//console.log("dragStart", this.dragStartPt, this.dragStartPos, event);
   }
 
   dragStopAction(event, ui) {
@@ -510,7 +577,7 @@ console.log("dragStart", this.dragStartPt, this.dragObject, event);
     const xg = this.xgid;
     const ok = xg.isMovable(this.dragStartPt, this.dragEndPt, this.flashflg);
     const hit = xg.isHitted(this.dragEndPt);
-console.log("dragStopOK?", ok, hit, this.dragStartPt, this.dragEndPt);
+//console.log("dragStopOK?", ok, hit, this.dragStartPt, this.dragEndPt);
 
     if (ok) {
       if (hit) {
@@ -522,31 +589,31 @@ console.log("dragStopOK?", ok, hit, this.dragStartPt, this.dragEndPt);
         if (oppoChequer) {
           oppoChequer.dom.animate(barPt, 300, () => { this.board.showBoard2(this.xgid); });
         }
-console.log("dragStopHIT", movestr, this.xgid.xgidstr);
+//console.log("dragStopHIT", movestr, this.xgid.xgidstr);
       }
       const movestr = this.dragStartPt + "/" + this.dragEndPt;
       this.xgid = this.xgid.moveChequer2(movestr);
-console.log("dragStopOK ", movestr, this.xgid.xgidstr);
+//console.log("dragStopOK ", movestr, this.xgid.xgidstr);
       if (!hit) {
         this.board.showBoard2(this.xgid);
       }
     } else {
       this.dragObject.animate(this.dragStartPos, 300);
     }
-console.log("dragStop button", this.xgid.moveFinished() , this.flashflg);
+//console.log("dragStop button", this.xgid.moveFinished() , this.flashflg);
     this.donebtn.prop("disabled", (!this.xgid.moveFinished() && this.flashflg) );
     const turn = BgUtil.cvtTurnGm2Xg(this.player);
     if (this.xgid.get_boff(turn) == 15) { this.bearoffAllAction(); }
   }
 
   swapChequerDraggable(player, init = false) {
-    this.chequerall.draggable({disabled: true});
+    this.chequerall.removeClass("draggable");
     if (init) { return; }
     const plyr = BgUtil.cvtTurnGm2Bd(player);
     for (let i = 0; i < 15; i++) {
       const pt = this.board.chequer[plyr][i].point;
       if (pt == 26 || pt == 27) { continue; }
-      this.board.chequer[plyr][i].dom.draggable({disabled: false});
+      this.board.chequer[plyr][i].dom.addClass("draggable");
     }
   }
 
@@ -561,15 +628,16 @@ console.log("dragStop button", this.xgid.moveFinished() , this.flashflg);
           dest2.push(pt);
         }
       }
-console.log("flashOnMovablePoint", startpt, destpt, dest2);
+//console.log("flashOnMovablePoint", startpt, destpt, dest2);
       this.board.flashOnMovablePoint(dest2, BgUtil.cvtTurnGm2Bd(this.player));
     }
   }
+
   flashOffMovablePoint() {
     this.board.flashOffMovablePoint();
   }
 
-  pointTouchEndAction() {
+  pointTouchEndAction(event) {
 //    this.flashOffMovablePoint();
   }
 
@@ -577,19 +645,18 @@ console.log("flashOnMovablePoint", startpt, destpt, dest2);
     const id = event.currentTarget.id;
     const pt = parseInt(id.substr(2));
     const chker = this.board.getChequerOnDragging(pt, BgUtil.cvtTurnGm2Bd(this.player));
-console.log("pointTouchStartAction", id, pt, chker);
+//console.log("pointTouchStartAction", id, pt, chker);
 
     if (chker) { //chker may be undefined
       const chkerdom = chker.dom;
-      if (chkerdom.data('ui-draggable')) {
-        this.dragStartPos = chker.position;
+      if (chkerdom.hasClass("draggable")) {
+        this.dragStartPos = {left: chkerdom[0].style.left,
+                             top:  chkerdom[0].style.top };
         this.outerDragFlag = true;
         const xx = event.pageX - 30;
         const yy = event.pageY - 30;
         chkerdom.css({left: xx, top: yy});
-        event.type = "mousedown.draggable";
-        event.target = chkerdom;
-        chkerdom.trigger(event);
+        chkerdom[0].dispatchEvent(new MouseEvent("mousedown", {clientX:event.clientX, clientY:event.clientY}));
 console.log("pointTouchStartAction", chkerdom);
       }
     }

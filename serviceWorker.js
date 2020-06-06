@@ -2,7 +2,7 @@
 // (参考) https://qiita.com/kaihar4/items/c09a6d73e190ab0b9b01
 'use strict';
 
-const CACHE_NAME = "board-v1";
+const CACHE_NAME = "Osampo-v2"; //v1=first release, v2=no use jquery.ui
 const ORIGIN = (location.hostname == 'localhost') ? '' : location.protocol + '//' + location.hostname;
 
 const STATIC_FILES = [
@@ -15,16 +15,14 @@ const STATIC_FILES = [
   ORIGIN + '/bgBoardApp/icon/android-chrome-192x192.png',
   ORIGIN + '/bgBoardApp/icon/android-chrome-512x512.png',
   ORIGIN + '/bgBoardApp/css/bgboardapp.css',
-  ORIGIN + '/bgBoardApp/css/font-awesome-animation.min.css',
-  ORIGIN + '/bgBoardApp/js/fontawesome-all.min.js',
-  ORIGIN + '/bgBoardApp/js/jquery-3.4.1.min.js',
-  ORIGIN + '/bgBoardApp/js/jquery-ui.min.js',
-  ORIGIN + '/bgBoardApp/js/jquery.ui.touch-punch.min.js',
-  ORIGIN + '/bgBoardApp/js/inobounce.min.js',
-  ORIGIN + '/bgBoardApp/js/BgBoard_class.js',
-  ORIGIN + '/bgBoardApp/js/BgChequer_class.js',
-  ORIGIN + '/bgBoardApp/js/BgXgid_class.js',
-  ORIGIN + '/bgBoardApp/js/BgUtil_class.js',
+  ORIGIN + '/css/font-awesome-animation.min.css',
+  ORIGIN + '/js/fontawesome-all.min.js',
+  ORIGIN + '/js/jquery-3.4.1.min.js',
+  ORIGIN + '/js/inobounce.min.js',
+  ORIGIN + '/js/BgBoard_class.js',
+  ORIGIN + '/js/BgChequer_class.js',
+  ORIGIN + '/js/BgXgid_class.js',
+  ORIGIN + '/js/BgUtil_class.js',
   ORIGIN + '/bgBoardApp/js/BgGame_class.js'
 ];
 

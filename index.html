@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
   <meta name="description" content="Backgammon Board App">
-  <meta name="author" content="(C)hinacoppy 2019">
+  <meta name="author" content="(C)hinacoppy 2019-2020">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/bgboardapp.css">
   <link rel="stylesheet" href="/css/bgBoard.css">
@@ -16,7 +16,7 @@
   <title>bgBoardApp</title>
 </head>
 <body class="container">
-<section id="board" class="board boardStyle1"></section>
+<section id="board" class="board boardStyle9"></section>
 
 <div id="player1" class="nav">
 <div id="score1" class="score">0</div>
@@ -111,8 +111,6 @@ Match length:
 
 <script src="/js/fontawesome-all.min.js" defer></script>
 <script src="/js/jquery-3.4.1.min.js"></script>
-<script src="/js/jquery-ui.min.js"></script>
-<script src="/js/jquery.ui.touch-punch.min.js"></script>
 <script src="/js/inobounce.min.js"></script>
 <script src="/js/BgUtil_class.js"></script>
 <script src="/js/BgXgid_class.js"></script>
@@ -121,7 +119,7 @@ Match length:
 <script src="js/BgGame_class.js"></script>
 <script>
 if (BgUtil.isIOS()) {
-  //iNoBounce.enable();
+  iNoBounce.enable();
 }
 var bgGame = new BgGame();
 </script>
