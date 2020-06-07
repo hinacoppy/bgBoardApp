@@ -509,10 +509,10 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
       y = event.pageY - dragobj.offsetTop;
 
       //イベントハンドラを登録
-      document.body.addEventListener("mousemove",  evfn_drag,    false);
+      document.body.addEventListener("mousemove",  evfn_drag,    {passive:false});
       document.body.addEventListener("mouseleave", evfn_dragend, false);
       dragobj.      addEventListener("mouseup",    evfn_dragend, false);
-      document.body.addEventListener("touchmove",  evfn_drag,    false);
+      document.body.addEventListener("touchmove",  evfn_drag,    {passive:false});
       document.body.addEventListener("touchleave", evfn_dragend, false);
       dragobj.      addEventListener("touchend",   evfn_dragend, false);
 
