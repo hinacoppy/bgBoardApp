@@ -90,10 +90,12 @@ class BgGame {
     this.gameendokbtn.on(clickEventType, () => { this.gameendOkAction(); });
     this.diceAsBtn.on(clickEventType, () => { this.diceClickAction(); });
 
-    if (!BgUtil.isIOS()) { //iOSのときはポイントクリックでチェッカーを拾わない
-      this.pointTriangle.on('touchstart mousedown', (e) => { this.pointTouchStartAction(e); });
-      //this.pointTriangle.on('touchend mouseup', (e) => { this.pointTouchEndAction(e); });
-    }
+//    if (!BgUtil.isIOS()) { //iOSのときはポイントクリックでチェッカーを拾わない
+//      this.pointTriangle.on('touchstart mousedown', (e) => { this.pointTouchStartAction(e); });
+//      //this.pointTriangle.on('touchend mouseup', (e) => { this.pointTouchEndAction(e); });
+//    }
+    //モバイルデバイス(touchstart)のときはポイントクリックでチェッカーを拾わない
+    this.pointTriangle.on('mousedown', (e) => { this.pointTouchStartAction(e); });
 
     //設定画面
     this.settingbtn.on(clickEventType, () => {
@@ -486,19 +488,21 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
     var x;//要素内のクリックされた位置
     var y;
     var dragobj; //ドラッグ中のオブジェクト
+    var zidx; //ドラッグ中のオブジェクトのzIndexを保持
 
     //この関数内の処理は、パフォーマンスのため jQuery Free で記述
 
     //ドラッグ開始時のコールバック関数
-    const evfn_dragstart = ((e) => {
-      dragobj = e.currentTarget; //dragする要素を取得し、広域変数に格納
+    const evfn_dragstart = ((origevt) => {
+      dragobj = origevt.currentTarget; //dragする要素を取得し、広域変数に格納
       if (!dragobj.classList.contains("draggable")) { return; } //draggableでないオブジェクトは無視
 
       dragobj.classList.add("dragging"); //drag中フラグ(クラス追加/削除で制御)
+      zidx = dragobj.style.zIndex;
       dragobj.style.zIndex = 999;
 
       //マウスイベントとタッチイベントの差異を吸収
-      const event = (e.type === "mousedown") ? e : e.changedTouches[0];
+      const event = (origevt.type === "mousedown") ? origevt : origevt.changedTouches[0];
 
       //要素内の相対座標を取得
       x = event.pageX - dragobj.offsetLeft;
@@ -517,15 +521,15 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
                    top:  dragobj.offsetTop
                  }};
 //console.log("evfn_dragstart", dragobj, event, x, y, event.pageX, event.pageY, event.clientX, event.screenX, event.offsetX);
-      this.dragStartAction(event, ui);
+      this.dragStartAction(origevt, ui);
     });
 
     //ドラッグ中のコールバック関数
-    const evfn_drag = ((e) => {
-      e.preventDefault(); //フリックしたときに画面を動かさないようにデフォルト動作を抑制
+    const evfn_drag = ((origevt) => {
+      origevt.preventDefault(); //フリックしたときに画面を動かさないようにデフォルト動作を抑制
 
       //マウスイベントとタッチイベントの差異を吸収
-      const event = (e.type === "mousemove") ? e : e.changedTouches[0];
+      const event = (origevt.type === "mousemove") ? origevt : origevt.changedTouches[0];
 
       //マウスが動いた場所に要素を動かす
       dragobj.style.top  = event.pageY - y + "px";
@@ -534,9 +538,9 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
     });
 
     //ドラッグ終了時のコールバック関数
-    const evfn_dragend = ((e) => {
+    const evfn_dragend = ((origevt) => {
       dragobj.classList.remove("dragging"); //drag中フラグを削除
-      dragobj.style.zIndex = null;
+      dragobj.style.zIndex = zidx;
 
       //イベントハンドラの削除
       document.body.removeEventListener("mousemove",  evfn_drag,    false);
@@ -550,8 +554,8 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
                    left: dragobj.offsetLeft,
                    top:  dragobj.offsetTop
                  }};
-//console.log("evfn_dragend", dragobj, e, ui);
-      this.dragStopAction(e, ui);
+//console.log("evfn_dragend", dragobj, origevt, ui);
+      this.dragStopAction(origevt, ui);
     });
 
     //dragできるオブジェクトにdragstartイベントを設定
