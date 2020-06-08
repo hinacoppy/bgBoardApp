@@ -90,12 +90,7 @@ class BgGame {
     this.gameendokbtn.on(clickEventType, () => { this.gameendOkAction(); });
     this.diceAsBtn.on(clickEventType, () => { this.diceClickAction(); });
 
-//    if (!BgUtil.isIOS()) { //iOSのときはポイントクリックでチェッカーを拾わない
-//      this.pointTriangle.on('touchstart mousedown', (e) => { this.pointTouchStartAction(e); });
-//      //this.pointTriangle.on('touchend mouseup', (e) => { this.pointTouchEndAction(e); });
-//    }
-    //モバイルデバイス(touchstart)のときはポイントクリックでチェッカーを拾わない
-    this.pointTriangle.on('mousedown', (e) => { this.pointTouchStartAction(e); });
+    this.pointTriangle.on('touchstart mousedown', (e) => { this.pointTouchStartAction(e); });
 
     //設定画面
     this.settingbtn.on(clickEventType, () => {
@@ -514,7 +509,8 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
       dragobj.      addEventListener("mouseup",    evfn_dragend, false);
       document.body.addEventListener("touchmove",  evfn_drag,    {passive:false});
       document.body.addEventListener("touchleave", evfn_dragend, false);
-      dragobj.      addEventListener("touchend",   evfn_dragend, false);
+      document.body.addEventListener("touchend",   evfn_dragend, false);
+//      dragobj.      addEventListener("touchend",   evfn_dragend, false);
 
       const ui = {position: { //dragStartAction()に渡すオブジェクトを作る
                    left: dragobj.offsetLeft,
@@ -539,6 +535,7 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
 
     //ドラッグ終了時のコールバック関数
     const evfn_dragend = ((origevt) => {
+//console.log("evfn_dragend", origevt.type, origevt.target);
       dragobj.classList.remove("dragging"); //drag中フラグを削除
       dragobj.style.zIndex = zidx;
 
@@ -548,7 +545,8 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
       dragobj.      removeEventListener("mouseup",    evfn_dragend, false);
       document.body.removeEventListener("touchmove",  evfn_drag,    false);
       document.body.removeEventListener("touchleave", evfn_dragend, false);
-      dragobj.      removeEventListener("touchend",   evfn_dragend, false);
+      document.body.removeEventListener("touchend",   evfn_dragend, false);
+//      dragobj.      removeEventListener("touchend",   evfn_dragend, false);
 
       const ui = {position: { //dragStopAction()に渡すオブジェクトを作る
                    left: dragobj.offsetLeft,
@@ -645,23 +643,37 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
 //    this.flashOffMovablePoint();
   }
 
-  pointTouchStartAction(event) {
-    const id = event.currentTarget.id;
+  pointTouchStartAction(origevt) {
+//console.log("pointTouchStartAction", origevt.type, origevt.currentTarget, origevt.clientX, origevt.pageX, origevt);
+    const id = origevt.currentTarget.id;
     const pt = parseInt(id.substr(2));
     const chker = this.board.getChequerOnDragging(pt, BgUtil.cvtTurnGm2Bd(this.player));
 //console.log("pointTouchStartAction", id, pt, chker);
+    const evttypeflg = (origevt.type === "mousedown")
+    const event = (evttypeflg) ? origevt : origevt.changedTouches[0];
 
     if (chker) { //chker may be undefined
       const chkerdom = chker.dom;
       if (chkerdom.hasClass("draggable")) {
+        this.outerDragFlag = true;
         this.dragStartPos = {left: chkerdom[0].style.left,
                              top:  chkerdom[0].style.top };
-        this.outerDragFlag = true;
-        const xx = event.pageX - 30;
-        const yy = event.pageY - 30;
-        chkerdom.css({left: xx, top: yy});
-        chkerdom[0].dispatchEvent(new MouseEvent("mousedown", {clientX:event.clientX, clientY:event.clientY}));
-console.log("pointTouchStartAction", chkerdom);
+        chkerdom.css({left: event.clientX - 30,
+                      top:  event.clientY - 30});
+        let delegateEvent;
+        if (evttypeflg) {
+          delegateEvent = new MouseEvent("mousedown", {clientX:event.clientX, clientY:event.clientY});
+        } else {
+          const touchobj = new Touch({identifier: 12345,
+                                      target: chkerdom[0],
+                                      clientX: event.clientX,
+                                      clientY: event.clientY,
+                                      pageX: event.pageX,
+                                      pageY: event.pageY});
+          delegateEvent = new TouchEvent("touchstart", {changedTouches:[touchobj]});
+        }
+        chkerdom[0].dispatchEvent(delegateEvent);
+//console.log("pointTouchStartAction", chkerdom);
       }
     }
   }
