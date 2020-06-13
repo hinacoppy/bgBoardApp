@@ -493,8 +493,8 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
 
     //ドラッグ開始時のコールバック関数
     const evfn_dragstart = ((origevt) => {
-console.log("evfn_dragstart=", origevt);
-this.debuglog("evfn_dragstart=", origevt.type, origevt.currentTarget.outerHTML, origevt.changedTouches[0].target.outerHTML);
+//console.log("evfn_dragstart=", origevt);
+//this.debuglog("evfn_dragstart=", origevt.type, origevt.currentTarget.outerHTML, origevt.changedTouches[0].target.outerHTML);
       dragobj = origevt.currentTarget; //dragする要素を取得し、広域変数に格納
       if (!dragobj.classList.contains("draggable")) { return; } //draggableでないオブジェクトは無視
 
@@ -650,8 +650,8 @@ this.debuglog("evfn_dragstart=", origevt.type, origevt.currentTarget.outerHTML, 
   }
 
   pointTouchStartAction(origevt) {
-console.log("pointTouchStartAction", origevt.type, origevt.currentTarget, origevt.clientX, origevt.pageX, origevt);
-this.debuglog("pointTouchStartAction", origevt.type, origevt.currentTarget.outerHTML, origevt.clientX);
+//console.log("pointTouchStartAction", origevt.type, origevt.currentTarget, origevt.clientX, origevt.pageX, origevt);
+//this.debuglog("pointTouchStartAction", origevt.type, origevt.currentTarget.outerHTML, origevt.clientX);
     const id = origevt.currentTarget.id;
     const pt = parseInt(id.substr(2));
     const chker = this.board.getChequerOnDragging(pt, BgUtil.cvtTurnGm2Bd(this.player));
@@ -680,8 +680,8 @@ this.debuglog("pointTouchStartAction", origevt.type, origevt.currentTarget.outer
                                       pageY: event.pageY});
           delegateEvent = new TouchEvent("touchstart", {changedTouches:[touchobj]});
         }
-console.log("pointTouchStartAction delegateEvent=", delegateEvent);
-this.debuglog("pointTouchStartAction delegateEvent=", delegateEvent.type, delegateEvent.currentTarget, delegateEvent.changedTouches[0].target);
+//console.log("pointTouchStartAction delegateEvent=", delegateEvent);
+//this.debuglog("pointTouchStartAction delegateEvent=", delegateEvent.type, delegateEvent.currentTarget, delegateEvent.changedTouches[0].target);
         chkerdom[0].dispatchEvent(delegateEvent);
 //console.log("pointTouchStartAction", chkerdom);
       }
