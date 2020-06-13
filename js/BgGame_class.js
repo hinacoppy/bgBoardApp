@@ -76,57 +76,26 @@ class BgGame {
   }
 
   setEventHandler() {
-    const clickEventType = 'click touchstart'; //(( window.ontouchstart!==null ) ? 'click':'touchend');
+    const clickEventType = 'click touchstart'; //(( window.ontouchstart !== null ) ? 'click':'touchstart');
     //Button Click Event
-    this.rollbtn.    on(clickEventType, (e) => { e.preventDefault(); this.rollAction(false); });
-    this.doublebtn.  on(clickEventType, (e) => { e.preventDefault(); this.doubleAction(); });
-    this.resignbtn.  on(clickEventType, (e) => { e.preventDefault(); this.resignAction(); });
-    this.takebtn.    on(clickEventType, (e) => { e.preventDefault(); this.takeAction(); });
-    this.dropbtn.    on(clickEventType, (e) => { e.preventDefault(); this.dropAction(); });
-    this.donebtn.    on(clickEventType, (e) => { e.preventDefault(); this.doneAction(); });
-    this.undobtn.    on(clickEventType, (e) => { e.preventDefault(); this.undoAction(); });
-    this.openrollbtn.on(clickEventType, (e) => { e.preventDefault(); this.rollAction(true); });
+    this.rollbtn.       on(clickEventType, (e) => { e.preventDefault(); this.rollAction(false); });
+    this.doublebtn.     on(clickEventType, (e) => { e.preventDefault(); this.doubleAction(); });
+    this.resignbtn.     on(clickEventType, (e) => { e.preventDefault(); this.resignAction(); });
+    this.takebtn.       on(clickEventType, (e) => { e.preventDefault(); this.takeAction(); });
+    this.dropbtn.       on(clickEventType, (e) => { e.preventDefault(); this.dropAction(); });
+    this.donebtn.       on(clickEventType, (e) => { e.preventDefault(); this.doneAction(); });
+    this.undobtn.       on(clickEventType, (e) => { e.preventDefault(); this.undoAction(); });
+    this.openrollbtn.   on(clickEventType, (e) => { e.preventDefault(); this.rollAction(true); });
     this.gameendnextbtn.on(clickEventType, (e) => { e.preventDefault(); this.gameendNextAction(); });
-    this.gameendokbtn.on(clickEventType, (e) => { e.preventDefault(); this.gameendOkAction(); });
-    this.diceAsBtn.on(clickEventType, (e) => { e.preventDefault(); this.diceClickAction(); });
-
-    this.pointTriangle.on('touchstart mousedown', (e) => { e.preventDefault(); this.pointTouchStartAction(e); });
-
-    //設定画面
-    this.settingbtn.on(clickEventType, (e) => {
-      e.preventDefault();
-      this.settings.css(this.calcCenterPosition("S", this.settings)).slideToggle("normal"); //画面表示
-      this.settingbtn.prop("disabled", true);
-    });
-//    this.resetscorebtn.on(clickEventType, (e) => {
-//      e.preventDefault();
-//      this.score = [0,0,0];
-//      this.scoreinfo[1].text(0);
-//      this.scoreinfo[2].text(0);
-//    });
-    this.newgamebtn.on(clickEventType, (e) => {
-      e.preventDefault();
-      this.settings.slideToggle("normal"); //画面を消す
-      this.settingbtn.prop("disabled", false);
-      this.initGameOption();
-      this.beginNewGame(true);
-    });
+    this.gameendokbtn.  on(clickEventType, (e) => { e.preventDefault(); this.gameendOkAction(); });
+    this.diceAsBtn.     on(clickEventType, (e) => { e.preventDefault(); this.doneAction(); });
+    this.settingbtn.    on(clickEventType, (e) => { e.preventDefault(); this.showSettingPanelAction(); });
+//    this.resetscorebtn. on(clickEventType, (e) => { e.preventDefault(); this.resetScoreAction(); });
+    this.newgamebtn.    on(clickEventType, (e) => { e.preventDefault(); this.newGameAction(); });
     this.convertkifubtn.on(clickEventType, (e) => { e.preventDefault(); this.convertKifuAction(); });
-    this.cancelbtn.on(clickEventType, (e) => {
-      e.preventDefault();
-      this.settings.slideToggle("normal"); //画面を消す
-      this.settingbtn.prop("disabled", false);
-    });
-
-    const rotateEvtType = 'resize'; //(BgUtil.isIOS()) ? 'orientationchange' : 'resize';
-    //window.addEventListener(rotateEvtType, () => { this.board.showBoard2(this.xgid); alert(rotateEvtType);}
-    $(window).on(rotateEvtType, () => {
-       //alert(rotateEvtType);
-       //this.board.bgBoardConfig();
-       //this.board.showBoard2(this.xgid);
-       this.board.redraw();
-    }); 
-
+    this.cancelbtn.     on(clickEventType, (e) => { e.preventDefault(); this.cancelSettingPanelAction(); });
+    this.pointTriangle. on('touchstart mousedown', (e) => { e.preventDefault(); this.pointTouchStartAction(e); });
+    $(window).          on('resize',       (e) => { e.preventDefault(); this.board.redraw(); }); 
   }
 
   initGameOption() {
@@ -196,6 +165,7 @@ console.log("undoAction", xgidstr);
 
   doneAction() {
 console.log("doneAction");
+    if (this.donebtn.prop("disabled")) { return; }
     this.hideAllPanel();
     this.swapTurn();
     this.xgid.dice = "00";
@@ -205,15 +175,6 @@ console.log("doneAction");
     this.swapChequerDraggable(true, true);
 //    this.addKifuXgid(this.xgid.xgidstr);
     this.showRollDoubleResignPanel(this.player);
-  }
-
-  diceClickAction() {
-    const doneflg = this.donebtn.prop("disabled");
-console.log("diceClickAction", doneflg);
-    if (!doneflg) {
-//    if (!this.donebtn.prop("disabled")) {
-      this.doneAction();
-    }
   }
 
   resignAction() {
@@ -229,6 +190,7 @@ console.log("resignAction");
 
   async doubleAction() {
 console.log("doubleAction");
+    if (this.doublebtn.prop("disabled")) { return; }
     this.hideAllPanel();
     this.swapTurn();
     this.xgid.dbloffer = true;
@@ -284,6 +246,30 @@ console.log("bearoffAllAction");
     this.calcScore(this.player); // this.player is winner
     this.addKifuXgid(this.xgid.xgidstr);
     this.showGameEndPanel(this.player);
+  }
+
+  showSettingPanelAction() {
+    if (this.settingbtn.prop("disabled")) { return; }
+    this.settings.css(this.calcCenterPosition("S", this.settings)).slideToggle("normal"); //画面表示
+    this.settingbtn.prop("disabled", true);
+  }
+
+  cancelSettingPanelAction() {
+    this.settings.slideToggle("normal"); //画面を消す
+    this.settingbtn.prop("disabled", false);
+  }
+
+  newGameAction() {
+    this.settings.slideToggle("normal"); //画面を消す
+    this.settingbtn.prop("disabled", false);
+    this.initGameOption();
+    this.beginNewGame(true);
+  }
+
+  resetScoreAction() {
+    this.score = [0,0,0];
+    this.scoreinfo[1].text(0);
+    this.scoreinfo[2].text(0);
   }
 
   randomdice(openroll = false) {
