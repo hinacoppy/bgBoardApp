@@ -76,40 +76,44 @@ class BgGame {
   }
 
   setEventHandler() {
-    const clickEventType = 'click'; //(( window.ontouchstart!==null ) ? 'click':'touchend');
+    const clickEventType = 'click touchstart'; //(( window.ontouchstart!==null ) ? 'click':'touchend');
     //Button Click Event
-    this.rollbtn.    on(clickEventType, () => { this.rollAction(false); });
-    this.doublebtn.  on(clickEventType, () => { this.doubleAction(); });
-    this.resignbtn.  on(clickEventType, () => { this.resignAction(); });
-    this.takebtn.    on(clickEventType, () => { this.takeAction(); });
-    this.dropbtn.    on(clickEventType, () => { this.dropAction(); });
-    this.donebtn.    on(clickEventType, () => { this.doneAction(); });
-    this.undobtn.    on(clickEventType, () => { this.undoAction(); });
-    this.openrollbtn.on(clickEventType, () => { this.rollAction(true); });
-    this.gameendnextbtn.on(clickEventType, () => { this.gameendNextAction(); });
-    this.gameendokbtn.on(clickEventType, () => { this.gameendOkAction(); });
-    this.diceAsBtn.on(clickEventType, () => { this.diceClickAction(); });
+    this.rollbtn.    on(clickEventType, (e) => { e.preventDefault(); this.rollAction(false); });
+    this.doublebtn.  on(clickEventType, (e) => { e.preventDefault(); this.doubleAction(); });
+    this.resignbtn.  on(clickEventType, (e) => { e.preventDefault(); this.resignAction(); });
+    this.takebtn.    on(clickEventType, (e) => { e.preventDefault(); this.takeAction(); });
+    this.dropbtn.    on(clickEventType, (e) => { e.preventDefault(); this.dropAction(); });
+    this.donebtn.    on(clickEventType, (e) => { e.preventDefault(); this.doneAction(); });
+    this.undobtn.    on(clickEventType, (e) => { e.preventDefault(); this.undoAction(); });
+    this.openrollbtn.on(clickEventType, (e) => { e.preventDefault(); this.rollAction(true); });
+    this.gameendnextbtn.on(clickEventType, (e) => { e.preventDefault(); this.gameendNextAction(); });
+    this.gameendokbtn.on(clickEventType, (e) => { e.preventDefault(); this.gameendOkAction(); });
+    this.diceAsBtn.on(clickEventType, (e) => { e.preventDefault(); this.diceClickAction(); });
 
-    this.pointTriangle.on('touchstart mousedown', (e) => { this.pointTouchStartAction(e); });
+    this.pointTriangle.on('touchstart mousedown', (e) => { e.preventDefault(); this.pointTouchStartAction(e); });
 
     //設定画面
-    this.settingbtn.on(clickEventType, () => {
+    this.settingbtn.on(clickEventType, (e) => {
+      e.preventDefault();
       this.settings.css(this.calcCenterPosition("S", this.settings)).slideToggle("normal"); //画面表示
       this.settingbtn.prop("disabled", true);
     });
-//    this.resetscorebtn.on(clickEventType, () => {
+//    this.resetscorebtn.on(clickEventType, (e) => {
+//      e.preventDefault();
 //      this.score = [0,0,0];
 //      this.scoreinfo[1].text(0);
 //      this.scoreinfo[2].text(0);
 //    });
-    this.newgamebtn.on(clickEventType, () => {
+    this.newgamebtn.on(clickEventType, (e) => {
+      e.preventDefault();
       this.settings.slideToggle("normal"); //画面を消す
       this.settingbtn.prop("disabled", false);
       this.initGameOption();
       this.beginNewGame(true);
     });
-    this.convertkifubtn.on(clickEventType, () => { this.convertKifuAction(); });
-    this.cancelbtn.on(clickEventType, () => {
+    this.convertkifubtn.on(clickEventType, (e) => { e.preventDefault(); this.convertKifuAction(); });
+    this.cancelbtn.on(clickEventType, (e) => {
+      e.preventDefault();
       this.settings.slideToggle("normal"); //画面を消す
       this.settingbtn.prop("disabled", false);
     });
@@ -489,6 +493,8 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
 
     //ドラッグ開始時のコールバック関数
     const evfn_dragstart = ((origevt) => {
+console.log("evfn_dragstart=", origevt);
+this.debuglog("evfn_dragstart=", origevt.type, origevt.currentTarget.outerHTML, origevt.changedTouches[0].target.outerHTML);
       dragobj = origevt.currentTarget; //dragする要素を取得し、広域変数に格納
       if (!dragobj.classList.contains("draggable")) { return; } //draggableでないオブジェクトは無視
 
@@ -644,7 +650,8 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
   }
 
   pointTouchStartAction(origevt) {
-//console.log("pointTouchStartAction", origevt.type, origevt.currentTarget, origevt.clientX, origevt.pageX, origevt);
+console.log("pointTouchStartAction", origevt.type, origevt.currentTarget, origevt.clientX, origevt.pageX, origevt);
+this.debuglog("pointTouchStartAction", origevt.type, origevt.currentTarget.outerHTML, origevt.clientX);
     const id = origevt.currentTarget.id;
     const pt = parseInt(id.substr(2));
     const chker = this.board.getChequerOnDragging(pt, BgUtil.cvtTurnGm2Bd(this.player));
@@ -666,12 +673,15 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
         } else {
           const touchobj = new Touch({identifier: 12345,
                                       target: chkerdom[0],
+                                      //currentTarget: chkerdom[0],
                                       clientX: event.clientX,
                                       clientY: event.clientY,
                                       pageX: event.pageX,
                                       pageY: event.pageY});
           delegateEvent = new TouchEvent("touchstart", {changedTouches:[touchobj]});
         }
+console.log("pointTouchStartAction delegateEvent=", delegateEvent);
+this.debuglog("pointTouchStartAction delegateEvent=", delegateEvent.type, delegateEvent.currentTarget, delegateEvent.changedTouches[0].target);
         chkerdom[0].dispatchEvent(delegateEvent);
 //console.log("pointTouchStartAction", chkerdom);
       }
@@ -686,6 +696,14 @@ console.log("showGameEndPanel", mes1, mes2, mes3);
   convertKifu(xgidkifu) {
     //★TODO
     return "MAT KIFU\n" + xgidkifu;
+  }
+
+  debuglog(...obj) {
+    const logarea = $("#kifumat");
+    let str;
+//    obj.forEach(value => str = str + " " + value.toString());
+//    logarea.val(logarea.val() + str + "\n");
+    logarea.val(logarea.val() + obj.join(" ") + "\n");
   }
 
 } //end of class BgGame
