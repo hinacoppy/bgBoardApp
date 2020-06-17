@@ -14,6 +14,11 @@
   <link rel="icon" href="icon/favicon.ico">
   <link rel="apple-touch-icon" href="icon/apple-touch-icon.png">
   <title>bgBoardApp</title>
+<style>
+textarea{
+  user-select:auto;
+}
+</style>
 </head>
 <body class="container">
 <section id="board" class="board boardStyle9"></section>
@@ -34,17 +39,15 @@
 </nav>
 
 <section id="panelholder" style="display:none">
-<button id="rollbtn" class="oparationbtn panel"><i class="fas fa-dice"></i> Roll</button>
-<span id="doubleresign" class="panel">
-<button id="doublebtn" class="oparationbtn"><i class="fas fa-dice-d6"></i> Double</button> &emsp;
-<button id="resignbtn" class="oparationbtn"><i class="fas fa-flag" style="color:white"></i> Resign</button>
-</span>
-
+<div id="rolldouble" class="panel">
+<button id="doublebtn" class="oparationbtn"><i class="fas fa-dice-d6"></i> Double</button> &emsp;&emsp;&emsp;
+<button id="rollbtn" class="oparationbtn"><i class="fas fa-dice"></i> Roll</button>
+</div>
 <button id="takebtn" class="oparationbtn panel"><i class="fas fa-thumbs-up"></i> Take</button>
 <button id="dropbtn" class="oparationbtn panel"><i class="fas fa-thumbs-down"></i> Pass</button>
 
 <div id="doneundo" class="panel">
-<button id="donebtn" class="oparationbtn"><i class="fas fa-check-circle"></i> Done</button> &emsp;
+<button id="donebtn" class="oparationbtn"><i class="fas fa-check-circle"></i> Done</button> &emsp;&emsp;&emsp;
 <button id="undobtn" class="oparationbtn"><i class="fas fa-undo"></i> Undo</button>
 </div>
 <button id="openingroll" class="oparationbtn panel"><i class="fas fa-dice"></i> Opening Roll</button>
@@ -94,19 +97,20 @@ Match length:
 <label for="useclock" class="togglelabel">Use Clock</label>
 </p>
 
+<p>
+<!--<button id="resetscorebtn" class="oparationbtn"><i class="fas fa-eraser"></i> Reset Score</button> &emsp;&emsp;&emsp;&emsp;-->
+<!-- <button id="convertkifubtn" class="oparationbtn"><i class="fas fa-check"></i> Convert Kifu</button> &emsp;&emsp;&emsp;&emsp; -->
+<button id="resignbtn" class="oparationbtn"><i class="fas fa-flag" style="color:white"></i> Resign</button> &emsp;&emsp;&emsp;&emsp;
+<button id="newgamebtn" class="oparationbtn"><i class="fas fa-check"></i> New Game</button> &emsp;&emsp;&emsp;&emsp;
+<button id="cancelbtn" class="oparationbtn"><i class="fas fa-times"></i> Cancel</button> &emsp;&emsp;&emsp;&emsp;
+<a href="help.html" target="help"><button id="helpbtn" class="oparationbtn"><i class="fas fa-question"></i> Help</button></a>
+</p>
 <aside class="aside">
 <textarea id="kifuxgid" cols="70" rows="5" style="display:none;"></textarea>
 <textarea id="kifumat" cols="70" rows="5" style="display:none;"></textarea>
 </aside>
-
-<br><br>
-<!--<button id="resetscorebtn" class="oparationbtn"><i class="fas fa-eraser"></i> Reset Score</button> &emsp;&emsp;&emsp;&emsp;-->
-<button id="newgamebtn" class="oparationbtn"><i class="fas fa-check"></i> New Game</button> &emsp;&emsp;&emsp;&emsp;
-<!-- <button id="convertkifubtn" class="oparationbtn"><i class="fas fa-check"></i> Convert Kifu</button> &emsp;&emsp;&emsp;&emsp; -->
-<button id="cancelbtn" class="oparationbtn"><i class="fas fa-times"></i> Cancel</button> &emsp;&emsp;&emsp;&emsp;
-<a href="help.html" target="help"><button id="helpbtn" class="oparationbtn"><i class="fas fa-question"></i> Help</button></a>
-
 </aside>
+
 
 
 <script src="/js/fontawesome-all.min.js" defer></script>

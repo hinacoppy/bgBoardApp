@@ -2,7 +2,7 @@
 // (参考) https://qiita.com/kaihar4/items/c09a6d73e190ab0b9b01
 'use strict';
 
-const CACHE_NAME = "bgBoardApp-v2.2"; //v1=first release, v2=no use jquery.ui
+const CACHE_NAME = "bgBoardApp-v3.0"; //v1=first release, v2=no use jquery.ui, v3=change layout
 const ORIGIN = (location.hostname == 'localhost') ? '' : location.protocol + '//' + location.hostname;
 
 const STATIC_FILES = [
@@ -15,7 +15,6 @@ const STATIC_FILES = [
   ORIGIN + '/bgBoardApp/icon/android-chrome-192x192.png',
   ORIGIN + '/bgBoardApp/icon/android-chrome-512x512.png',
   ORIGIN + '/bgBoardApp/css/bgboardapp.css',
-  ORIGIN + '/css/bgBoard.css',
   ORIGIN + '/css/font-awesome-animation.min.css',
   ORIGIN + '/js/fontawesome-all.min.js',
   ORIGIN + '/js/jquery-3.4.1.min.js',
