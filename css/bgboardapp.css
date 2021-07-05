@@ -1,6 +1,6 @@
 /**
   bgboardapp.css
-  designed by hinacoppy 2019--2020
+  designed by hinacoppy 2019--2021
 */
 
 /* document outline ----------------------------------------- */
@@ -21,6 +21,9 @@ body{
   min-height:100vh;
   height:100vh;
   font-family:'Arial', 'Meiryo UI';
+}
+select{
+  font-size:100%;
 }
 .container{
 }
@@ -105,6 +108,31 @@ body{
   text-align:center;
   font-size:3vw;
   margin:0 auto;
+}
+
+.delay{
+  display:none;
+  background-color: rgba( 160, 160, 64, 0.85 );
+  color:white;
+  width:9vh;
+  height:3vw;
+  line-height:3vw;
+  text-align:center;
+  font-size:2vw;
+  margin:0 auto;
+  transform:translateY(-3.5vw)
+}
+.timeupLose{
+  background-color:yellow;
+  color:red;
+}
+
+#pausepanel{
+  background-color: rgba( 128, 128, 128, 0.60 );
+  color:cyan;
+  width:65vw;
+  height:80vh;
+  text-align:center;
 }
 
 .oparationbtn{

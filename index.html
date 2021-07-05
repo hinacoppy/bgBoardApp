@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
   <meta name="description" content="Backgammon Board App">
-  <meta name="author" content="(C)hinacoppy 2019-2020">
+  <meta name="author" content="(C)hinacoppy 2019-2021">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/bgboardapp.css">
   <link rel="stylesheet" href="/css/bgBoard.css">
@@ -27,15 +27,18 @@ textarea{
 <div id="score1" class="score">0</div>
 <div id="pip1" class="pip">157</div>
 <div id="clock1" class="clock">10:00</div>
+<div id="delay1" class="delay">12</div>
 </div>
 <div id="player2" class="nav">
 <div id="score2" class="score">0</div>
 <div id="pip2" class="pip">157</div>
 <div id="clock2" class="clock">10:00</div>
+<div id="delay2" class="delay">12</div>
 </div>
 <nav id="nav" class="nav">
 <div id="matchinfo" class="score">5</div>
 <button id="settingbtn" class="oparationbtn"><i class="fas fa-bars"></i> Settings</button>
+<button id="pausebtn" class="oparationbtn"><i class="fas fa-pause"></i> Pause</button>
 </nav>
 
 <section id="panelholder" style="display:none">
@@ -61,6 +64,13 @@ textarea{
 </div>
 </section>
 
+<aside id="pausepanel" class="settings" style="display:none">
+<br><br><br>
+<i class="fas fa-pause-circle fa-8x"></i>
+<br><br><br>
+<button id="restartbtn" class="oparationbtn"><i class="fas fa-play"></i> Re-Start Clock</button>
+</aside>
+
 <aside id="settings" class="settings" style="display:none">
 <h2>### Backgammon Board App Settings ###</h2>
 <p>
@@ -83,6 +93,23 @@ Match length:
 <option value="25">25</option>
 </select>
 (0 = Unlimited)
+</p>
+<p>
+Clock time: Pt &nbsp; x &nbsp;
+<select id="selminpoint" name="selminpoint">
+<option value="1">1</option>
+<option value="2" selected>2</option>
+<option value="2.5">2.5</option>
+</select>
+min. &emsp;&emsp;&emsp;&emsp;
+
+Delay: &nbsp;
+<select id="seldelay" name="seldelay">
+<option value="8">8</option>
+<option value="12" selected>12</option>
+<option value="20">20</option>
+</select>
+sec.
 </p>
 <p>
 <input type="checkbox" id="showpip" name="showpip" class="switch" checked>
@@ -114,7 +141,7 @@ Match length:
 
 
 <script src="/js/fontawesome-all.min.js" defer></script>
-<script src="/js/jquery-3.4.1.min.js"></script>
+<script src="/js/jquery-3.6.0.min.js"></script>
 <script src="/js/inobounce.min.js"></script>
 <script src="/js/BgUtil_class.js"></script>
 <script src="/js/BgXgid_class.js"></script>

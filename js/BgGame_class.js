@@ -16,11 +16,19 @@ class BgGame {
     this.animDelay = 800;
     this.gameFinished = false;
 
+    this.clock = [0, 600, 600];
+    this.delayInit = 12;
+    this.delay = this.delayInit;
+    this.clockplayer = 0;
+    this.clockobj = 0;
+
     this.setDomNames();
     this.setEventHandler();
     this.setChequerDraggable();
     this.showpipflg = true;
     this.useclockflg = false;
+    this.clockmodeflg = (this.useclockflg && this.matchLength != 0);
+    this.pauseMode = false; //true=ゲーム中、false=ゲーム開始前
     this.flashflg = true;
     this.outerDragFlag = false; //駒でない部分をタップしてドラッグを始めたら true
     this.initGameOption();
@@ -39,6 +47,8 @@ class BgGame {
     this.newgamebtn  = $("#newgamebtn");
     this.cancelbtn   = $("#cancelbtn");
     this.settingbtn  = $("#settingbtn");
+    this.pausebtn    = $("#pausebtn");
+    this.restartbtn  = $("#restartbtn");
     this.openrollbtn = $("#openingroll");
 //    this.resetscorebtn = $("#resetscorebtn");
     this.convertkifubtn = $("#convertkifubtn");
@@ -72,6 +82,11 @@ class BgGame {
     this.kifuxgid    = $("#kifuxgid");
     this.kifumat     = $("#kifumat");
 
+    //clock
+    this.pausepanel  = $("#pausepanel");
+    this.selminpoint = $("#selminpoint");
+    this.seldelay    = $("#seldelay");
+
     //chequer
     this.chequerall = $(".chequer");
   }
@@ -91,6 +106,8 @@ class BgGame {
     this.gameendokbtn.  on(clickEventType, (e) => { e.preventDefault(); this.gameendOkAction(); });
     this.diceAsBtn.     on(clickEventType, (e) => { e.preventDefault(); this.diceAsDoneAction(e); });
     this.settingbtn.    on(clickEventType, (e) => { e.preventDefault(); this.showSettingPanelAction(); });
+    this.pausebtn.      on(clickEventType, (e) => { e.preventDefault(); this.pauseClockAction(); });
+    this.restartbtn.    on(clickEventType, (e) => { e.preventDefault(); this.restartClockAction(); });
 //    this.resetscorebtn. on(clickEventType, (e) => { e.preventDefault(); this.resetScoreAction(); });
     this.newgamebtn.    on(clickEventType, (e) => { e.preventDefault(); this.newGameAction(); });
     this.convertkifubtn.on(clickEventType, (e) => { e.preventDefault(); this.convertKifuAction(); });
@@ -104,10 +121,7 @@ class BgGame {
     this.showpipflg  = $("[name=showpip]")  .prop("checked");
     this.flashflg    = $("[name=flashdest]").prop("checked");
 
-    $(".clock").toggle(this.useclockflg);
-    $(".pip").toggle(this.showpipflg && !this.useclockflg); //クロックモードのときはピップ表示しない
-
-    this.matchLength = this.matchlen.val();
+    this.matchLength = parseInt(this.matchlen.val());
     const matchinfotxt = (this.matchLength == 0) ? "$" : this.matchLength;
     this.matchinfo.text(matchinfotxt);
     this.score = [0,0,0];
@@ -115,8 +129,14 @@ class BgGame {
     this.scoreinfo[2].text(0);
     this.kifuxgid.val("");
     this.kifumat.val("");
+    this.setClockOption();
 
-console.log("initGameOption", this.showpipflg, this.useclockflg, this.flashflg, this.matchLength);
+    this.clockmodeflg = (this.useclockflg && this.matchLength != 0);
+    $(".clock,.delay").toggle(this.clockmodeflg).removeClass("timeupLose");
+    $(".pip").toggle(this.showpipflg && !this.clockmodeflg); //クロックモードのときはピップ表示しない
+    this.pausebtn.toggle(this.clockmodeflg); //クロックモードでない時はポーズボタンを表示しない
+    this.setButtonEnabled(this.pausebtn, false);
+console.log("initGameOption", this.showpipflg, this.useclockflg, this.flashflg, this.matchLength, this.clockmodeflg);
   }
 
   beginNewGame(newmatch = false) {
@@ -143,6 +163,7 @@ console.log("beginNewGame", this.xgid.xgidstr, this.xgid.matchsc);
     if (openroll) {
       this.player = (dice[0] > dice[1]);
       this.xgid.turn = BgUtil.cvtTurnGm2Xg(this.player);
+      this.tapTimer(this.player);
     }
 console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgidstr);
     this.swapChequerDraggable(this.player);
@@ -178,6 +199,7 @@ console.log("doneAction");
     this.swapChequerDraggable(true, true);
 //    this.addKifuXgid(this.xgid.xgidstr);
     this.showRollDoublePanel(this.player);
+    this.tapTimer(this.player);
   }
 
   resignAction() {
@@ -192,6 +214,7 @@ console.log("resignAction");
     this.addKifuXgid(this.xgid.xgidstr);
     this.showGameEndPanel(this.player);
     this.gameFinished = true;
+    this.pauseTimer(false);
   }
 
   async doubleAction() {
@@ -207,6 +230,7 @@ console.log("doubleAction");
     await this.board.animateCube(this.animDelay); //キューブを揺すのはshowBoard()の後
     this.addKifuXgid(this.xgid.xgidstr);
     this.showTakeDropPanel(this.player);
+    this.tapTimer(this.player);
   }
 
   takeAction() {
@@ -218,6 +242,7 @@ console.log("takeAction");
     this.board.showBoard2(this.xgid);
     this.addKifuXgid(this.xgid.xgidstr);
     this.showRollDoublePanel(this.player);
+    this.tapTimer(this.player);
   }
 
   dropAction() {
@@ -232,6 +257,7 @@ console.log("dropAction");
     this.addKifuXgid(this.xgid.xgidstr);
     this.showGameEndPanel(this.player);
     this.gameFinished = true;
+    this.pauseTimer(false);
   }
 
   gameendNextAction() {
@@ -252,6 +278,7 @@ console.log("dropAction");
     this.addKifuXgid(this.xgid.xgidstr);
     this.showGameEndPanel(this.player);
     this.gameFinished = true;
+    this.pauseTimer(false);
   }
 
   diceAsDoneAction(e) {
@@ -260,14 +287,17 @@ console.log("dropAction");
   }
 
   showSettingPanelAction() {
-    if (this.settingbtn.prop("disabled")) { return; }
+    this.pauseTimer(this.pauseMode);
     this.settings.css(this.calcCenterPosition("S", this.settings)).slideToggle("normal"); //画面表示
-    this.settingbtn.prop("disabled", true);
+    this.setButtonEnabled(this.settingbtn, false);
+    this.setButtonEnabled(this.pausebtn, false);
   }
 
   cancelSettingPanelAction() {
+    this.startTimer(this.pauseMode);
     this.settings.slideToggle("normal"); //画面を消す
-    this.settingbtn.prop("disabled", false);
+    this.setButtonEnabled(this.settingbtn, true);
+    this.setButtonEnabled(this.pausebtn, this.pauseMode); //ゲーム中でないときは非活性のまま
   }
 
   newGameAction() {
@@ -361,22 +391,31 @@ console.log("dropAction");
     }
   }
 
-  makeGameEndPanal(player) {
+  makeGameEndPanal(player, timeuplose) {
     const mes1 = "You WIN" + ((this.matchwinflg) ? " and the MATCH" : "");
     this.gameend.children('.mes1').text(mes1);
-    const winlevel = ["", "SINGLE", "GAMMON", "BACK GAMMON"];
-    const res = winlevel[this.gamescore[1]];
-    const mes2 = "Get " + this.gamescore[0] * this.gamescore[1] + "pt (" + res + ")";
-    this.gameend.children('.mes2').text(mes2);
+
+    if (timeuplose) {
+      const mes2 = "Opponent LOSE by Timeup!";
+      this.gameend.children('.mes2').text(mes2);
+    } else {
+      const winlevel = ["", "SINGLE", "GAMMON", "BACK GAMMON"];
+      const res = winlevel[this.gamescore[1]];
+      const mes2 = "Get " + this.gamescore[0] * this.gamescore[1] + "pt (" + res + ")";
+      this.gameend.children('.mes2').text(mes2);
+    }
 
     const p1 = BgUtil.cvtTurnGm2Bd(player);
     const p2 = BgUtil.cvtTurnGm2Bd(!player);
+    if (timeuplose) {
+      this.score[p1] = this.matchLength;
+    }
     const mes3 = this.score[p1] + " - " + this.score[p2] + ((this.matchLength == 0) ? "" : "&emsp;(" +this.matchLength + "pt)");
     this.gameend.children('.mes3').html(mes3);
   }
 
-  showGameEndPanel(player) {
-    this.makeGameEndPanal(player);
+  showGameEndPanel(player, timeuplose = false) {
+    this.makeGameEndPanal(player, timeuplose);
     this.gameendnextbtn.toggle(!this.matchwinflg);
     this.gameendokbtn.toggle(this.matchwinflg);
     this.gameend.show().toggleClass('turn1', player).toggleClass('turn2', !player)
@@ -647,6 +686,110 @@ console.log("dropAction");
 //    obj.forEach(value => str = str + " " + value.toString());
 //    logarea.val(logarea.val() + str + "\n");
     logarea.val(logarea.val() + obj.join(" ") + "\n");
+  }
+
+  //クロックタイマー用ロジック
+  tapTimer(turn) {
+    if (!this.clockmodeflg) { return; }
+
+    this.clockplayer = BgUtil.cvtTurnGm2Bd(turn);
+    const player = this.clockplayer;
+    const oppo = BgUtil.getBdOppo(this.clockplayer);
+
+    this.pauseMode = true; //ゲーム中モード
+    this.delay = this.delayInit; //保障時間を設定
+    this.stopTimer(); //相手方のクロックをストップし
+    this.startTimer(this.pauseMode); //自分方のクロックをスタートさせる
+
+    $("#delay" + player).text(Math.trunc(this.delay)).show();
+    $("#delay" + oppo).hide();
+    this.setButtonEnabled(this.pausebtn, true);
+console.log("tapTimer", turn, player);
+  }
+
+  pauseTimer(pausemode) {
+    this.stopTimer();
+    this.pauseMode = pausemode;
+    this.setButtonEnabled(this.pausebtn, false); //ポーズ時はポーズボタンは非活性
+    if (!pausemode) {
+      $(".delay").hide(); //ゲーム終了時にはディレイは非表示
+    } //ポーズボタン、設定ボタンが押されたとき(ゲーム中モード時)はディレイはそのまま表示
+  }
+
+  //クロックをカウントダウン
+  countdownClock(player, clockspd) {
+    if (this.delay > 0) {
+      //保障時間内
+      this.delay -= clockspd / 1000;
+      $("#delay" + player).text(Math.trunc(this.delay));
+    } else {
+      //保障時間切れ後
+      $("#delay" + player).hide();
+      this.clock[player] -= clockspd / 1000;
+      this.dispTimer(player, this.clock[player]);
+      if (this.clock[player] <= 0) {
+        this.timeupLose(player); //切れ負け処理
+      }
+    }
+  }
+
+  startTimer(pausemode) {
+    if (!pausemode) { return; }
+    const clockspd = 1000;
+    this.clockobj = setInterval(() => this.countdownClock(this.clockplayer, clockspd), clockspd);
+    //アロー関数で呼び出すことで、コールバック関数内でthisが使える
+  }
+
+  stopTimer() {
+    clearInterval(this.clockobj);
+  }
+
+  dispTimer(player, time) {
+    const min = Math.trunc(time / 60);
+    const sec = Math.trunc(time % 60);
+    const timestr = ("00" + min).substr(-2) + ":" + ("00" + sec).substr(-2);
+    $("#clock" + player).text(timestr);
+  }
+
+  timeupLose(player) {
+    $("#clock" + player).addClass("timeupLose");
+    const oppo = BgUtil.cvtTurnBd2Gm(BgUtil.getBdOppo(player));
+    this.matchwinflg = true;
+    this.showGameEndPanel(oppo, true); //切れ勝ちの画面を表示
+    this.gameFinished = true;
+    this.pauseTimer(false);
+console.log("timeupLose", player);
+  }
+
+  pauseClockAction() {
+    this.pauseTimer(true); //ポーズボタンを押せるのはゲーム中モードのときのみ
+    this.pausepanel.css(this.calcCenterPosition("B", this.pausepanel)).slideToggle("normal"); //画面表示
+    this.setButtonEnabled(this.pausebtn, false);
+    this.setButtonEnabled(this.settingbtn, false);
+console.log("pauseClockAction")
+  }
+
+  restartClockAction() {
+    this.startTimer(true);
+    this.pausepanel.slideToggle("normal"); //画面を消す
+    this.setButtonEnabled(this.pausebtn, true);
+    this.setButtonEnabled(this.settingbtn, true);
+  }
+
+  setClockOption() {
+    const time = Math.ceil(parseInt(this.matchlen.val()) * parseFloat(this.selminpoint.val())) * 60;
+    //設定時間 = ポイント数 x 時間(分) で分単位に切り上げ。このアプリは秒で管理するため、60を掛ける
+    this.clock = [0, time, time];
+    this.delayInit = parseInt(this.seldelay.val());
+    this.dispTimer(1, time);
+    this.dispTimer(2, time);
+    $("#delay1").text(this.delayInit);
+    $("#delay2").text(this.delayInit);
+console.log("setClockOption", this.clock, this.delayInit, time);
+  }
+
+  setButtonEnabled(button, enable) {
+    button.prop("disabled", !enable);
   }
 
 } //end of class BgGame
