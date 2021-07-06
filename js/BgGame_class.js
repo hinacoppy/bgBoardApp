@@ -332,8 +332,8 @@ console.log("dropAction");
   }
 
   showScoreInfo() {
-    this.scoreinfo[1].text(this.xgid.sc_me);
-    this.scoreinfo[2].text(this.xgid.sc_yu);
+    this.scoreinfo[1].text(this.score[1]);
+    this.scoreinfo[2].text(this.score[2]);
   }
 
   calcScore(player) {
