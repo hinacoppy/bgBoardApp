@@ -14,7 +14,8 @@ class BgGame {
     this.board = new BgBoard("bgBoardApp", this);
     this.undoStack = [];
     this.animDelay = 800;
-    this.gameFinished = false;
+    this.gameFinished = true;
+    this.settingVars = {}; //設定内容を保持するオブジェクト
 
     this.clock = [0, 600, 600];
     this.delayInit = 12;
@@ -148,7 +149,6 @@ console.log("initGameOption", this.showpipflg, this.useclockflg, this.flashflg, 
     this.swapChequerDraggable(true, true);
     this.hideAllPanel();
     this.showOpenRollPanel();
-    this.gameFinished = false;
 console.log("beginNewGame", this.xgid.xgidstr, this.xgid.matchsc);
   }
 
@@ -164,6 +164,7 @@ console.log("beginNewGame", this.xgid.xgidstr, this.xgid.matchsc);
       this.player = (dice[0] > dice[1]);
       this.xgid.turn = BgUtil.cvtTurnGm2Xg(this.player);
       this.tapTimer(this.player);
+      this.gameFinished = false;
     }
 console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgidstr);
     this.swapChequerDraggable(this.player);
@@ -288,14 +289,15 @@ console.log("dropAction");
 
   showSettingPanelAction() {
     this.pauseTimer(this.pauseMode);
-    this.settings.css(this.calcCenterPosition("S", this.settings)).slideToggle("normal"); //画面表示
+    this.settings.css(this.calcCenterPosition("S", this.settings));
+    this.settings.slideToggle("normal", () => this.saveSettingVars()); //画面表示、設定情報を退避しておく
     this.setButtonEnabled(this.settingbtn, false);
     this.setButtonEnabled(this.pausebtn, false);
   }
 
   cancelSettingPanelAction() {
     this.startTimer(this.pauseMode);
-    this.settings.slideToggle("normal"); //画面を消す
+    this.settings.slideToggle("normal", () => this.loadSettingVars()); //画面を消す、設定情報を戻す
     this.setButtonEnabled(this.settingbtn, true);
     this.setButtonEnabled(this.pausebtn, this.pauseMode); //ゲーム中でないときは非活性のまま
   }
@@ -790,6 +792,26 @@ console.log("setClockOption", this.clock, this.delayInit, time);
 
   setButtonEnabled(button, enable) {
     button.prop("disabled", !enable);
+  }
+
+  saveSettingVars() {
+    this.settingVars.matchlen    = $("#matchlen").val();
+    this.settingVars.selminpoint = $("#selminpoint").val();
+    this.settingVars.seldelay    = $("#seldelay").val();
+    this.settingVars.showpip     = $("#showpip").prop("checked");
+    this.settingVars.flashdest   = $("#flashdest").prop("checked");
+    this.settingVars.useclock    = $("#useclock").prop("checked");
+console.log("saveSettingVars", this.settingVars);
+  }
+
+  loadSettingVars() {
+console.log("loadSettingVars", this.settingVars);
+    $("#matchlen")   .val(this.settingVars.matchlen);
+    $("#selminpoint").val(this.settingVars.selminpoint);
+    $("#seldelay")   .val(this.settingVars.seldelay);
+    $("#showpip")    .prop("checked", this.settingVars.showpip);
+    $("#flashdest")  .prop("checked", this.settingVars.flashdest);
+    $("#useclock")   .prop("checked", this.settingVars.useclock);
   }
 
 } //end of class BgGame
