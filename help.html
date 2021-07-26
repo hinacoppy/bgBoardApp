@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="author" content="(C)hinacoppy 2019 - 2021">
@@ -14,7 +14,7 @@ body {
 </style>
 </head>
 <body>
-<h1>Backgammon Board App</h1>
+<h2>Backgammon Board App</h2>
 
 <h3>◆このアプリは何？</h3>
 
@@ -41,7 +41,7 @@ body {
 <h3>◆設定項目には何があるの？</h3>
 
 <p class="contents">
-[Settings] をタップすると設定画面が表示されます。<br>
+[<i class="fas fa-bars"></i> Settings] をタップすると設定画面が表示されます。<br>
 <br>
 [Match Length] マッチポイント数を設定できます。0 にすると Unlimited Game になります。<br>
 [Clock time] クロック時間を設定できます。ポイント数 x 時間(分) で整数に切り上げます。(ex. 5pt x 2.5min => 13min)<br>
@@ -54,11 +54,17 @@ body {
 &emsp;→この機能が ON のときは、ピップカウントは非表示になります。<br>
 &emsp; (後付けの理由)よりシリアスなゲームとするためです。(本当の理由)同じ場所に表示するよう画面デザインしたためです。<br>
 <br>
-[New Game] 設定内容が反映され、スコアはリセットされます。<br>
-[Cancel] 何も設定せずに設定画面が閉じます。<br>
-<!-- [Convert Kifu] (未実装)MAT形式の棋譜を出力します。<br> -->
-[Help] ヘルプ画面(この画面)が表示されます。<br>
+[<i class="fas fa-check"></i> New Game] 設定内容が反映され、スコアはリセットされます。<br>
+[<i class="fas fa-times"></i> Cancel] 何も設定せずに設定画面を閉じます。<br>
+[<i class="fas fa-download"></i> Kifu] MAT形式の棋譜を出力(ダウンロード)します。<br>
+[<i class="fas fa-question"></i> Help] ヘルプ画面(この画面)が表示されます。<br>
 &emsp;→ヘルプ画面は別画面で開いていますので、アプリに戻るには画面を閉じてください。<br>
+<br>
+[<i class="fas fa-flag"></i> Resign] 手番側が負けを宣言します。<br>
+&emsp;→単純なロジックで「シングル負け、ギャモン負け、バックギャモン負け」を判定しています。<br>
+&emsp;&emsp;→一枚でも上がっていれば、シングル負け。<br>
+&emsp;&emsp;→コンタクトがあれば、バックギャモン負け。<br>
+&emsp;&emsp;→コンタクトがなければ、ギャモン負け。(たとえ1ポイントに15枚重なっていようとも。。)<br>
 </p>
 
 <h3>◆まだ実装できていない機能や Known Bugs &emsp; m(_ _)m</h3>
@@ -72,7 +78,6 @@ body {
 &emsp; &emsp; &emsp;→大局には影響がないと思いますので、そのままとさせてください。m(_ _)m<br>
 <br>
 ・ドラッグでしか駒を動かすことができない。タップやスワイプで動かす機能はありません。<br>
-<!-- ・棋譜出力機能はまだ実装できていません。<br> -->
 ・レイアウトデザインが中途半端。色デザインがイマイチ<br>
 &emsp;→アプリの機能的には問題ではないため、気にしないことにします。<br>
 </p>
@@ -110,5 +115,6 @@ Webアプリとして実装していますので、インストールしても�
 <br>
 (C)hinacoppy 2019 - 2021<br>
 </p>
+<script src="/js/fontawesome-all.min.js" defer></script>
 </body>
 </html>
