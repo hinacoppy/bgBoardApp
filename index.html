@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
   <meta charset="utf-8">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,11 +14,6 @@
   <link rel="icon" href="icon/favicon.ico">
   <link rel="apple-touch-icon" href="icon/apple-touch-icon.png">
   <title>bgBoardApp</title>
-<style>
-textarea{
-  user-select:auto;
-}
-</style>
 </head>
 <body class="container">
 <section id="board" class="board boardStyle9"></section>
@@ -45,6 +40,7 @@ textarea{
 <div id="rolldouble" class="panel">
 <button id="doublebtn" class="oparationbtn"><i class="fas fa-dice-d6"></i> Double</button> &emsp;&emsp;&emsp;
 <button id="rollbtn" class="oparationbtn"><i class="fas fa-dice"></i> Roll</button>
+<button id="passbtn" class="oparationbtn"><i class="fas fa-ban"></i> Pass</button>
 </div>
 <button id="takebtn" class="oparationbtn panel"><i class="fas fa-thumbs-up"></i> Take</button>
 <button id="dropbtn" class="oparationbtn panel"><i class="fas fa-thumbs-down"></i> Pass</button>
@@ -112,30 +108,27 @@ Delay: &nbsp;
 sec.
 </p>
 <p>
-<input type="checkbox" id="showpip" name="showpip" class="switch" checked>
+<input type="checkbox" id="showpip" name="showpip" class="switch" value="showpip" checked>
 <label for="showpip" class="togglelabel">Show pip</label>
 </p>
 <p>
-<input type="checkbox" id="flashdest" name="flashdest" class="switch" checked>
+<input type="checkbox" id="flashdest" name="flashdest" class="switch" value="flashdest" checked>
 <label for="flashdest" class="togglelabel">Flash movable Pt</label>
 </p>
 <p>
-<input type="checkbox" id="useclock" name="useclock" class="switch">
+<input type="checkbox" id="useclock" name="useclock" class="switch" value="useclock">
 <label for="useclock" class="togglelabel">Use Clock</label>
 </p>
 
 <p>
-<!--<button id="resetscorebtn" class="oparationbtn"><i class="fas fa-eraser"></i> Reset Score</button> &emsp;&emsp;&emsp;&emsp;-->
-<!-- <button id="convertkifubtn" class="oparationbtn"><i class="fas fa-check"></i> Convert Kifu</button> &emsp;&emsp;&emsp;&emsp; -->
-<button id="resignbtn" class="oparationbtn"><i class="fas fa-flag" style="color:white"></i> Resign</button> &emsp;&emsp;&emsp;&emsp;
-<button id="newgamebtn" class="oparationbtn"><i class="fas fa-check"></i> New Game</button> &emsp;&emsp;&emsp;&emsp;
-<button id="cancelbtn" class="oparationbtn"><i class="fas fa-times"></i> Cancel</button> &emsp;&emsp;&emsp;&emsp;
+<button id="resignbtn" class="oparationbtn"><i class="fas fa-flag" style="color:white"></i> Resign</button> &emsp;
+<button id="newgamebtn" class="oparationbtn"><i class="fas fa-check"></i> New Game</button> &emsp;
+<button id="cancelbtn" class="oparationbtn"><i class="fas fa-times"></i> Cancel</button> &emsp;
+<a id="downloadkifu" href="" download="kifu.txt"><button id="downloadkifubtn" class="oparationbtn"><i class="fas fa-download"></i> Kifu</button></a> &emsp;
 <a href="help.html" target="help"><button id="helpbtn" class="oparationbtn"><i class="fas fa-question"></i> Help</button></a>
 </p>
-<aside class="aside">
-<textarea id="kifuxgid" cols="70" rows="5" style="display:none;"></textarea>
-<textarea id="kifumat" cols="70" rows="5" style="display:none;"></textarea>
-</aside>
+
+<div id="kifuxgid" style="display:none;"></div>
 </aside>
 
 
@@ -148,6 +141,7 @@ sec.
 <script src="/js/BgChequer_class.js"></script>
 <script src="/js/BgBoard_class.js"></script>
 <script src="js/BgGame_class.js"></script>
+<script src="js/BgKifu_class.js"></script>
 <script>
 if (BgUtil.isIOS()) {
   iNoBounce.enable();

@@ -2,7 +2,7 @@
 // (参考) https://qiita.com/kaihar4/items/c09a6d73e190ab0b9b01
 'use strict';
 
-const CACHE_NAME = "bgBoardApp-v20210705";
+const CACHE_NAME = "bgBoardApp-v20210720";
 const ORIGIN = (location.hostname == 'localhost') ? '' : location.protocol + '//' + location.hostname;
 
 const STATIC_FILES = [
@@ -23,7 +23,8 @@ const STATIC_FILES = [
   ORIGIN + '/js/BgChequer_class.js',
   ORIGIN + '/js/BgXgid_class.js',
   ORIGIN + '/js/BgUtil_class.js',
-  ORIGIN + '/bgBoardApp/js/BgGame_class.js'
+  ORIGIN + '/bgBoardApp/js/BgGame_class.js',
+  ORIGIN + '/bgBoardApp/js/BgKifu_class.js'
 ];
 
 const CACHE_KEYS = [

@@ -17,6 +17,8 @@ class BgGame {
     this.gameFinished = true;
     this.settingVars = {}; //設定内容を保持するオブジェクト
 
+    this.closeout = [null, false, false];
+
     this.clock = [0, 600, 600];
     this.delayInit = 12;
     this.delay = this.delayInit;
@@ -51,8 +53,9 @@ class BgGame {
     this.pausebtn    = $("#pausebtn");
     this.restartbtn  = $("#restartbtn");
     this.openrollbtn = $("#openingroll");
+    this.passbtn     = $("#passbtn");
 //    this.resetscorebtn = $("#resetscorebtn");
-    this.convertkifubtn = $("#convertkifubtn");
+    this.downloadkifubtn = $("#downloadkifubtn");
     this.gameendnextbtn= $("#gameendnextbtn");
     this.gameendokbtn  = $("#gameendokbtn");
     this.diceAsBtn  = $("#dice10,#dice11,#dice20,#dice21");
@@ -81,7 +84,6 @@ class BgGame {
     this.flashflg    = $("[name=flashdest]").prop("checked"); //ドラッグ開始時に移動可能なポイントを光らせる
     this.matchlen    = $("#matchlen");
     this.kifuxgid    = $("#kifuxgid");
-    this.kifumat     = $("#kifumat");
 
     //clock
     this.pausepanel  = $("#pausepanel");
@@ -103,6 +105,7 @@ class BgGame {
     this.donebtn.       on(clickEventType, (e) => { e.preventDefault(); this.doneAction(); });
     this.undobtn.       on(clickEventType, (e) => { e.preventDefault(); this.undoAction(); });
     this.openrollbtn.   on(clickEventType, (e) => { e.preventDefault(); this.rollAction(true); });
+    this.passbtn.       on(clickEventType, (e) => { e.preventDefault(); this.passAction(); });
     this.gameendnextbtn.on(clickEventType, (e) => { e.preventDefault(); this.gameendNextAction(); });
     this.gameendokbtn.  on(clickEventType, (e) => { e.preventDefault(); this.gameendOkAction(); });
     this.diceAsBtn.     on(clickEventType, (e) => { e.preventDefault(); this.diceAsDoneAction(e); });
@@ -111,7 +114,7 @@ class BgGame {
     this.restartbtn.    on(clickEventType, (e) => { e.preventDefault(); this.restartClockAction(); });
 //    this.resetscorebtn. on(clickEventType, (e) => { e.preventDefault(); this.resetScoreAction(); });
     this.newgamebtn.    on(clickEventType, (e) => { e.preventDefault(); this.newGameAction(); });
-    this.convertkifubtn.on(clickEventType, (e) => { e.preventDefault(); this.convertKifuAction(); });
+    this.downloadkifubtn.on(clickEventType, (e) => { e.preventDefault(); this.downloadKifuAction(); });
     this.cancelbtn.     on(clickEventType, (e) => { e.preventDefault(); this.cancelSettingPanelAction(); });
     this.pointTriangle. on('touchstart mousedown', (e) => { e.preventDefault(); this.pointTouchStartAction(e); });
     $(window).          on('resize',       (e) => { e.preventDefault(); this.board.redraw(); }); 
@@ -128,8 +131,6 @@ class BgGame {
     this.score = [0,0,0];
     this.scoreinfo[1].text(0);
     this.scoreinfo[2].text(0);
-    this.kifuxgid.val("");
-    this.kifumat.val("");
     this.setClockOption();
 
     this.clockmodeflg = (this.useclockflg && this.matchLength != 0);
@@ -141,7 +142,6 @@ console.log("initGameOption", this.showpipflg, this.useclockflg, this.flashflg, 
   }
 
   beginNewGame(newmatch = false) {
-//console.log("beginNewGame");
     const initpos = "-b----E-C---eE---c-e----B-";
     this.xgid.initialize(initpos, newmatch, this.matchLength);
     this.board.showBoard2(this.xgid);
@@ -175,36 +175,31 @@ console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgids
 
   undoAction() {
     //ムーブ前のボードを再表示
-    if (this.undoStack.length > 0) {
-      const xgidstr = this.popXgidPosition();
-      this.xgid = new Xgid(xgidstr);
-      this.xgid.usabledice = true;
-      this.donebtn.prop("disabled", (!this.xgid.moveFinished() && this.flashflg) );
-      this.pushXgidPosition();
-console.log("undoAction", xgidstr);
-      this.board.showBoard2(this.xgid);
-      this.swapChequerDraggable(this.player);
-    }
+    if (this.undoStack.length == 0) { return; }
+    const xgidstr = this.popXgidPosition();
+    this.xgid = new Xgid(xgidstr);
+    this.xgid.usabledice = true;
+    this.donebtn.prop("disabled", (!this.xgid.moveFinished() && this.flashflg) );
+    this.pushXgidPosition();
+    this.board.showBoard2(this.xgid);
+    this.swapChequerDraggable(this.player);
   }
 
   doneAction() {
-console.log("doneAction");
     if (this.donebtn.prop("disabled")) { return; }
     if (this.gameFinished) { return; }
     this.hideAllPanel();
     this.swapTurn();
     this.xgid.dice = "00";
-    this.xgid.turn = BgUtil.cvtTurnGm2Xg(this.player);
+    this.swapXgTurn();
     this.showPipInfo();
     this.board.showBoard2(this.xgid);
     this.swapChequerDraggable(true, true);
-//    this.addKifuXgid(this.xgid.xgidstr);
     this.showRollDoublePanel(this.player);
     this.tapTimer(this.player);
   }
 
   resignAction() {
-console.log("resignAction");
     this.cancelSettingPanelAction();
     if (this.gameFinished) { return; }
     this.hideAllPanel();
@@ -219,41 +214,36 @@ console.log("resignAction");
   }
 
   async doubleAction() {
-console.log("doubleAction");
     if (this.doublebtn.prop("disabled")) { return; }
     this.hideAllPanel();
     this.swapTurn();
     this.xgid.dbloffer = true;
-    this.xgid.cube += 1;
-    this.xgid.cubepos = BgUtil.getXgOppo(this.xgid.turn);
-    this.swapXgTurn();
     this.board.showBoard2(this.xgid); //double offer
     await this.board.animateCube(this.animDelay); //キューブを揺すのはshowBoard()の後
     this.addKifuXgid(this.xgid.xgidstr);
+    this.swapXgTurn(); //XGのturnを変えるのは棋譜用XGID出力後
     this.showTakeDropPanel(this.player);
     this.tapTimer(this.player);
   }
 
   takeAction() {
-console.log("takeAction");
     this.hideAllPanel();
     this.swapTurn();
-    this.swapXgTurn();
     this.xgid.dice = "00";
+    this.xgid.cube += 1;
+    this.xgid.cubepos = this.xgid.turn;
     this.board.showBoard2(this.xgid);
     this.addKifuXgid(this.xgid.xgidstr);
+    this.swapXgTurn(); //XGのturnを変えるのは棋譜用XGID出力後
     this.showRollDoublePanel(this.player);
     this.tapTimer(this.player);
   }
 
   dropAction() {
-console.log("dropAction");
     this.hideAllPanel();
     this.swapTurn();
-    this.xgid.cube -= 1;
     this.calcScore(this.player); //dblofferフラグをリセットする前に計算する必要あり
     this.xgid.dbloffer = false;
-    this.swapXgTurn();
     this.board.showBoard2(this.xgid);
     this.addKifuXgid(this.xgid.xgidstr);
     this.showGameEndPanel(this.player);
@@ -264,7 +254,7 @@ console.log("dropAction");
   gameendNextAction() {
     this.hideAllPanel();
     this.showScoreInfo();
-    this.addKifuXgid("\n");
+    this.addKifuXgid(''); //空行
     this.beginNewGame(false);
   }
 
@@ -306,6 +296,7 @@ console.log("dropAction");
     this.settings.slideToggle("normal"); //画面を消す
     this.settingbtn.prop("disabled", false);
     this.initGameOption();
+    this.clearKifuXgid();
     this.beginNewGame(true);
   }
 
@@ -313,6 +304,12 @@ console.log("dropAction");
     this.score = [0,0,0];
     this.scoreinfo[1].text(0);
     this.scoreinfo[2].text(0);
+  }
+
+  passAction() {
+    this.xgid.dice = "66";
+    this.addKifuXgid(this.xgid.xgidstr);
+    this.doneAction();
   }
 
   randomdice(openroll = false) {
@@ -370,6 +367,9 @@ console.log("dropAction");
 
   showRollDoublePanel(player) {
     this.doublebtn.prop("disabled", !this.canDouble(player) );
+    const closeout = this.isCloseout(player);
+    this.rollbtn.toggle(!closeout); //rollボタンかpassボタンのどちらかを表示
+    this.passbtn.toggle( closeout);
     if (player) {
       this.showElement(this.rolldouble, 'R', player);
     } else {
@@ -483,6 +483,11 @@ console.log("dropAction");
 
   swapXgTurn() {
     this.xgid.turn = -1 * this.xgid.turn;
+  }
+
+  isCloseout(player) {
+    const xgturn = BgUtil.cvtTurnGm2Xg(!player); //クローズアウトを確認するのは相手側
+    return this.xgid.isCloseout(xgturn);
   }
 
   setChequerDraggable() {
@@ -666,28 +671,20 @@ console.log("dropAction");
     }
   }
 
+  //棋譜処理用ロジック
+  clearKifuXgid() {
+    this.kifuxgid.text('');
+  }
+
   addKifuXgid(xgid) {
     this.kifuxgid.append(xgid + "\n");
-//    this.kifuxgid.val( this.kifuxgid.val() + xgid + "\n"); //★FIX ME  textarea -> div
   }
 
-  convertKifuAction() {
-    const xgidkifu = this.kifuxgid.val();
-    const matkifu = this.convertKifu(xgidkifu);
-    this.kifumat.val( matkifu );
-  }
-
-  convertKifu(xgidkifu) {
-    //★TODO
-    return "MAT KIFU\n" + xgidkifu;
-  }
-
-  debuglog(...obj) {
-    const logarea = $("#kifumat");
-    let str;
-//    obj.forEach(value => str = str + " " + value.toString());
-//    logarea.val(logarea.val() + str + "\n");
-    logarea.val(logarea.val() + obj.join(" ") + "\n");
+  downloadKifuAction() {
+console.log("downloadKifuAction");
+    const kifu = new BgKifu(this);
+    kifu.convertKifu();
+    kifu.downloadKifu();
   }
 
   //クロックタイマー用ロジック
@@ -760,7 +757,6 @@ console.log("tapTimer", turn, player);
     this.showGameEndPanel(oppo, true); //切れ勝ちの画面を表示
     this.gameFinished = true;
     this.pauseTimer(false);
-console.log("timeupLose", player);
   }
 
   pauseClockAction() {
@@ -768,7 +764,6 @@ console.log("timeupLose", player);
     this.pausepanel.css(this.calcCenterPosition("B", this.pausepanel)).slideToggle("normal"); //画面表示
     this.setButtonEnabled(this.pausebtn, false);
     this.setButtonEnabled(this.settingbtn, false);
-console.log("pauseClockAction")
   }
 
   restartClockAction() {
