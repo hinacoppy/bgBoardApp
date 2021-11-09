@@ -70,9 +70,17 @@
 <aside id="settings" class="settings" style="display:none">
 <h2>### Backgammon Board App Settings ###</h2>
 <p>
+Game mode: &nbsp;
+<select id="gamemode" name="gamemode">
+<option value="normal" selected>Normal Backgammon</option>
+<option value="hyper">Hyper Gammon</option>
+<option value="nack">Nack Gammon</option>
+</select>
+</p>
+<p>
 Match length:
 <select id="matchlen" name="matchlen">
-<option value="0">0</option>
+<option value="0">$</option>
 <option value="1">1</option>
 <option value="2">2</option>
 <option value="3">3</option>
@@ -88,7 +96,7 @@ Match length:
 <option value="23">23</option>
 <option value="25">25</option>
 </select>
-(0 = Unlimited)
+($ = Unlimited)
 </p>
 <p>
 Clock time: Pt &nbsp; x &nbsp;
@@ -110,14 +118,16 @@ sec.
 <p>
 <input type="checkbox" id="showpip" name="showpip" class="switch" value="showpip" checked>
 <label for="showpip" class="togglelabel">Show pip</label>
-</p>
-<p>
+&emsp;&emsp;&emsp;&emsp;&emsp;
 <input type="checkbox" id="flashdest" name="flashdest" class="switch" value="flashdest" checked>
 <label for="flashdest" class="togglelabel">Flash movable Pt</label>
 </p>
 <p>
 <input type="checkbox" id="useclock" name="useclock" class="switch" value="useclock">
 <label for="useclock" class="togglelabel">Use Clock</label>
+&emsp;&emsp;&emsp;&emsp;&emsp;
+<input type="checkbox" id="jacoby" name="jacoby" class="switch" value="jacoby" checked>
+<label for="jacoby" class="togglelabel">Jacoby Rule</label>
 </p>
 
 <p>

@@ -182,7 +182,7 @@ input {
   display:none;
 }
 .togglelabel {
-  display:block;
+  display:inline-block;
   width:300px;
   position:relative;
   padding:15px 30px 15px 62px;
