@@ -791,6 +791,7 @@ console.log("tapTimer", turn, player);
   }
 
   dispTimer(player, time) {
+    if (time < 0) { time = 0; }
     const min = Math.trunc(time / 60);
     const sec = Math.trunc(time % 60);
     const timestr = ("00" + min).substr(-2) + ":" + ("00" + sec).substr(-2);
