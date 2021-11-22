@@ -16,7 +16,6 @@ class BgGame {
     this.animDelay = 800;
     this.gameFinished = true;
     this.settingVars = {}; //設定内容を保持するオブジェクト
-    this.gamemode = "normal";
 
     this.closeout = [null, false, false];
 
@@ -125,7 +124,6 @@ class BgGame {
     this.showpipflg  = $("[name=showpip]")  .prop("checked");
     this.flashflg    = $("[name=flashdest]").prop("checked");
     this.jacobyflg   = $("[name=jacoby]")   .prop("checked");
-    this.gamemode    = $("[name=gamemode]") .val();
 
     this.matchLength = parseInt(this.matchlen.val());
     const matchinfotxt = (this.matchLength == 0) ? "$" : this.matchLength;
@@ -139,26 +137,18 @@ class BgGame {
     $(".pip").toggle(this.showpipflg && !this.clockmodeflg); //クロックモードのときはピップ表示しない
     this.pausebtn.toggle(this.clockmodeflg); //クロックモードでない時はポーズボタンを表示しない
     this.setButtonEnabled(this.pausebtn, false);
-console.log("initGameOption", this.showpipflg, this.jacobyflg, this.flashflg, this.matchLength, this.clockmodeflg);
+//console.log("initGameOption", this.showpipflg, this.jacobyflg, this.flashflg, this.matchLength, this.clockmodeflg);
   }
 
   beginNewGame(newmatch = false) {
-    const initpos = this.selectInitpos();
+    const initpos = "-b----E-C---eE---c-e----B-";
     this.xgid.initialize(initpos, newmatch, this.matchLength);
     this.board.showBoard2(this.xgid);
     this.showPipInfo();
     this.swapChequerDraggable(true, true);
     this.hideAllPanel();
     this.showOpenRollPanel();
-console.log("beginNewGame", this.xgid.xgidstr, this.xgid.matchsc);
-  }
-
-  selectInitpos() {
-    switch(this.gamemode) {
-      case "hyper": return "-aaa------------------AAA-";
-      case "nack" : return "-bb---D-C---dD---c-d---BB-";
-      default     : return "-b----E-C---eE---c-e----B-";
-    }
+//console.log("beginNewGame", this.xgid.xgidstr, this.xgid.matchsc);
   }
 
   async rollAction(openroll = false) {
@@ -175,7 +165,7 @@ console.log("beginNewGame", this.xgid.xgidstr, this.xgid.matchsc);
       this.tapTimer(this.player);
       this.gameFinished = false;
     }
-console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgidstr);
+//console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgidstr);
     this.swapChequerDraggable(this.player);
     this.addKifuXgid(this.xgid.xgidstr);
     this.pushXgidPosition();
@@ -346,9 +336,6 @@ console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgids
 
   calcScore(player) {
     let [cubeprice, gammonprice] = this.xgid.get_gamesc( BgUtil.cvtTurnGm2Xg(player) );
-    if (this.gamemode == "hyper") {
-      gammonprice = this.calcHyperGammonScore(player);
-    }
     if (this.jacobyflg && this.matchLength == 0 && cubeprice == 1) {
       gammonprice = 1;
     }
@@ -361,37 +348,6 @@ console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgids
     this.xgid.sc_me = this.score[1];
     this.xgid.sc_yu = this.score[2];
     this.matchwinflg = (this.matchLength != 0) && (this.score[w] >= this.matchLength);
-  }
-
-  calcHyperGammonScore(player) {
-    let boff = [3, 3];
-    let bgarea = [0, 0];
-    const pos = this.xgid.get_position();
-    const posary = pos.split("");
-    for (let i = 0; i <= 25; i++) {
-      const asc = posary[i].charCodeAt(0);
-      if (asc == "-".charCodeAt(0)) {
-        //do nothing
-      } else if (asc >= "A".charCodeAt(0) && asc <= "Z".charCodeAt(0)) {
-        const ptnum = asc - "A".charCodeAt(0) + 1;
-        boff[0] -= ptnum;
-        if (i > 18) { bgarea[0] += ptnum; }
-      } else if (asc >= "a".charCodeAt(0) && asc <= "z".charCodeAt(0)) {
-        const ptnum = asc - "a".charCodeAt(0) + 1;
-        boff[1] -= ptnum;
-        if (i < 7) { bgarea[1] += ptnum; }
-      }
-    } // for
-
-    const looser = player ? 1 : 0;
-    const dbloffer = this.xgid.get_dbloffer();
-    const contact = this.xgid._have_contact();
-
-    if (boff[looser] > 0)        { return 1; }
-    else if (dbloffer)           { return 1; }
-    else if (contact)            { return 3; }
-    else if (bgarea[looser] > 0) { return 3; }
-    else                         { return 2; }
   }
 
   canDouble(player) {
@@ -728,7 +684,7 @@ console.log("rollAction", openroll, this.player, this.xgid.dice, this.xgid.xgids
   }
 
   downloadKifuAction() {
-console.log("downloadKifuAction");
+//console.log("downloadKifuAction");
     const kifu = new BgKifu(this);
     kifu.convertKifu();
     kifu.downloadKifu();
@@ -750,7 +706,7 @@ console.log("downloadKifuAction");
     $("#delay" + player).text(Math.trunc(this.delay)).show();
     $("#delay" + oppo).hide();
     this.setButtonEnabled(this.pausebtn, true);
-console.log("tapTimer", turn, player);
+//console.log("tapTimer", turn, player);
   }
 
   pauseTimer(pausemode) {
@@ -831,7 +787,7 @@ console.log("tapTimer", turn, player);
     this.dispTimer(2, time);
     $("#delay1").text(this.delayInit);
     $("#delay2").text(this.delayInit);
-console.log("setClockOption", this.clock, this.delayInit, time);
+//console.log("setClockOption", this.clock, this.delayInit, time);
   }
 
   setButtonEnabled(button, enable) {
@@ -839,7 +795,6 @@ console.log("setClockOption", this.clock, this.delayInit, time);
   }
 
   saveSettingVars() {
-    this.settingVars.gamemode    = $("#gamemode").val();
     this.settingVars.matchlen    = $("#matchlen").val();
     this.settingVars.selminpoint = $("#selminpoint").val();
     this.settingVars.seldelay    = $("#seldelay").val();
@@ -847,12 +802,9 @@ console.log("setClockOption", this.clock, this.delayInit, time);
     this.settingVars.flashdest   = $("#flashdest").prop("checked");
     this.settingVars.useclock    = $("#useclock").prop("checked");
     this.settingVars.jacoby      = $("#jacoby").prop("checked");
-console.log("saveSettingVars", this.settingVars);
   }
 
   loadSettingVars() {
-console.log("loadSettingVars", this.settingVars);
-    $("#gamemode")   .val(this.settingVars.gamemode);
     $("#matchlen")   .val(this.settingVars.matchlen);
     $("#selminpoint").val(this.settingVars.selminpoint);
     $("#seldelay")   .val(this.settingVars.seldelay);
